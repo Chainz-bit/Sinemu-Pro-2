@@ -40,7 +40,7 @@ class RegisteredUserController extends Controller
         $username = $this->buildUniqueUsername($validated['name'], $validated['email']);
 
         $user = User::create([
-            'nama' => $validated['name'],
+            'name' => $validated['name'],
             'username' => $username,
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
@@ -50,7 +50,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('home', absolute: false));
+        return redirect(route('dashboard', absolute: false));
     }
 
     private function buildUniqueUsername(string $name, string $email): string

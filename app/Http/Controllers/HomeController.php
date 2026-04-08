@@ -103,7 +103,7 @@ class HomeController extends Controller
             })->values()->all();
         }
 
-        $userName = Auth::user()->nama ?? 'Pengguna';
+        $userName = Auth::user()->nama ?? Auth::user()->name ?? 'Pengguna';
         $userLocation = Auth::user()->location ?? 'Lokasi Anda';
 
         return view('home', compact(
