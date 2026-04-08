@@ -6,8 +6,10 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Sinemu') }}</title>
 
-    <!-- Vite -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Vite (skip on testing to avoid manifest dependency in CI) -->
+    @if (!app()->environment('testing'))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @endif
     <link href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}" rel="stylesheet">
 
     <!-- Bootstrap Icons (optional) -->

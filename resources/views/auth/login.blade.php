@@ -46,7 +46,7 @@
                     <div class="alert-box alert-error">{{ $errors->first() }}</div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}" class="login-form" novalidate>
+                <form method="POST" action="{{ route('login') }}" class="login-form" novalidate autocomplete="off">
                     @csrf
 
                     <div class="field-group">
@@ -55,7 +55,7 @@
                             <span class="input-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Zm1.8-.2 5.85 4.45a.6.6 0 0 0 .7 0l5.85-4.45" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" required autofocus autocomplete="username">
+                            <input id="email" type="email" name="email" value="" placeholder="nama@email.com" required autofocus autocomplete="off" autocapitalize="off" spellcheck="false">
                         </div>
                     </div>
 
@@ -71,7 +71,7 @@
                             <span class="input-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M8 11V8.5a4 4 0 0 1 8 0V11m-9.5 0h11a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 17.5 20h-11A1.5 1.5 0 0 1 5 18.5v-6A1.5 1.5 0 0 1 6.5 11Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
-                            <input id="password" type="password" name="password" placeholder="********" required autocomplete="current-password">
+                            <input id="password" type="password" name="password" placeholder="********" required autocomplete="new-password">
                             <button id="togglePassword" type="button" class="toggle-password" aria-label="Tampilkan kata sandi">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M2.8 12.2C4.3 8.7 7.7 6.5 12 6.5s7.7 2.2 9.2 5.7c-1.5 3.5-4.9 5.7-9.2 5.7s-7.7-2.2-9.2-5.7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.2" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
                             </button>
