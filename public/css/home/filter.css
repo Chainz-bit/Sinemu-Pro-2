@@ -1,17 +1,18 @@
 .section-space#pencarian {
     position: relative;
-    z-index: 40;
-    content-visibility: visible !important;
-    contain: none !important;
+    z-index: 20;
     overflow: visible;
 }
 
 .filter-wrap {
-    padding: 1.25rem 1.6rem 1.1rem;
-    background: var(--sinemu-card);
+    padding: 1.15rem 1.35rem 1.25rem;
+    background: rgba(255, 255, 255, 0.5);
     position: relative;
-    z-index: 41;
+    z-index: 21;
     overflow: visible;
+    border-radius: 24px;
+    border: none !important;
+    box-shadow: 0 14px 30px rgba(18, 16, 27, 0.08) !important;
 }
 
 .filter-header {
@@ -60,7 +61,7 @@
 
 .filter-subtitle {
     color: var(--sinemu-muted);
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     margin: 0;
     line-height: 1.35;
     max-width: 560px;
@@ -94,7 +95,7 @@
     border-radius: 999px;
     min-height: 46px;
     border: 1px solid var(--sinemu-border);
-    box-shadow: none;
+    box-shadow: none !important;
     background: #ffffff;
 }
 
@@ -244,4 +245,8 @@
 .filter-option:hover,
 .filter-option.is-active {
     background: rgba(90, 63, 246, 0.08);
+}
+
+.filter-search-btn {
+    min-height: 46px;
 }

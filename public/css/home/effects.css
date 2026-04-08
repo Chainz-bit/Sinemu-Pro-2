@@ -28,3 +28,37 @@
     contain-intrinsic-size: 1px 1000px;
 }
 
+.home-main > .section-space {
+    position: relative;
+}
+
+.home-main > .section-space + .section-space {
+    margin-top: 0;
+}
+
+.home-main > .section-space + .section-space::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10px;
+    height: 22px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%);
+    filter: blur(8px);
+    opacity: 0.8;
+    z-index: 1;
+}
+
+.home-main > .section-space:not(:last-of-type)::after {
+    content: "";
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: -6px;
+    height: 12px;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(18, 16, 27, 0.035) 0%, rgba(18, 16, 27, 0) 100%);
+    filter: blur(6px);
+    opacity: 0.22;
+}

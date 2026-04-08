@@ -1,62 +1,51 @@
-.hero-card,
 .surface-card {
     border: 1px solid var(--sinemu-border);
     border-radius: 32px;
-    background: var(--sinemu-card);
+    background: #ffffff;
     box-shadow: 0 6px 14px rgba(17, 12, 5, 0.04);
 }
 
-.hero-card {
-    padding: 2.8rem;
-}
-
-.hero-card-main {
-    background:
-        radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.92), transparent 46%),
-        radial-gradient(circle at 75% 20%, rgba(129, 101, 255, 0.14), transparent 40%),
-        var(--sinemu-card);
+.hero-modern-section {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.5) 100%),
+        url("/img/img-bg-hero.jpg") center/cover no-repeat;
+    border-radius: 0;
+    padding-inline: clamp(0.9rem, 2.4vw, 2.2rem);
+    padding-bottom: 2.2rem;
 }
 
-.hero-summary {
-    background: var(--sinemu-surface-soft);
+.hero-modern {
+    max-width: 760px;
+    margin: 0 auto;
 }
 
-.hero-title {
-    font-size: clamp(2.5rem, 6vw, 4.4rem);
-    line-height: 1;
-    letter-spacing: -0.06em;
+.hero-modern-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.04em;
     font-weight: 800;
-    color: var(--sinemu-primary-dark);
+    color: #20232b;
 }
 
-.hero-title .accent {
+.hero-modern-title span {
     color: var(--sinemu-primary);
 }
 
-.hero-subtitle {
-    color: var(--sinemu-muted);
-    max-width: 620px;
-    font-size: 1.02rem;
-}
-
-.hero-info {
-    padding: 1.75rem;
-    height: 100%;
-}
-
-.hero-info-card {
-    border-radius: 22px;
-    border: 1px solid var(--sinemu-border);
-    padding: 1rem;
-    background: linear-gradient(180deg, var(--sinemu-white) 0%, var(--sinemu-surface-soft) 100%);
+.hero-modern-subtitle {
+    color: #5d6069;
+    font-size: 1.04rem;
+    max-width: 540px;
+    margin-inline: auto;
+    line-height: 1.45;
 }
 
 .btn-sinemu {
-    border-radius: 18px;
-    padding: 1rem 1.6rem;
+    border-radius: 999px;
+    padding: 0.8rem 1.4rem;
     font-weight: 800;
     letter-spacing: 0.01em;
 }
@@ -65,7 +54,7 @@
     background: linear-gradient(135deg, var(--sinemu-primary) 0%, var(--sinemu-primary-mid) 100%);
     border: none;
     color: #fff;
-    box-shadow: 0 20px 40px rgba(90, 63, 246, 0.32);
+    box-shadow: 0 12px 24px rgba(90, 63, 246, 0.28);
 }
 
 .btn-sinemu-outline {
@@ -73,4 +62,3 @@
     border: 1px solid var(--sinemu-primary-soft);
     color: var(--sinemu-primary);
 }
-

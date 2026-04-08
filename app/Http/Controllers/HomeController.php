@@ -14,26 +14,9 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $stats = [
-            [
-                'title' => 'BARANG KEMBALI',
-                'description' => 'Lebih dari 1,200 barang telah dikembalikan ke pemiliknya melalui platform ini.',
-                'icon' => 'fa-solid fa-box-open',
-                'accent' => 'success',
-            ],
-            [
-                'title' => 'Privasi & Keamanan',
-                'description' => 'Verifikasi berlapis untuk menjamin keamanan klaim setiap barang yang ditemukan.',
-                'icon' => 'fa-solid fa-shield-heart',
-                'accent' => 'primary',
-            ],
-            [
-                'title' => 'Tidak Diterbitkan',
-                'description' => 'Banyak tersedia dengan 24 jam keputusan sebagai faktor risiko penggolongan barang.',
-                'icon' => 'fa-solid fa-clock-rotate-left',
-                'accent' => 'warning',
-            ],
-        ];
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
 
         $lostItems = [];
         $lostTotalCount = 0;
@@ -120,11 +103,10 @@ class HomeController extends Controller
             })->values()->all();
         }
 
-        $userName = Auth::user()->name ?? 'Pengguna';
+        $userName = Auth::user()->nama ?? 'Pengguna';
         $userLocation = Auth::user()->location ?? 'Lokasi Anda';
 
         return view('home', compact(
-            'stats',
             'lostItems',
             'foundItems',
             'lostTotalCount',

@@ -11,8 +11,13 @@
         padding: 56px 0;
     }
 
-    .hero-card {
-        padding: 1.5rem;
+    .hero-modern-section {
+        padding-top: 4.7rem;
+        border-radius: 0;
+    }
+
+    .hero-modern-subtitle {
+        font-size: 0.95rem;
     }
 
     .carousel-item {
@@ -89,6 +94,15 @@
         left: 1rem;
     }
 
+    .lokasi-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .lokasi-map-panel,
+    .lokasi-map-frame {
+        min-height: 240px;
+    }
+
     .filter-wrap {
         padding: 1rem;
     }
@@ -102,6 +116,10 @@
         gap: 1.6rem;
     }
 
+    .contact-head {
+        text-align: left !important;
+    }
+
     .footer-links-wrap {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -112,6 +130,48 @@
 }
 
 @media (max-width: 575.98px) {
+    .item-block-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-block-title {
+        font-size: 1.35rem;
+    }
+
+    .carousel-item {
+        flex: 0 0 86%;
+    }
+
+    .item-media {
+        height: 160px;
+    }
+
+    .hero-modern-title {
+        font-size: clamp(1.55rem, 8.1vw, 2.2rem);
+    }
+
+    .hero-modern-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .contact-section {
+        border-radius: 18px;
+    }
+
+    .contact-head .section-title {
+        font-size: clamp(1.6rem, 7vw, 2rem);
+    }
+
+    .contact-info-card {
+        padding: 0.9rem;
+        min-height: 148px;
+    }
+
+    .contact-form-card {
+        padding: 0.9rem;
+    }
+
     .footer-links-wrap {
         grid-template-columns: 1fr;
     }

@@ -5,18 +5,18 @@
 @endpush
 
 @section('content')
-    {{-- Register Page Start --}}
+    {{-- Admin Register Page Start --}}
     <main class="register-shell register-body">
         {{-- Left Panel Start --}}
-        <section class="login-left" aria-label="Informasi platform">
+        <section class="login-left" aria-label="Informasi pendaftaran admin">
             <div class="left-content">
-                <h1 class="left-title">Daftar akun Sinemu sekarang</h1>
-                <p class="left-subtitle">Buat akun untuk mulai melapor, mencari, dan memantau proses barang hilang maupun temuan dengan cepat.</p>
+                <h1 class="left-title">Buat akun admin SiNemu sekarang</h1>
+                <p class="left-subtitle">Daftarkan akun admin untuk mengelola verifikasi laporan temuan dan klaim barang secara efisien.</p>
 
                 <div class="left-illustration" aria-hidden="true">
                     <img
                         src="{{ asset('img/login-image.png') }}"
-                        alt="Ilustrasi Registrasi"
+                        alt="Ilustrasi Registrasi Admin"
                         class="left-illustration-img"
                         loading="lazy"
                         decoding="async"
@@ -27,41 +27,51 @@
         {{-- Left Panel End --}}
 
         {{-- Right Panel Start --}}
-        <section class="login-right" aria-label="Form registrasi">
+        <section class="login-right" aria-label="Form registrasi admin">
             <div class="right-content">
                 <div class="brand-wrap">
                     <img src="{{ asset('img/logo.png') }}" alt="Sinemu" class="brand-logo" width="130" height="40" fetchpriority="high">
                 </div>
 
                 <header class="login-header">
-                    <h2>Buat akun baru</h2>
-                    <p>Lengkapi data berikut untuk mulai menggunakan Sinemu</p>
+                    <h2>Buat akun admin</h2>
+                    <p>Lengkapi data berikut untuk mengakses dashboard admin</p>
                 </header>
 
                 @if ($errors->any())
                     <div class="alert-box alert-error">{{ $errors->first() }}</div>
                 @endif
 
-                <form method="POST" action="{{ route('register') }}" class="login-form" novalidate>
+                <form method="POST" action="{{ route('admin.register') }}" class="login-form" novalidate>
                     @csrf
 
                     <div class="field-group">
-                        <label for="name">Nama Lengkap</label>
+                        <label for="nama">Nama Lengkap</label>
                         <div class="input-wrap">
                             <span class="input-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
-                            <input id="name" type="text" name="name" value="{{ old('name') }}" placeholder="Nama lengkap anda" required autocomplete="name">
+                            <input id="nama" type="text" name="nama" value="{{ old('nama') }}" placeholder="Nama lengkap admin" required autocomplete="name">
                         </div>
                     </div>
 
                     <div class="field-group">
-                        <label for="email">Alamat Email</label>
+                        <label for="username">Username</label>
                         <div class="input-wrap">
                             <span class="input-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Zm1.8-.2 5.85 4.45a.6.6 0 0 0 .7 0l5.85-4.45" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" required autocomplete="username">
+                            <input id="username" type="text" name="username" value="{{ old('username') }}" placeholder="Username admin" required autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="instansi">Instansi</label>
+                        <div class="input-wrap">
+                            <span class="input-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M3 20h18M5 20V8l7-4 7 4v12M9 20v-5h6v5M9 11h.01M12 11h.01M15 11h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </span>
+                            <input id="instansi" type="text" name="instansi" value="{{ old('instansi') }}" placeholder="Nama instansi admin" required autocomplete="organization">
                         </div>
                     </div>
 
@@ -91,18 +101,18 @@
                         </div>
                     </div>
 
-                    <button class="btn-submit" type="submit">Daftar Sekarang</button>
+                    <button class="btn-submit" type="submit">Daftar Admin</button>
                 </form>
 
                 <p class="register-link">
-                    Sudah punya akun?
-                    <a href="{{ route('login') }}">Masuk Sekarang</a>
+                    Sudah punya akun admin?
+                    <a href="{{ route('admin.login') }}">Masuk Sekarang</a>
                 </p>
             </div>
         </section>
         {{-- Right Panel End --}}
     </main>
-    {{-- Register Page End --}}
+    {{-- Admin Register Page End --}}
 @endsection
 
 @push('scripts')

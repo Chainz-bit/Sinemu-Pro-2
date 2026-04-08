@@ -2,6 +2,8 @@
     background: var(--sinemu-surface-soft);
     padding-top: 2.5rem !important;
     padding-bottom: 2rem !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .claim-card .section-title {
@@ -70,7 +72,7 @@
 }
 
 .claim-help {
-    border: 1px solid var(--sinemu-border-soft);
+    border: none;
     border-radius: 999px;
     background: var(--sinemu-surface-info);
     padding: 1.05rem 1.4rem;
@@ -125,16 +127,12 @@
 .btn-register-submit {
     border: none;
     border-radius: 999px;
-    background: var(--sinemu-button-dark);
+    background: var(--sinemu-primary);
     color: #fff;
     font-weight: 800;
     letter-spacing: 0.03em;
     min-height: 54px;
     box-shadow: 0 8px 18px rgba(10, 23, 53, 0.22);
-}
-
-.btn-register-submit:hover {
-    background: var(--sinemu-button-dark-hover);
 }
 
 .register-note {

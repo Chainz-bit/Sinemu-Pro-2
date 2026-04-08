@@ -3,7 +3,7 @@
     {{-- ========================================= --}}
     {{-- Main Content Container Start --}}
     {{-- ========================================= --}}
-    <div class="container pb-5 home-main">
+    <div class="container-fluid px-0 pb-5 home-main">
         {{-- ========================================= --}}
         {{-- Navbar Start --}}
         {{-- ========================================= --}}
@@ -19,24 +19,44 @@
                     <li class="nav-item"><a class="nav-link" href="#pencarian">Pencarian</a></li>
                     <li class="nav-item"><a class="nav-link" href="#hilang-temuan">Hilang &amp; Temuan</a></li>
                     <li class="nav-item"><a class="nav-link" href="#klaim">Tutorial</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#admin-kecamatan">Admin</a></li>
                     <li class="nav-item"><a class="nav-link" href="#lokasi-pengambilan">Lokasi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
                 </ul>
                 <div class="d-flex align-items-center gap-3 nav-actions ms-lg-3">
                     @auth
                         <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
                         <button class="icon-btn"><i class="fa-solid fa-gear"></i></button>
-                        <div class="user-chip profile-chip">
-                            <div>
-                                <div class="fw-semibold small">{{ $userName ?? 'Pengguna' }}</div>
-                                <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
-                            </div>
-                            <span class="avatar avatar-img">
-                                <img src="{{ asset('img/avatar.png') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async">
-                            </span>
+                        <div class="dropdown profile-dropdown">
+                            <button class="user-chip profile-chip profile-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div>
+                                    <div class="fw-semibold small">{{ $userName ?? 'Pengguna' }}</div>
+                                    <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
+                                </div>
+                                <span class="avatar avatar-img">
+                                    <img src="{{ asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async">
+                                </span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end profile-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('dashboard') }}">
+                                        <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
                         </div>
                     @else
-                        <a class="btn btn-sinemu btn-sinemu-primary btn-sm px-3 py-2" href="{{ url('/login') }}">Masuk</a>
+                        <button class="btn btn-sinemu btn-sinemu-primary btn-sm px-3 py-2" type="button" data-bs-toggle="modal" data-bs-target="#loginPortalModal">
+                            Masuk
+                        </button>
                     @endauth
                 </div>
             </div>
@@ -44,51 +64,55 @@
         {{-- Navbar End --}}
 
         {{-- ========================================= --}}
-        {{-- Hero Start --}}
+        {{-- Login Portal Modal Start --}}
         {{-- ========================================= --}}
-        <section class="section-space">
-            <div class="row g-4 align-items-stretch">
-                <div class="col-lg-8" data-animate="1">
-                    <div class="hero-card hero-card-main h-100">
-                        <h1 class="hero-title mb-3">Selamat Datang di <span class="accent">Sinemu</span></h1>
-                        <p class="hero-subtitle mb-4 mt-3">Platform Pencarian dan Pelaporan Barang Hilang &amp; Temuan terintegrasi. Menghubungkan kejujuran penemu dengan harapan pemilik barang.</p>
-                        <div class="d-flex flex-wrap gap-3">
-                            <button class="btn btn-sinemu btn-sinemu-primary mt-3" type="button" data-action="coming-soon">Melapor barang <i class="fa-solid fa-plus-circle ms-2"></i></button>
-                            <button class="btn btn-sinemu btn-sinemu-outline mt-3" type="button" data-action="coming-soon">Cari Barang Saya</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4" data-animate="2">
-                    <div class="hero-card hero-info hero-summary">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h2 class="h5 fw-bold mb-0"><i class="fa-regular fa-rectangle-list me-2 text-primary"></i>Ringkasan Sinemu</h2>
-                        </div>
-                        <div class="hero-info-card mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="fw-bold text-uppercase small text-primary">Barang Kembali</div>
-                                <span class="badge rounded-pill text-bg-primary px-3">92%</span>
+        @guest
+            <div class="modal fade login-portal-modal" id="loginPortalModal" tabindex="-1" aria-labelledby="loginPortalModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <button type="button" class="btn-close login-portal-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <div class="modal-body p-0">
+                            <div class="login-portal-head text-center">
+                                <img src="{{ asset('img/logo.png') }}" alt="Sinemu" class="login-portal-logo" loading="lazy" decoding="async">
+                                <h2 id="loginPortalModalLabel" class="login-portal-title">Masuk ke SiNemu</h2>
+                                <p class="login-portal-subtitle mb-0">Pilih peran Anda untuk melanjutkan akses portal.</p>
                             </div>
-                            <div class="text-muted small">Lebih dari 1,200 barang telah dikembalikan ke pemilik sah melalui platform ini.</div>
-                        </div>
-                        <div class="hero-info-card mb-3">
-                            <div class="fw-bold small text-primary">Privasi &amp; Keamanan</div>
-                            <div class="text-muted small">Verifikasi berlapis untuk menjamin keamanan klaim setiap barang yang ditemukan.</div>
-                        </div>
-                        <div class="hero-info-card">
-                            <div class="fw-bold small text-primary">Titik Distribusi</div>
-                            <div class="text-muted small">Bekerja sama dengan 24 kantor kecamatan sebagai lokasi resmi pengambilan barang.</div>
+
+                            <a href="{{ url('/login') }}" class="login-portal-option">
+                                <span class="login-portal-option-icon"><i class="fa-regular fa-user"></i></span>
+                                <span class="login-portal-option-text">
+                                    <strong>Pencari Barang</strong>
+                                    <small>Cari barang yang hilang atau lapor kehilangan</small>
+                                </span>
+                                <i class="fa-solid fa-chevron-right login-portal-arrow"></i>
+                            </a>
+
+                            <a href="{{ route('admin.login') }}" class="login-portal-option">
+                                <span class="login-portal-option-icon"><i class="fa-regular fa-id-badge"></i></span>
+                                <span class="login-portal-option-text">
+                                    <strong>Admin</strong>
+                                    <small>Kelola laporan barang temuan dan verifikasi klaim</small>
+                                </span>
+                                <i class="fa-solid fa-chevron-right login-portal-arrow"></i>
+                            </a>
+
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-        {{-- Hero End --}}
+        @endguest
+        {{-- Login Portal Modal End --}}
 
         {{-- ========================================= --}}
-        {{-- Filter Start --}}
+        {{-- Hero + Filter Start --}}
         {{-- ========================================= --}}
-        <section id="pencarian" class="section-space pt-0">
-            <div class="surface-card filter-wrap" data-animate="1">
+        <section id="pencarian" class="section-space hero-modern-section">
+            <div class="hero-modern text-center" data-animate="1">
+                <h1 class="hero-modern-title mb-3">Kehilangan atau Menemukan <span>Barang</span> di <span>Indramayu?</span></h1>
+                <p class="hero-modern-subtitle mb-4">SiNemu bantu temukan barang berhargamu. Lapor dengan mudah, cari dengan cepat, dan klaim dengan aman.</p>
+            </div>
+
+            <div class="surface-card filter-wrap" data-animate="2">
                 <div class="filter-header">
                     <div class="filter-head-left">
                         <span class="filter-icon">
@@ -102,15 +126,15 @@
                     <button class="chevron-btn" type="button"><i class="fa-solid fa-chevron-up"></i></button>
                 </div>
 
-                <form id="filterForm" class="row g-3" novalidate>
-                    <div class="col-md-6 col-xl-3 position-relative filter-keyword" >
+                <form id="filterForm" class="row g-3 align-items-end" novalidate>
+                    <div class="col-md-6 col-xl position-relative filter-keyword">
                         <label for="keywordInput" class="form-label ps-2 py-2">KATA KUNCI</label>
                         <div class="input-with-icon">
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <input id="keywordInput" type="text" class="form-control" placeholder="Dompet, Kunci, HP...">
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3">
+                    <div class="col-md-6 col-xl">
                         <label for="categoryDropdownToggle" class="form-label ps-2 py-2">KATEGORI</label>
                         <div class="filter-dropdown" id="categoryDropdown">
                             <button id="categoryDropdownToggle" class="form-select text-start filter-dropdown-toggle" type="button" aria-expanded="false">
@@ -130,11 +154,11 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-3">
+                    <div class="col-md-6 col-xl">
                         <label for="dateInput" class="form-label ps-2 py-2">WAKTU PENEMUAN</label>
                         <input id="dateInput" type="text" class="form-control modern-date-input" placeholder="dd/mm/yyyy" inputmode="numeric" autocomplete="off">
                     </div>
-                    <div class="col-md-6 col-xl-3">
+                    <div class="col-md-6 col-xl">
                         <label for="regionDropdownToggle" class="form-label ps-2 py-2">WILAYAH</label>
                         <div class="filter-dropdown" id="regionDropdown">
                             <button id="regionDropdownToggle" class="form-select text-start filter-dropdown-toggle" type="button" aria-expanded="false">
@@ -154,106 +178,101 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-12 d-flex flex-wrap gap-3 align-items-center">
-                        <button id="searchButton" class="btn btn-sinemu btn-sinemu-primary px-4 py-2" type="submit">CARI</button>
+                    <div class="col-md-6 col-xl-2 d-flex">
+                        <button id="searchButton" class="btn btn-sinemu btn-sinemu-primary w-100 filter-search-btn" type="submit">
+                            <i class="fa-solid fa-magnifying-glass me-2"></i>Cari
+                        </button>
                     </div>
                 </form>
             </div>
         </section>
-        {{-- Filter End --}}
+        {{-- Hero + Filter End --}}
 
         {{-- ========================================= --}}
         {{-- Daftar Barang Start --}}
         {{-- ========================================= --}}
         <section id="hilang-temuan" class="section-space pt-0">
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="surface-card p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <div class="mini-kicker mb-2">Daftar Barang Hilang</div>
-                                <h2 class="h3 fw-bold mb-0">Daftar Barang Hilang</h2>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span id="lostCountText" class="text-muted small" data-total-count="{{ $lostTotalCount ?? count($lostItems) }}">{{ $lostTotalCount ?? count($lostItems) }} item</span>
-                                <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
-                                    <i class="fa-solid fa-chevron-left"></i>
-                                </button>
-                                <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="next" aria-label="Berikutnya">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="carousel-track" id="lostItemsList">
-                            @foreach ($lostItems as $item)
-                                <div class="carousel-item filter-item"
-                                    data-list="lost"
-                                    data-category="{{ strtoupper($item['category']) }}"
-                                    data-name="{{ strtolower($item['name']) }}"
-                                    data-region="{{ strtolower($item['location']) }}"
-                                    data-date="{{ $item['date'] }}">
-                                    <div class="item-card item-card-lost">
-                                        <div class="item-visual gradient-blue">
-                                            <span class="item-badge">{{ $item['category'] }}</span>
-                                            <span class="status-pill status-lost">HILANG</span>
-                                        </div>
-                                        <div class="mt-3">
-                                            <h3 class="h6 fw-bold mb-1">{{ $item['name'] }}</h3>
-                                            <p class="text-muted small mb-2"><i class="fa-solid fa-location-dot me-1 text-secondary"></i>{{ $item['location'] }}</p>
-                                            <p class="text-muted xsmall mb-3">{{ $item['date'] }}</p>
-                                            <button class="btn btn-dark btn-sm rounded-pill px-3 detail-button" type="button" data-item="{{ $item['name'] }}" data-category="{{ $item['category'] }}" data-list="Barang Hilang">LIHAT DETAIL</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        <div id="lostEmptyState" class="empty-state mt-3">Tidak ada barang hilang yang cocok dengan filter saat ini.</div>
+            <div class="item-block surface-card p-3 p-lg-4 mb-4">
+                <div class="item-block-head mb-3">
+                    <div>
+                        <div class="item-kicker item-kicker-danger">Informasi Terkini</div>
+                        <h2 class="item-block-title mb-0">Daftar Barang Hilang Terkini</h2>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <a href="#" class="item-link-more">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
+                        <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="next" aria-label="Berikutnya">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
 
-                <div class="col-lg-6">
-                    <div class="surface-card p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div>
-                                <div class="mini-kicker mb-2">Daftar Barang Temuan</div>
-                                <h2 class="h3 fw-bold mb-0">Daftar Barang Temuan</h2>
+                <div class="carousel-track carousel-draggable" id="lostItemsList">
+                    @foreach ($lostItems as $item)
+                        <article class="carousel-item item-card-v2 filter-item"
+                            data-list="lost"
+                            data-category="{{ strtoupper($item['category']) }}"
+                            data-name="{{ strtolower($item['name']) }}"
+                            data-region="{{ strtolower($item['location']) }}"
+                            data-date="{{ $item['date'] }}">
+                            <div class="item-media">
+                                <img src="{{ asset('img/login-image.png') }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="600" height="360">
+                                <span class="item-status item-status-danger">Belum Ditemukan</span>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
-                                <span id="foundCountText" class="text-muted small" data-total-count="{{ $foundTotalCount ?? count($foundItems) }}">{{ $foundTotalCount ?? count($foundItems) }} item</span>
-                                <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
-                                    <i class="fa-solid fa-chevron-left"></i>
-                                </button>
-                                <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="next" aria-label="Berikutnya">
-                                    <i class="fa-solid fa-chevron-right"></i>
-                                </button>
+                            <div class="item-body">
+                                <h3 class="item-name">{{ $item['name'] }}</h3>
+                                <p class="item-meta"><i class="fa-solid fa-location-dot"></i> {{ $item['location'] }}</p>
+                                <p class="item-meta"><i class="fa-regular fa-clock"></i> {{ $item['date'] }}</p>
+                                <button class="btn item-action-btn detail-button" type="button" data-item="{{ $item['name'] }}" data-category="{{ $item['category'] }}" data-list="Barang Hilang">Lihat Detail Laporan</button>
                             </div>
-                        </div>
-                        <div class="carousel-track" id="foundItemsList">
-                            @foreach ($foundItems as $item)
-                                <div class="carousel-item filter-item"
-                                    data-list="found"
-                                    data-category="{{ strtoupper($item['category']) }}"
-                                    data-name="{{ strtolower($item['name']) }}"
-                                    data-region="{{ strtolower($item['location']) }}"
-                                    data-date="{{ $item['date'] }}">
-                                    <div class="item-card item-card-found">
-                                        <div class="item-visual gradient-gold">
-                                            <span class="item-badge">{{ $item['category'] }}</span>
-                                            <span class="status-pill status-found">TEMUAN</span>
-                                        </div>
-                                        <div class="mt-3">
-                                            <h3 class="h6 fw-bold mb-1">{{ $item['name'] }}</h3>
-                                            <p class="text-muted small mb-2"><i class="fa-solid fa-location-dot me-1 text-secondary"></i>{{ $item['location'] }}</p>
-                                            <p class="text-muted xsmall mb-3">{{ $item['date'] }}</p>
-                                            <button class="btn btn-dark btn-sm rounded-pill px-3 detail-button" type="button" data-item="{{ $item['name'] }}" data-category="{{ $item['category'] }}" data-list="Barang Temuan">KLAIM BARANG</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        <div id="foundEmptyState" class="empty-state mt-3">Tidak ada barang temuan yang cocok dengan filter saat ini.</div>
+                        </article>
+                    @endforeach
+                </div>
+                <div id="lostEmptyState" class="empty-state mt-3">Tidak ada barang hilang yang cocok dengan filter saat ini.</div>
+            </div>
+
+            <div class="item-block surface-card p-3 p-lg-4">
+                <div class="item-block-head mb-3">
+                    <div>
+                        <div class="item-kicker item-kicker-success">Update Terbaru</div>
+                        <h2 class="item-block-title mb-0">Barang Temuan Terbaru</h2>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="item-chip item-chip-active">Terbaru</span>
+                        <span class="item-chip">Terverifikasi</span>
+                        <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="next" aria-label="Berikutnya">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
                 </div>
+
+                <div class="carousel-track carousel-draggable" id="foundItemsList">
+                    @foreach ($foundItems as $item)
+                        <article class="carousel-item item-card-v2 filter-item"
+                            data-list="found"
+                            data-category="{{ strtoupper($item['category']) }}"
+                            data-name="{{ strtolower($item['name']) }}"
+                            data-region="{{ strtolower($item['location']) }}"
+                            data-date="{{ $item['date'] }}">
+                            <div class="item-media">
+                                <img src="{{ asset('img/login-image.png') }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="600" height="360">
+                                <span class="item-status item-status-success">Sudah Ditemukan</span>
+                            </div>
+                            <div class="item-body">
+                                <h3 class="item-name">{{ $item['name'] }}</h3>
+                                <p class="item-meta"><i class="fa-solid fa-location-dot"></i> {{ $item['location'] }}</p>
+                                <p class="item-meta"><i class="fa-regular fa-clock"></i> {{ $item['date'] }}</p>
+                                <button class="btn item-action-btn detail-button" type="button" data-item="{{ $item['name'] }}" data-category="{{ $item['category'] }}" data-list="Barang Temuan">Klaim Barang Ini</button>
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+                <div id="foundEmptyState" class="empty-state mt-3">Tidak ada barang temuan yang cocok dengan filter saat ini.</div>
             </div>
         </section>
         {{-- Daftar Barang End --}}
@@ -315,113 +334,121 @@
         {{-- Prosedur Klaim End --}}
 
         {{-- ========================================= --}}
-        {{-- Pendaftaran + Peta Start --}}
+        {{-- Lokasi Pengambilan Start --}}
         {{-- ========================================= --}}
-        <section id="pendaftaran" class="section-space pt-0">
-            <div id="admin-kecamatan" class="admin-register-card p-4 p-lg-5 mb-4">
-                <div class="text-center mb-4">
-                    <h2 class="section-title mb-2 fs-4">Pendaftaran Admin Kecamatan</h2>
-                    <p class="section-subtitle mx-auto mb-0 fs-6">Khusus untuk perwakilan resmi kantor kecamatan di seluruh wilayah.</p>
-                </div>
-                <div class="row g-3 justify-content-center register-form mb-4">
-                    <div class="col-md-6">
-                        <label class="register-label form-label ps-2 py-2">NAMA INSTANSI KECAMATAN</label>
-                        <input id="adminOfficeName" type="text" class="form-control register-input" placeholder="Kecamatan Suka Makmur...">
+        <section id="lokasi-pengambilan" class="section-space pt-0">
+            <div class="surface-card lokasi-wrap p-3 p-lg-4">
+                <div class="lokasi-layout">
+                    <div class="lokasi-map-panel">
+                        <iframe
+                            class="lokasi-map-frame"
+                            title="Lokasi Kantor Sinemu Indramayu"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps?q=-6.3265,108.3202&z=15&output=embed">
+                        </iframe>
                     </div>
-                    <div class="col-md-6">
-                        <label class="register-label form-label ps-2 py-2">KONTAK WHATSAPP</label>
-                        <input id="adminPhone" type="text" class="form-control register-input" placeholder="0812-xxxx-xxxx">
-                    </div>
-                    <div class="col-12">
-                        <label class="register-label form-label ps-2 py-2">ALAMAT KANTOR LENGKAP</label>
-                        <textarea id="adminAddress" class="form-control register-textarea" rows="2" placeholder="Jl. Pahlawan No. 123, Kelurahan Bahagia..."></textarea>
-                    </div>
-                    <div class="col-12 mt-2 d-flex justify-content-center align-items-center gap-3 mt-4 mb-2">
-                        <button class="btn btn-register-submit w-100 fs-6" type="button" data-action="registration">AJUKAN PENDAFTARAN</button>
-                    </div>
-                    <div class="col-12 mt-3">
-                        <div class="register-note">
-                            <img src="{{ asset('img/Icon-warning.png') }}" alt="Info verifikasi" class="register-note-icon" loading="lazy" decoding="async">
-                            Setiap pengajuan akun admin akan melalui proses verifikasi fisik dan administratif langsung ke lokasi kantor kecamatan terkait untuk menjamin keamanan dan keaslian data titik pengambilan barang.
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <aside class="lokasi-info-panel">
+                        <h3 class="lokasi-title mb-2">Lokasi Kami</h3>
+                        <p class="lokasi-subtitle mb-3">Dapatkan petunjuk terdekat tentang kantor kami, dengan mudah.</p>
 
-            <div id="lokasi-pengambilan" class="map-card p-4 p-lg-5 map-modern">
-                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-4">
-                    <div>
-                        <h2 class="section-title mb-2 fs-4">Peta Lokasi Pengambilan</h2>
-                        <p class="section-subtitle mb-0 fs-6">Navigasi titik penyerahan dan pengambilan barang resmi di seluruh wilayah kota.</p>
-                    </div>
-                    <div class="d-flex flex-wrap gap-2">
-                        <button class="btn map-btn-near" type="button" data-action="coming-soon"><i class="fa-solid fa-location-crosshairs me-2 "></i>CARI TERDEKAT</button>
-                    </div>
-                </div>
-
-                <div class="map-layout">
-                    <form id="mapFilterForm" class="map-sidebar" novalidate>
-                        <div class="map-label">FILTER WILAYAH</div>
-                        <select id="mapRegionSelect" class="map-select-input mb-3">
-                            @foreach ($mapRegions as $region)
-                                <option value="{{ $region['slug'] }}">{{ $region['name'] }}</option>
-                            @endforeach
-                        </select>
-
-                        <div class="map-label mt-2">TIPE TITIK LAYANAN</div>
-                        <label class="map-radio active mb-2">
-                            <input class="map-service-input" type="radio" name="serviceType" value="kecamatan" checked>
-                            <span class="dot"></span>KANTOR KECAMATAN
-                        </label>
-                        <label class="map-radio mb-2">
-                            <input class="map-service-input" type="radio" name="serviceType" value="polisi">
-                            <span class="dot"></span>KANTOR POLISI
-                        </label>
-                        <label class="map-radio mb-2">
-                            <input class="map-service-input" type="radio" name="serviceType" value="keamanan">
-                            <span class="dot"></span>POS KEAMANAN
-                        </label> 
-  
-                        <div class="map-label mt-2">NAVIGASI CEPAT</div>
-                        <div class="map-quick-grid">
-                            @foreach ($mapRegions as $index => $region)
-                                <button class="map-chip{{ $index === 0 ? ' active' : '' }}" type="button" data-map-region="{{ $region['slug'] }}">{{ strtoupper(str_replace('Kecamatan ', '', $region['name'])) }}</button>
-                            @endforeach
-                        </div>
-                    </form>
-
-                    <div class="map-board">
-                        <div class="map-canvas">
-                            <div id="pickupMap" class="real-map" aria-label="Peta lokasi pengambilan"></div>
-                            <div class="map-smart-nav">
-                                <div class="map-smart-icon"><i class="fa-regular fa-map"></i></div>
-                                <div>
-                                    <div class="map-smart-title">NAVIGASI PINTAR</div>
-                                    <div class="map-smart-text">Wilayah aktif: <span id="activeRegionName">{{ $mapRegions[0]['name'] ?? '-' }}</span>. Peta akan disesuaikan otomatis berdasarkan data pendaftaran admin kecamatan.</div>
-                                </div>
-                            </div>
-                            <div class="map-zoom">
-                                <button id="mapZoomIn" type="button" class="map-ctrl-btn" title="Perbesar">+</button>
-                                <button id="mapZoomOut" type="button" class="map-ctrl-btn" title="Perkecil">-</button>
-                                <a id="openGoogleMaps" href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer" class="map-open-link" title="Buka Google Maps">
-                                    <i class="fa-solid fa-location-arrow"></i>
-                                </a>
+                        <div class="lokasi-contact-chip mb-2">
+                            <span class="lokasi-chip-icon"><i class="fa-solid fa-location-dot"></i></span>
+                            <div>
+                                <p class="mb-0 fw-bold">Alamat Kami</p>
+                                <small>Jl. Jenderal Sudirman No. 88, Indramayu</small>
                             </div>
                         </div>
-                    </div>
+
+                        <a class="lokasi-action-btn lokasi-action-primary" href="https://maps.google.com/?q=-6.3265,108.3202" target="_blank" rel="noopener">
+                            <i class="fa-regular fa-map me-2"></i>Buka di Maps
+                        </a>
+                        <a class="lokasi-action-btn lokasi-action-secondary mt-2" href="https://www.google.com/maps/dir/?api=1&destination=-6.3265,108.3202" target="_blank" rel="noopener">
+                            <i class="fa-solid fa-route me-2"></i>Dapatkan Rute
+                        </a>
+                    </aside>
                 </div>
             </div>
-            <script id="mapRegionData" type="application/json">@json($mapRegions)</script>
         </section>
-        {{-- Pendaftaran + Peta End --}}
+        {{-- Lokasi Pengambilan End --}}
+
+        {{-- ========================================= --}}
+        {{-- Contact Us Start --}}
+        {{-- ========================================= --}}
+        <section id="kontak" class="section-space pt-0">
+            <div class="surface-card contact-section p-3 p-lg-4">
+                <div class="text-center contact-head">
+                    <h2 class="section-title mb-2">Kontak Kami</h2>
+                    <p class="section-subtitle mx-auto mb-0">Punya pertanyaan atau masukan? Kirimkan pesan kepada kami!</p>
+                </div>
+
+                <div class="row g-3 g-lg-4 align-items-stretch">
+                    <div class="col-lg-7">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <article class="contact-info-card h-100">
+                                    <span class="contact-info-icon bg-email"><i class="fa-regular fa-envelope"></i></span>
+                                    <p class="contact-info-label">EMAIL</p>
+                                    <p class="contact-info-text mb-0">support@sinemu.id</p>
+                                </article>
+                            </div>
+                            <div class="col-6">
+                                <article class="contact-info-card h-100">
+                                    <span class="contact-info-icon bg-phone"><i class="fa-solid fa-phone"></i></span>
+                                    <p class="contact-info-label">TELEPON</p>
+                                    <p class="contact-info-text mb-0">+62 21 1234 5678</p>
+                                </article>
+                            </div>
+                            <div class="col-6">
+                                <article class="contact-info-card h-100">
+                                    <span class="contact-info-icon bg-location"><i class="fa-solid fa-location-dot"></i></span>
+                                    <p class="contact-info-label">ALAMAT KANTOR</p>
+                                    <p class="contact-info-text mb-0">Jl. Jenderal Sudirman No. 88, Indramayu</p>
+                                </article>
+                            </div>
+                            <div class="col-6">
+                                <article class="contact-info-card h-100">
+                                    <span class="contact-info-icon bg-clock"><i class="fa-regular fa-clock"></i></span>
+                                    <p class="contact-info-label">JAM OPERASIONAL</p>
+                                    <p class="contact-info-text mb-0">Senin - Jumat<br>08.00 - 16.00</p>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-5">
+                        <form id="contactForm" class="contact-form-card h-100" novalidate>
+                            <div class="mb-3">
+                                <label for="contactName" class="form-label">Nama Lengkap</label>
+                                <input id="contactName" type="text" class="form-control" placeholder="Masukkan nama">
+                            </div>
+                            <div class="mb-3">
+                                <label for="contactEmail" class="form-label">Alamat Email</label>
+                                <input id="contactEmail" type="email" class="form-control" placeholder="Masukkan email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="contactPhone" class="form-label">Telepon</label>
+                                <input id="contactPhone" type="text" class="form-control" placeholder="Masukkan nomor telepon">
+                            </div>
+                            <div class="mb-3">
+                                <label for="contactMessage" class="form-label">Pesan</label>
+                                <textarea id="contactMessage" class="form-control contact-textarea" rows="3" placeholder="Tuliskan pesan Anda"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-sinemu btn-sinemu-primary w-100 contact-submit-btn">
+                                <i class="fa-solid fa-paper-plane me-2"></i>Kirim Pesan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {{-- Contact Us End --}}
 
         @push('styles')
-            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         @endpush
 
         @push('scripts')
-            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
             <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
             <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
         @endpush

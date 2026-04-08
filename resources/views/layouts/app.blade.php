@@ -8,6 +8,7 @@
 
     <!-- Vite -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}" rel="stylesheet">
 
     <!-- Bootstrap Icons (optional) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -62,6 +63,7 @@
             <p class="mb-0">© 2024 SINEMU INDONESIA - BUILD FOR COMMUNITY</p>
         </div>
     </footer>
+    <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
 
 </body>
 </html>

@@ -14,8 +14,16 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View|RedirectResponse
     {
+        if ($request->query('portal') === 'admin') {
+            return redirect()->route('admin.login');
+        }
+
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+
         return view('auth.login');
     }
 
@@ -24,6 +32,10 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        if ($request->input('portal') === 'admin') {
+            return redirect()->route('admin.login');
+        }
+
         $request->authenticate();
 
         $request->session()->regenerate();

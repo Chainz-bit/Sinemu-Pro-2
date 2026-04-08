@@ -3,9 +3,74 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
+use App\Models\SuperAdmin;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules;
+use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    //
+    public function create(): View
+    {
+        return view('admin.auth.register');
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nama' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
+            'instansi' => ['required', 'string', 'max:255'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $username = $this->buildUniqueAdminUsername($validated['username']);
+
+        $superAdmin = SuperAdmin::query()->first();
+        if (!$superAdmin) {
+            $superAdmin = SuperAdmin::query()->create([
+                'nama' => 'Super Admin',
+                'username' => 'superadmin',
+                'password' => Hash::make('password'),
+            ]);
+        }
+
+        $admin = Admin::query()->create([
+            'super_admin_id' => $superAdmin->id,
+            'nama' => $validated['nama'],
+            'username' => $username,
+            'instansi' => $validated['instansi'],
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        Auth::guard('admin')->login($admin);
+        $request->session()->regenerate();
+
+        return redirect()->route('admin.dashboard');
+    }
+
+    private function buildUniqueAdminUsername(string $usernameInput): string
+    {
+        $base = Str::lower(trim($usernameInput));
+        $base = preg_replace('/[^a-z0-9._-]/', '', $base) ?? '';
+
+        if ($base === '') {
+            $base = 'admin';
+        }
+
+        $username = $base;
+        $counter = 1;
+
+        while (Admin::query()->where('username', $username)->exists()) {
+            $username = $base.$counter;
+            $counter++;
+        }
+
+        return $username;
+    }
 }

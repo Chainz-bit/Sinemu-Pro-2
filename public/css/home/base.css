@@ -41,15 +41,26 @@
 
 body {
     font-family: "Plus Jakarta Sans", sans-serif;
-    background:
-        radial-gradient(circle at 10% 15%, rgba(255, 255, 255, 0.8), transparent 35%),
-        linear-gradient(180deg, #f6f2ea 0%, var(--sinemu-bg) 100%);
+    background: white;
     color: var(--sinemu-text);
     min-height: 100vh;
 }
 
+/* Sembunyikan scrollbar halaman utama, tapi tetap bisa scroll */
+html,
+body {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
 .page-shell {
-    padding-top: 120px;
     padding-bottom: 0;
     min-height: 100vh;
     display: flex;
@@ -61,7 +72,7 @@ body {
 }
 
 .section-space {
-    padding: 72px 0;
+    padding: 64px 0;
 }
 
 .section-title {
@@ -78,4 +89,3 @@ body {
 .xsmall {
     font-size: 0.7rem;
 }
-
