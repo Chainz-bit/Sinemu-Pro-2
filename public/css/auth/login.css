@@ -174,8 +174,8 @@ body {
     border-radius: 14px;
     padding: 1.3rem;
     box-shadow: var(--auth-shadow);
-    backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
 }
 
 .field-group {

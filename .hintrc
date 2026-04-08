@@ -13,7 +13,8 @@
           "scrollbar-width",
           "scrollbar-color",
           "scrollbar-width: thin",
-          "min-height: auto"
+          "min-height: auto",
+          "scrollbar-width: none"
         ]
       }
     ]
