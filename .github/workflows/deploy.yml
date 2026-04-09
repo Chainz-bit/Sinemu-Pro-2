@@ -133,7 +133,7 @@ jobs:
             # Pull image terbaru
             docker pull ghcr.io/chainz-bit/sinemu-pro-2:latest
             
-            # Update container tanpa downtime besar (Perhatikan tanda strip)
+            # Update container tanpa downtime besar
             docker-compose up -d --remove-orphans
             
             # Tunggu container siap
@@ -143,7 +143,7 @@ jobs:
               sleep 2
             done
             
-            # Jalankan migrasi database (Perhatikan tanda strip)
+            # Jalankan migrasi database
             docker-compose exec -T app php artisan migrate --force --no-interaction
             
             echo "✅ Deployment selesai!"
