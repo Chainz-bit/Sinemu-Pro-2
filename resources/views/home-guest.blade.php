@@ -17,7 +17,7 @@
 
         <section class="section-space">
             <div class="hero-card hero-card-main">
-                <h1 class="hero-title mb-3">Selamat Datang di <span class="accent">Sinemu</span></h1>
+                <h1 class="hero-title mb-3">Selamat Datang di <span class="accent">Sinemu pro2</span></h1>
                 <p class="hero-subtitle mb-4">Masuk atau daftar untuk melaporkan dan mencari barang hilang atau temuan di wilayah Anda.</p>
                 <div class="d-flex flex-wrap gap-3">
                     @if (Route::has('login'))
