@@ -35,7 +35,12 @@ WORKDIR /var/www/html
 # Copy file project
 COPY . .
 
-# Install dependencies Laravel
+# ========== TAMBAHKAN BLOK INI ==========
+# Install NPM dependencies dan build Vite assets
+RUN npm ci --no-audit --no-fund && npm run build
+# ========================================
+
+# Install dependencies Laravel (optimize untuk production)
 RUN composer install --optimize-autoloader --no-dev
 
 # Set permission
