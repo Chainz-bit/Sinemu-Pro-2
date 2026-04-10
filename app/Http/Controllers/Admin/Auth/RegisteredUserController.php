@@ -22,8 +22,14 @@ class RegisteredUserController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $request->merge([
+            'password' => $request->input('password') !== null ? (string) $request->input('password') : null,
+            'password_confirmation' => $request->input('password_confirmation') !== null ? (string) $request->input('password_confirmation') : null,
+        ]);
+
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:admins,email'],
             'username' => ['required', 'string', 'max:255'],
             'instansi' => ['required', 'string', 'max:255'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
@@ -43,6 +49,7 @@ class RegisteredUserController extends Controller
         $admin = Admin::query()->create([
             'super_admin_id' => $superAdmin->id,
             'nama' => $validated['nama'],
+            'email' => $validated['email'],
             'username' => $username,
             'instansi' => $validated['instansi'],
             'password' => Hash::make($validated['password']),

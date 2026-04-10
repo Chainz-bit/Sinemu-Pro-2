@@ -17,17 +17,35 @@ class LoginController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
-        $credentials = $request->validate([
-            'username' => 'required',
-            'password' => 'required',
+        $request->merge([
+            'login' => $request->input('login') !== null ? (string) $request->input('login') : null,
+            'password' => $request->input('password') !== null ? (string) $request->input('password') : null,
         ]);
 
-        if (Auth::guard('admin')->attempt($credentials, (bool) $request->boolean('remember'))) {
+        $validated = $request->validate(
+            [
+                'login' => 'required|string',
+                'password' => 'required|string',
+            ],
+            [
+                'login.required' => 'Email atau username wajib diisi.',
+                'login.string' => 'Email atau username harus berupa teks.',
+                'password.required' => 'Kata sandi wajib diisi.',
+                'password.string' => 'Kata sandi harus berupa teks.',
+            ]
+        );
+
+        $loginInput = trim((string) $validated['login']);
+        $loginField = filter_var($loginInput, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+
+        if (Auth::guard('admin')->attempt([$loginField => $loginInput, 'password' => $validated['password']], (bool) $request->boolean('remember'))) {
             $request->session()->regenerate();
             return redirect()->intended(route('admin.dashboard'));
         }
 
-        return back()->withErrors(['username' => 'Username atau password salah.']);
+        return back()
+            ->withInput($request->only('login', 'remember'))
+            ->withErrors(['login' => 'Email/username atau kata sandi tidak sesuai.']);
     }
 
     public function logout(Request $request): RedirectResponse
@@ -36,6 +54,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
+        return redirect()->route('home');
     }
 }

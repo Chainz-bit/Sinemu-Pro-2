@@ -46,12 +46,12 @@
                     @csrf
 
                     <div class="field-group">
-                        <label for="username">Username</label>
+                        <label for="login">Email atau Username</label>
                         <div class="input-wrap">
                             <span class="input-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
-                            <input id="username" type="text" name="username" value="" placeholder="Masukkan username" required autofocus autocomplete="off" autocapitalize="off" spellcheck="false">
+                            <input id="login" type="text" name="login" value="{{ old('login') }}" placeholder="Masukkan email atau username" required autofocus autocomplete="username" autocapitalize="off" spellcheck="false">
                         </div>
                     </div>
 
@@ -73,7 +73,7 @@
                         <span>Ingat saya untuk 30 hari</span>
                     </label>
 
-                    <button class="btn-submit" type="submit">Masuk Dashboard</button>
+                    <button class="btn-submit" type="submit">Masuk</button>
                 </form>
 
                 <p class="register-link">

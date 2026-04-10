@@ -29,6 +29,7 @@ class HomeController extends Controller
                 ->get()
                 ->map(function ($item) {
                     return [
+                        'id' => $item->id,
                         'category' => 'UMUM',
                         'name' => $item->nama_barang,
                         'location' => $item->lokasi_hilang,
@@ -50,6 +51,7 @@ class HomeController extends Controller
                 ->get()
                 ->map(function ($item) {
                     return [
+                        'id' => $item->id,
                         'category' => strtoupper($item->kategori->nama_kategori ?? 'UMUM'),
                         'name' => $item->nama_barang,
                         'location' => $item->lokasi_ditemukan,
@@ -61,11 +63,15 @@ class HomeController extends Controller
         }
 
         $categories = ['Semua Kategori'];
+        $kategoriOptions = collect();
         if (Schema::hasTable('kategoris')) {
+            $kategoriOptions = Kategori::query()
+                ->orderBy('nama_kategori')
+                ->get(['id', 'nama_kategori']);
+
             $categories = array_merge(
                 ['Semua Kategori'],
-                Kategori::query()
-                    ->orderBy('nama_kategori')
+                $kategoriOptions
                     ->pluck('nama_kategori')
                     ->map(fn ($name) => ucwords(strtolower($name)))
                     ->values()
@@ -103,8 +109,8 @@ class HomeController extends Controller
             })->values()->all();
         }
 
-        $userName = Auth::user()->nama ?? Auth::user()->name ?? 'Pengguna';
-        $userLocation = Auth::user()->location ?? 'Lokasi Anda';
+        $userName = Auth::user()?->nama ?? Auth::user()?->name ?? 'Pengguna';
+        $userLocation = Auth::user()?->location ?? 'Lokasi Anda';
 
         return view('home', compact(
             'lostItems',
@@ -112,6 +118,7 @@ class HomeController extends Controller
             'lostTotalCount',
             'foundTotalCount',
             'categories',
+            'kategoriOptions',
             'regions',
             'mapRegions',
             'userName',

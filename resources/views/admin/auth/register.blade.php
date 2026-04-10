@@ -56,6 +56,16 @@
                     </div>
 
                     <div class="field-group">
+                        <label for="email">Alamat Email</label>
+                        <div class="input-wrap">
+                            <span class="input-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Zm1.8-.2 5.85 4.45a.6.6 0 0 0 .7 0l5.85-4.45" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </span>
+                            <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="admin@email.com" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
                         <label for="username">Username</label>
                         <div class="input-wrap">
                             <span class="input-icon" aria-hidden="true">

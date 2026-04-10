@@ -2,13 +2,14 @@
     const body = document.body;
     if (!body) return;
 
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let navigating = false;
+
     body.classList.add('page-transition');
 
     const showPage = function () {
-        requestAnimationFrame(function () {
-            body.classList.add('page-ready');
-            body.classList.remove('page-leaving');
-        });
+        navigating = false;
+        body.classList.remove('page-leaving');
     };
 
     if (document.readyState === 'loading') {
@@ -33,12 +34,22 @@
         const url = new URL(anchor.href, window.location.href);
         if (url.origin !== window.location.origin) return;
         if (url.href === window.location.href) return;
+        if (navigating) return;
 
         event.preventDefault();
-        body.classList.add('page-leaving');
+        navigating = true;
 
+        // Jika browser mendukung View Transition API, biarkan navigasi langsung.
+        // CSS `@view-transition { navigation: auto; }` akan meng-handle animasi.
+        if ('startViewTransition' in document && !prefersReducedMotion) {
+            window.location.href = url.href;
+            return;
+        }
+
+        // Fallback ringan untuk browser lama.
+        body.classList.add('page-leaving');
         window.setTimeout(function () {
             window.location.href = url.href;
-        }, 220);
+        }, 45);
     });
 })();

@@ -106,6 +106,24 @@
         {{-- ========================================= --}}
         {{-- Hero + Filter Start --}}
         {{-- ========================================= --}}
+        @auth
+            @if(session('status'))
+                <div class="container mt-3">
+                    <div class="alert alert-success mb-0">{{ session('status') }}</div>
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="container mt-3">
+                    <div class="alert alert-danger mb-0">{{ session('error') }}</div>
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="container mt-3">
+                    <div class="alert alert-danger mb-0">{{ $errors->first() }}</div>
+                </div>
+            @endif
+        @endauth
+
         <section id="pencarian" class="section-space hero-modern-section">
             <div class="hero-modern text-center" data-animate="1">
                 <h1 class="hero-modern-title mb-3">Kehilangan atau Menemukan <span>Barang</span> di <span>Indramayu?</span></h1>
@@ -199,6 +217,11 @@
                         <h2 class="item-block-title mb-0">Daftar Barang Hilang Terkini</h2>
                     </div>
                     <div class="d-flex align-items-center gap-2">
+                        @auth
+                            <button type="button" class="btn btn-sinemu btn-sinemu-primary btn-sm" data-action="open-lost-report">
+                                Lapor Barang Hilang
+                            </button>
+                        @endauth
                         <a href="#" class="item-link-more">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
                         <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
                             <i class="fa-solid fa-chevron-left"></i>
@@ -240,6 +263,11 @@
                         <h2 class="item-block-title mb-0">Barang Temuan Terbaru</h2>
                     </div>
                     <div class="d-flex align-items-center gap-2">
+                        @auth
+                            <button type="button" class="btn btn-sinemu btn-sinemu-primary btn-sm" data-action="open-found-report">
+                                Lapor Barang Temuan
+                            </button>
+                        @endauth
                         <span class="item-chip item-chip-active">Terbaru</span>
                         <span class="item-chip">Terverifikasi</span>
                         <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
@@ -267,7 +295,18 @@
                                 <h3 class="item-name">{{ $item['name'] }}</h3>
                                 <p class="item-meta"><i class="fa-solid fa-location-dot"></i> {{ $item['location'] }}</p>
                                 <p class="item-meta"><i class="fa-regular fa-clock"></i> {{ $item['date'] }}</p>
-                                <button class="btn item-action-btn detail-button" type="button" data-item="{{ $item['name'] }}" data-category="{{ $item['category'] }}" data-list="Barang Temuan">Klaim Barang Ini</button>
+                                @auth
+                                    <button
+                                        class="btn item-action-btn claim-button"
+                                        type="button"
+                                        data-barang-id="{{ $item['id'] }}"
+                                        data-barang-name="{{ $item['name'] }}"
+                                    >
+                                        Klaim Barang Ini
+                                    </button>
+                                @else
+                                    <button class="btn item-action-btn" type="button" data-bs-toggle="modal" data-bs-target="#loginPortalModal">Klaim Barang Ini</button>
+                                @endauth
                             </div>
                         </article>
                     @endforeach
@@ -447,6 +486,128 @@
         @push('styles')
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         @endpush
+
+        @auth
+            <div class="modal fade" id="lostReportModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <form method="POST" action="{{ route('user.lost-reports.store') }}" class="modal-content">
+                        @csrf
+                        <div class="modal-header">
+                            <h5 class="modal-title">Lapor Barang Hilang</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Barang</label>
+                                <input type="text" name="nama_barang" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Lokasi Hilang</label>
+                                <input type="text" name="lokasi_hilang" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal Hilang</label>
+                                <input type="date" name="tanggal_hilang" class="form-control" required>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label">Keterangan</label>
+                                <textarea name="keterangan" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Kirim Laporan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal fade" id="foundReportModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <form method="POST" action="{{ route('user.found-reports.store') }}" class="modal-content">
+                        @csrf
+                        <div class="modal-header">
+                            <h5 class="modal-title">Lapor Barang Temuan</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Barang</label>
+                                <input type="text" name="nama_barang" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Kategori</label>
+                                <select name="kategori_id" class="form-select">
+                                    <option value="">Pilih Kategori</option>
+                                    @foreach(($kategoriOptions ?? collect()) as $kategori)
+                                        <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Lokasi Ditemukan</label>
+                                <input type="text" name="lokasi_ditemukan" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal Ditemukan</label>
+                                <input type="date" name="tanggal_ditemukan" class="form-control" required>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label">Deskripsi</label>
+                                <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Kirim Temuan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal fade" id="claimModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <form method="POST" action="{{ route('user.claims.store') }}" class="modal-content">
+                        @csrf
+                        <input type="hidden" name="barang_id" id="claimBarangId">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Ajukan Klaim Barang</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Barang Temuan</label>
+                                <input type="text" id="claimBarangName" class="form-control" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nama Barang Hilang Anda</label>
+                                <input type="text" name="nama_barang_hilang" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Lokasi Hilang</label>
+                                <input type="text" name="lokasi_hilang" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal Hilang</label>
+                                <input type="date" name="tanggal_hilang" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Keterangan Barang</label>
+                                <textarea name="keterangan" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label">Catatan Klaim</label>
+                                <textarea name="catatan" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Ajukan Klaim</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endauth
 
         @push('scripts')
             <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

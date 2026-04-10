@@ -9,7 +9,7 @@ class Admin extends Authenticatable
 {
     use HasFactory;
 
-    protected $fillable = ['super_admin_id', 'nama', 'username', 'password', 'instansi', 'profil'];
+    protected $fillable = ['super_admin_id', 'nama', 'email', 'username', 'password', 'instansi', 'profil'];
     protected $hidden = ['password'];
 
     public function superAdmin()
@@ -25,5 +25,10 @@ class Admin extends Authenticatable
     public function klaims()
     {
         return $this->hasMany(Klaim::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(AdminNotification::class);
     }
 }

@@ -24,6 +24,7 @@ public function run(): void
     Admin::create([
         'super_admin_id' => $super->id,
         'nama' => 'Angga Pengelola Sistem',
+        'email' => 'admin@sinemu.local',
         'username' => 'admin',
         'password' => Hash::make('password'),
         'instansi' => 'Politeknik Negeri Indramayu',

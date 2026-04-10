@@ -1,0 +1,139 @@
+/* section: tablet */
+@media (max-width: 1024px) {
+    .admin-shell {
+        grid-template-columns: 1fr;
+        position: relative;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        max-width: calc(100vw - 40px);
+        height: 100vh;
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+        z-index: 40;
+        transform: translateX(-105%);
+        transition: transform 0.26s ease;
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+    }
+
+    body.sidebar-open .sidebar {
+        transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+        display: block;
+        border: 0;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.24);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.22s ease, visibility 0.22s ease;
+        z-index: 30;
+    }
+
+    body.sidebar-open .sidebar-backdrop {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .sidebar-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-toggle {
+        display: inline-block;
+        flex: 0 0 auto;
+    }
+
+    .search-form {
+        width: min(420px, calc(100% - 52px));
+    }
+
+}
+
+/* section: mobile */
+@media (max-width: 699px) {
+    .stat-card {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 640px) {
+    .topbar {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr) 32px 32px;
+        align-items: center;
+        gap: 8px;
+        height: auto;
+    }
+
+    .search-form {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .top-actions {
+        display: contents;
+    }
+
+    .notification-modal {
+        position: fixed;
+        top: 70px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+
+    .top-actions > button {
+        width: 32px;
+        height: 32px;
+    }
+
+    .report-card > header {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .report-actions {
+        margin-left: auto;
+        justify-content: flex-end;
+    }
+
+    .lost-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .lost-toolbar-right {
+        margin-left: auto;
+    }
+}
+
+/* section: small mobile */
+@media (max-width: 520px) {
+    .stat-card {
+        grid-column: span 12;
+    }
+
+    .topbar {
+        grid-template-columns: 36px minmax(0, 1fr) 30px 30px;
+        gap: 6px;
+        padding: 8px;
+    }
+
+    .top-actions > button {
+        width: 30px;
+        height: 30px;
+    }
+
+    .lost-toolbar-right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+

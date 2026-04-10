@@ -28,4 +28,17 @@ class RegistrationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
     }
+
+    public function test_new_users_can_register_with_numeric_password(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Numeric User',
+            'email' => 'numeric@example.com',
+            'password' => 12345678,
+            'password_confirmation' => 12345678,
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard', absolute: false));
+    }
 }

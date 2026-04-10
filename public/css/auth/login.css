@@ -28,7 +28,7 @@ html,
 body {
     margin: 0;
     padding: 0;
-    height: 100%;
+    min-height: 100%;
     font-family: "Plus Jakarta Sans", sans-serif;
     color: var(--auth-text);
     background: var(--auth-bg);
@@ -39,14 +39,14 @@ body {
    Login - Layout
 ========================================= */
 .login-body {
-    height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
 }
 
 .login-shell {
-    height: 100vh;
+    min-height: 100dvh;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     overflow: hidden;
 }
 
@@ -60,12 +60,12 @@ body {
 }
 
 .left-content {
-    width: min(500px, 100%);
+    width: min(540px, 100%);
 }
 
 .left-title {
     margin: 0 0 1.1rem;
-    font-size: 2.4rem;
+    font-size: clamp(2rem, 3.1vw, 3rem);
     line-height: 1.15;
     font-weight: 800;
 }
@@ -78,9 +78,9 @@ body {
 }
 
 .left-illustration {
-    margin-top: 1.5rem;
+    margin-top: 1.75rem;
     width: 100%;
-    aspect-ratio: 16 / 8;
+    aspect-ratio: 16 / 7.6;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -91,10 +91,10 @@ body {
 }
 
 .left-illustration-img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    max-width: 96%;
+    max-height: 96%;
     display: block;
     object-fit: contain;
     object-position: center;
@@ -104,12 +104,12 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1.5rem;
+    padding: clamp(1rem, 2.4vw, 2rem);
     background: url("/img/login-form.jpg") center center / cover no-repeat;
 }
 
 .right-content {
-    width: min(420px, 100%);
+    width: min(460px, 100%);
 }
 
 /* =========================================
@@ -126,7 +126,7 @@ body {
 
 .login-header {
     text-align: center;
-    margin-bottom: 1.3rem;
+    margin-bottom: 1.1rem;
 }
 
 .login-header h2 {
@@ -169,10 +169,10 @@ body {
    Login - Form
 ========================================= */
 .login-form {
-    background: rgba(255, 255, 255, 0.74);
+    background: rgba(255, 255, 255, 0.84);
     border: 1px solid rgba(255, 255, 255, 0.45);
     border-radius: 14px;
-    padding: 1.3rem;
+    padding: 1.2rem;
     box-shadow: var(--auth-shadow);
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
@@ -351,7 +351,7 @@ body {
 }
 
 .register-link {
-    margin: 1.1rem 0 0;
+    margin: 1rem 0 0;
     text-align: center;
     color: #5b6271;
     font-size: 0.95rem;
@@ -393,6 +393,18 @@ body {
     .login-right {
         align-items: flex-start;
         padding: 1.25rem 0.95rem;
+    }
+}
+
+@media (max-height: 760px) and (min-width: 1081px) {
+    .login-right {
+        align-items: flex-start;
+        overflow-y: auto;
+    }
+
+    .right-content {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
 }
 

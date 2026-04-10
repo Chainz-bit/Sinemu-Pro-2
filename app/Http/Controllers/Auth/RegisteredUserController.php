@@ -31,6 +31,11 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        $request->merge([
+            'password' => $request->input('password') !== null ? (string) $request->input('password') : null,
+            'password_confirmation' => $request->input('password_confirmation') !== null ? (string) $request->input('password_confirmation') : null,
+        ]);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
@@ -50,7 +55,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('home');
     }
 
     private function buildUniqueUsername(string $name, string $email): string

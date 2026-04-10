@@ -208,16 +208,22 @@ class HomeDataSeeder extends Seeder
 
         if (Schema::hasTable('laporan_barang_hilangs') && $user) {
             foreach ($lostItems as $item) {
+                $payload = [
+                    'user_id' => $user->id,
+                    'tanggal_hilang' => $item['tanggal_hilang'],
+                    'keterangan' => $item['keterangan'],
+                ];
+
+                if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
+                    $payload['sumber_laporan'] = 'lapor_hilang';
+                }
+
                 LaporanBarangHilang::updateOrCreate(
                     [
                         'nama_barang' => $item['nama_barang'],
                         'lokasi_hilang' => $item['lokasi_hilang'],
                     ],
-                    [
-                        'user_id' => $user->id,
-                        'tanggal_hilang' => $item['tanggal_hilang'],
-                        'keterangan' => $item['keterangan'],
-                    ]
+                    $payload
                 );
             }
         }

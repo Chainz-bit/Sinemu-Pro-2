@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -22,8 +23,38 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
+            'login' => $user->email,
             'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_users_can_authenticate_using_username(): void
+    {
+        $user = User::factory()->create([
+            'username' => 'usertester',
+        ]);
+
+        $response = $this->post('/login', [
+            'login' => 'usertester',
+            'password' => 'password',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_users_can_authenticate_with_numeric_password_input(): void
+    {
+        $user = User::factory()->create([
+            'password' => Hash::make('12345678'),
+        ]);
+
+        $response = $this->post('/login', [
+            'login' => $user->email,
+            'password' => 12345678,
         ]);
 
         $this->assertAuthenticated();
@@ -35,7 +66,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/login', [
-            'email' => $user->email,
+            'login' => $user->email,
             'password' => 'wrong-password',
         ]);
 
