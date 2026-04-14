@@ -5,6 +5,10 @@
     $activeMenu = 'lost-items';
     $searchAction = route('admin.lost-items');
     $searchPlaceholder = 'Cari laporan atau barang';
+    $hideSearch = true;
+    $hideSidebar = true;
+    $topbarBackUrl = route('admin.lost-items');
+    $topbarBackLabel = 'Kembali ke Daftar Barang Hilang';
 
     $fotoPath = trim((string) ($laporanBarangHilang->foto_barang ?? ''), '/');
     [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
@@ -30,6 +34,21 @@
     ];
     $statusValue = $latestKlaim->status_klaim ?? 'pending';
     $pelaporEmail = $laporanBarangHilang->user?->email ?? 'Email tidak tersedia';
+    $hasPelaporEmail = filter_var($pelaporEmail, FILTER_VALIDATE_EMAIL) !== false;
+    $emailContactHref = $hasPelaporEmail
+        ? 'mailto:' . $pelaporEmail
+        : '#';
+    $contactSubject = rawurlencode('Tindak lanjut laporan barang hilang #' . $laporanBarangHilang->id);
+    $contactBody = rawurlencode('Halo ' . $pelaporName . ', kami ingin menindaklanjuti laporan barang hilang Anda.');
+    $hubungiHref = $hasPelaporEmail
+        ? ('mailto:' . $pelaporEmail . '?subject=' . $contactSubject . '&body=' . $contactBody)
+        : '#';
+    $createdAtLabel = !empty($laporanBarangHilang->created_at)
+        ? \Illuminate\Support\Carbon::parse($laporanBarangHilang->created_at)->format('d M Y, H:i')
+        : '-';
+    $updatedAtLabel = !empty($laporanBarangHilang->updated_at)
+        ? \Illuminate\Support\Carbon::parse($laporanBarangHilang->updated_at)->format('d M Y, H:i')
+        : '-';
     $initials = collect(explode(' ', trim($pelaporName)))
         ->filter()
         ->take(2)
@@ -40,13 +59,43 @@
 @section('page-content')
     <section class="lost-detail-page">
         @if(session('status'))
-            <div class="feedback-alert success">{{ session('status') }}</div>
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Berhasil</strong>
+                    <span>{{ session('status') }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
         @endif
         @if(session('error'))
-            <div class="feedback-alert error">{{ session('error') }}</div>
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Gagal</strong>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
         @endif
         @if($errors->any())
-            <div class="feedback-alert error">{{ $errors->first() }}</div>
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Gagal</strong>
+                    <span>{{ $errors->first() }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
         @endif
 
         <div class="lost-detail-header">
@@ -57,10 +106,11 @@
                     <strong>Detail Barang</strong>
                 </p>
                 <h1>Detail Laporan Barang Hilang</h1>
-            </div>
-            <div class="lost-detail-actions">
-                <a href="{{ route('admin.lost-items') }}" class="filter-btn lost-action-btn lost-action-btn-ghost">Kembali</a>
-                <button type="submit" form="lost-status-update-form" class="filter-btn lost-action-btn lost-action-btn-primary" @disabled(!$latestKlaim)>Simpan</button>
+                <div class="lost-detail-header-meta">
+                    <span>Laporan #{{ $laporanBarangHilang->id }}</span>
+                    <span>Dibuat {{ $createdAtLabel }} WIB</span>
+                    <span>Diperbarui {{ $updatedAtLabel }} WIB</span>
+                </div>
             </div>
         </div>
 
@@ -68,6 +118,7 @@
             <article class="report-card lost-detail-main">
                 <div class="lost-detail-main-content">
                     <div class="lost-detail-image-wrap">
+                        <span class="lost-detail-image-label">Foto Barang</span>
                         <img
                             src="{{ $fotoUrl }}"
                             alt="{{ $laporanBarangHilang->nama_barang }}"
@@ -95,8 +146,8 @@
                                 <strong>{{ $laporanBarangHilang->lokasi_hilang ?: '-' }}</strong>
                             </div>
                             <div>
-                                <span>Status</span>
-                                <strong><span class="status-chip {{ $statusClass }}">{{ $statusLabel }}</span></strong>
+                                <span>ID Laporan</span>
+                                <strong>#{{ $laporanBarangHilang->id }}</strong>
                             </div>
                         </div>
                     </div>
@@ -104,7 +155,7 @@
             </article>
 
             <div class="lost-detail-side">
-                <article class="report-card lost-detail-panel">
+                <article class="report-card lost-detail-panel lost-panel-status">
                     <header><h2>Status Saat Ini</h2></header>
                     <div class="lost-detail-panel-body">
                         <span class="status-chip {{ $statusClass }}">{{ $statusLabel }}</span>
@@ -115,7 +166,7 @@
 
                             <div class="lost-form-group">
                                 <label class="lost-status-form-label" for="status_klaim">Status Baru</label>
-                                <select id="status_klaim" name="status_klaim" class="form-input lost-status-form-input" @disabled(!$latestKlaim)>
+                                <select id="status_klaim" name="status_klaim" class="form-input lost-status-form-input">
                                     @foreach($statusOptionLabels as $optionValue => $optionLabel)
                                         <option value="{{ $optionValue }}" @selected(old('status_klaim', $statusValue) === $optionValue)>{{ $optionLabel }}</option>
                                     @endforeach
@@ -129,18 +180,13 @@
                                     name="catatan"
                                     class="form-input form-textarea-sm lost-status-form-input"
                                     placeholder="{{ $latestKlaim?->catatan ?: 'Contoh: Bukti kepemilikan valid dan sudah diverifikasi admin.' }}"
-                                    @disabled(!$latestKlaim)
                                 >{{ old('catatan') }}</textarea>
                             </div>
                         </form>
-
-                        @if(!$latestKlaim)
-                            <p class="lost-empty-note">Belum ada data klaim untuk laporan ini, jadi status belum bisa diedit.</p>
-                        @endif
                     </div>
                 </article>
 
-                <article class="report-card lost-detail-panel">
+                <article class="report-card lost-detail-panel lost-panel-reporter">
                     <header><h2>Informasi Pelapor</h2></header>
                     <div class="lost-detail-panel-body">
                         <div class="lost-person-row">
@@ -151,14 +197,14 @@
                             </div>
                         </div>
                         <div class="lost-contact-actions">
-                            <a href="#" class="filter-btn">Hubungi</a>
-                            <a href="#" class="filter-btn">Email</a>
+                            <a href="{{ $hubungiHref }}" class="filter-btn {{ $hasPelaporEmail ? '' : 'is-disabled' }}">Hubungi</a>
+                            <a href="{{ $emailContactHref }}" class="filter-btn {{ $hasPelaporEmail ? '' : 'is-disabled' }}">Email</a>
                         </div>
                         <p>{{ $pelaporEmail }}</p>
                     </div>
                 </article>
 
-                <article class="report-card lost-detail-panel">
+                <article class="report-card lost-detail-panel lost-panel-location">
                     <header><h2>Lokasi &amp; Waktu Laporan</h2></header>
                     <div class="lost-detail-panel-body">
                         <div class="lost-info-item">
@@ -183,7 +229,7 @@
                     </div>
                 </article>
 
-                <article class="report-card lost-detail-panel">
+                <article class="report-card lost-detail-panel lost-panel-activity">
                     <header><h2>Riwayat Aktivitas</h2></header>
                     <div class="lost-detail-panel-body">
                         <div class="lost-activity-item">
@@ -200,11 +246,46 @@
                 </article>
             </div>
         </div>
+
+        <div class="lost-detail-bottom-actions">
+            <button type="submit" form="lost-status-update-form" class="filter-btn lost-action-btn lost-action-btn-primary">Perbarui Status</button>
+        </div>
     </section>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.add('lost-detail-page-mode');
+
+            const form = document.getElementById('lost-status-update-form');
+            if (!form) return;
+
+            const submitButton = document.querySelector('button[form="lost-status-update-form"][type="submit"]');
+            if (!submitButton) return;
+
+            const statusInput = form.querySelector('#status_klaim');
+            const noteInput = form.querySelector('#catatan');
+
+            if (!statusInput || !noteInput || statusInput.disabled || noteInput.disabled) return;
+
+            const initialStatus = statusInput.value;
+            const initialNote = noteInput.value;
+            const initialText = submitButton.textContent.trim();
+
+            const syncSubmitState = function () {
+                const hasChanged = statusInput.value !== initialStatus || noteInput.value !== initialNote;
+                submitButton.disabled = !hasChanged;
+            };
+
+            statusInput.addEventListener('change', syncSubmitState);
+            noteInput.addEventListener('input', syncSubmitState);
+
+            form.addEventListener('submit', function () {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Menyimpan...';
+                submitButton.dataset.originalText = initialText;
+            });
+
+            syncSubmitState();
         });
     </script>
 @endsection

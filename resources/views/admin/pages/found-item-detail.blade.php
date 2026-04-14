@@ -6,6 +6,10 @@
     $activeMenu = 'found-items';
     $searchAction = route('admin.found-items');
     $searchPlaceholder = 'Cari laporan atau barang';
+    $hideSearch = true;
+    $hideSidebar = true;
+    $topbarBackUrl = route('admin.found-items');
+    $topbarBackLabel = 'Kembali ke Daftar Barang Temuan';
 
     $fotoPath = trim((string) ($barang->foto_barang ?? ''), '/');
     [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
@@ -27,6 +31,22 @@
     ];
     [$statusLabel, $statusClass] = $statusMap[$barang->status_barang] ?? ['UNKNOWN', 'status-diproses'];
     $petugasName = $barang->admin?->nama ?? 'Admin';
+    $petugasEmail = $barang->admin?->email ?? 'Email tidak tersedia';
+    $hasPetugasEmail = filter_var($petugasEmail, FILTER_VALIDATE_EMAIL) !== false;
+    $emailContactHref = $hasPetugasEmail
+        ? 'mailto:' . $petugasEmail
+        : '#';
+    $contactSubject = rawurlencode('Tindak lanjut laporan barang temuan #' . $barang->id);
+    $contactBody = rawurlencode('Halo ' . $petugasName . ', kami ingin menindaklanjuti laporan barang temuan ini.');
+    $hubungiHref = $hasPetugasEmail
+        ? ('mailto:' . $petugasEmail . '?subject=' . $contactSubject . '&body=' . $contactBody)
+        : '#';
+    $createdAtLabel = !empty($barang->created_at)
+        ? \Illuminate\Support\Carbon::parse($barang->created_at)->format('d M Y, H:i')
+        : '-';
+    $updatedAtLabel = !empty($barang->updated_at)
+        ? \Illuminate\Support\Carbon::parse($barang->updated_at)->format('d M Y, H:i')
+        : '-';
     $initials = collect(explode(' ', trim($petugasName)))
         ->filter()
         ->take(2)
@@ -38,14 +58,42 @@
 @section('page-content')
     <section class="found-detail-page">
         @if(session('status'))
-            <div class="info-modal-backdrop" id="status-info-modal" role="dialog" aria-modal="true" aria-labelledby="status-info-title">
-                <div class="info-modal">
-                    <h3 id="status-info-title">Informasi</h3>
-                    <p>{{ session('status') }}</p>
-                    <div class="info-modal-actions">
-                        <button type="button" class="btn-primary" id="status-info-close">Tutup</button>
-                    </div>
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Berhasil</strong>
+                    <span>{{ session('status') }}</span>
                 </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Gagal</strong>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
+        @endif
+        @if($errors->any())
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Gagal</strong>
+                    <span>{{ $errors->first() }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
             </div>
         @endif
 
@@ -57,10 +105,11 @@
                     <strong>Detail Barang</strong>
                 </p>
                 <h1>Detail Laporan Barang Temuan</h1>
-            </div>
-            <div class="found-detail-actions">
-                <a href="{{ route('admin.found-items.export', $barang->id) }}" class="filter-btn found-action-btn found-action-btn-ghost">Export Laporan</a>
-                <button type="submit" form="status-update-form" class="filter-btn found-action-btn found-action-btn-primary">Simpan</button>
+                <div class="found-detail-header-meta">
+                    <span>Laporan #{{ $barang->id }}</span>
+                    <span>Dibuat {{ $createdAtLabel }} WIB</span>
+                    <span>Diperbarui {{ $updatedAtLabel }} WIB</span>
+                </div>
             </div>
         </div>
 
@@ -68,6 +117,7 @@
             <article class="report-card found-detail-main">
                 <div class="found-detail-main-content">
                     <div class="found-detail-image-wrap">
+                        <span class="found-detail-image-label">Foto Barang</span>
                         <img
                             src="{{ $fotoUrl }}"
                             alt="{{ $barang->nama_barang }}"
@@ -95,8 +145,8 @@
                                 <strong>{{ $barang->lokasi_ditemukan ?: '-' }}</strong>
                             </div>
                             <div>
-                                <span>Status</span>
-                                <strong><span class="status-chip {{ $statusClass }}">{{ $statusLabel }}</span></strong>
+                                <span>ID Laporan</span>
+                                <strong>#{{ $barang->id }}</strong>
                             </div>
                         </div>
                     </div>
@@ -104,14 +154,14 @@
             </article>
 
             <div class="found-detail-side">
-                <article class="report-card found-detail-panel">
+                <article class="report-card found-detail-panel found-panel-status">
                     <header>
                         <h2>Status Saat Ini</h2>
                     </header>
                     <div class="found-detail-panel-body">
                         <span class="status-chip {{ $statusClass }}">{{ $statusLabel }}</span>
 
-                        <form method="POST" action="{{ route('admin.found-items.update-status', $barang->id) }}" class="status-edit-form" id="status-update-form">
+                        <form method="POST" action="{{ route('admin.found-items.update-status', $barang->id) }}" class="status-edit-form" id="status-update-form" data-confirm-delete data-confirm-title="Konfirmasi Perbarui Status" data-confirm-submit-label="Perbarui" data-confirm-submit-variant="primary" data-confirm-message="Perbarui status barang temuan ini? Pastikan data sudah sesuai sebelum menyimpan.">
                             @csrf
                             @method('PATCH')
                             <label for="status_barang" class="status-form-label">Status Baru</label>
@@ -127,7 +177,7 @@
                     </div>
                 </article>
 
-                <article class="report-card found-detail-panel">
+                <article class="report-card found-detail-panel found-panel-reporter">
                     <header><h2>Informasi Penemu</h2></header>
                     <div class="found-detail-panel-body">
                         <div class="found-person-row">
@@ -138,13 +188,14 @@
                             </div>
                         </div>
                         <div class="found-contact-actions">
-                            <a href="#" class="filter-btn">Hubungi</a>
-                            <a href="#" class="filter-btn">Email</a>
+                            <a href="{{ $hubungiHref }}" class="filter-btn {{ $hasPetugasEmail ? '' : 'is-disabled' }}">Hubungi</a>
+                            <a href="{{ $emailContactHref }}" class="filter-btn {{ $hasPetugasEmail ? '' : 'is-disabled' }}">Email</a>
                         </div>
+                        <p>{{ $petugasEmail }}</p>
                     </div>
                 </article>
 
-                <article class="report-card found-detail-panel">
+                <article class="report-card found-detail-panel found-panel-location">
                     <header><h2>Lokasi &amp; Waktu Penyimpanan</h2></header>
                     <div class="found-detail-panel-body">
                         <div class="found-info-item">
@@ -168,7 +219,7 @@
                     </div>
                 </article>
 
-                <article class="report-card found-detail-panel">
+                <article class="report-card found-detail-panel found-panel-activity">
                     <header><h2>Riwayat Aktivitas</h2></header>
                     <div class="found-detail-panel-body">
                         @forelse($statusHistories as $history)
@@ -194,23 +245,44 @@
                 </article>
             </div>
         </div>
+
+        <div class="found-detail-bottom-actions">
+            <button type="submit" form="status-update-form" class="filter-btn found-action-btn found-action-btn-primary" disabled>Perbarui Status</button>
+        </div>
     </section>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.add('found-detail-page-mode');
-            const infoModal = document.getElementById('status-info-modal');
-            const closeInfoModal = document.getElementById('status-info-close');
-            if (infoModal && closeInfoModal) {
-                closeInfoModal.addEventListener('click', function () {
-                    infoModal.remove();
-                });
-                infoModal.addEventListener('click', function (event) {
-                    if (event.target === infoModal) {
-                        infoModal.remove();
-                    }
-                });
-            }
+
+            const form = document.getElementById('status-update-form');
+            if (!form) return;
+
+            const submitButton = document.querySelector('button[form="status-update-form"][type="submit"]');
+            if (!submitButton) return;
+
+            const statusInput = form.querySelector('#status_barang');
+            const noteInput = form.querySelector('#catatan_status');
+
+            if (!statusInput || !noteInput || statusInput.disabled || noteInput.disabled) return;
+
+            const initialStatus = statusInput.value;
+            const initialNote = noteInput.value;
+
+            const syncSubmitState = function () {
+                const hasChanged = statusInput.value !== initialStatus || noteInput.value !== initialNote;
+                submitButton.disabled = !hasChanged;
+            };
+
+            statusInput.addEventListener('change', syncSubmitState);
+            noteInput.addEventListener('input', syncSubmitState);
+
+            form.addEventListener('submit', function () {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Menyimpan...';
+            });
+
+            syncSubmitState();
         });
     </script>
 @endsection

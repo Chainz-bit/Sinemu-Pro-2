@@ -13,11 +13,16 @@
 
     .hero-modern-section {
         padding-top: 4.7rem;
+        padding-bottom: 0.8rem;
         border-radius: 0;
     }
 
     .hero-modern-subtitle {
         font-size: 0.95rem;
+    }
+
+    .hero-modern-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .carousel-item {
@@ -105,6 +110,7 @@
 
     .filter-wrap {
         padding: 1rem;
+        transform: translateY(6px);
     }
 
     .filter-subtitle {
@@ -130,6 +136,12 @@
 }
 
 @media (max-width: 575.98px) {
+    .hero-modern-section {
+        gap: 0.65rem;
+        padding-top: 4.4rem;
+        padding-bottom: 0.35rem;
+    }
+
     .item-block-head {
         flex-direction: column;
         align-items: flex-start;
@@ -153,6 +165,23 @@
 
     .hero-modern-subtitle {
         font-size: 0.9rem;
+    }
+
+    .hero-modern-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hero-modern-actions .btn {
+        width: 100%;
+    }
+
+    .filter-wrap {
+        transform: translateY(0);
+    }
+
+    .hero-modern-meta {
+        grid-template-columns: 1fr;
     }
 
     .contact-section {

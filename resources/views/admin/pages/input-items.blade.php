@@ -18,15 +18,45 @@
         </section>
 
         @if(session('status'))
-            <div class="feedback-alert success">{{ session('status') }}</div>
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Berhasil</strong>
+                    <span>{{ session('status') }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
         @endif
 
         @if(session('error'))
-            <div class="feedback-alert error">{{ session('error') }}</div>
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Gagal</strong>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
         @endif
 
         @if($errors->any())
-            <div class="feedback-alert error">{{ $errors->first() }}</div>
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Gagal</strong>
+                    <span>{{ $errors->first() }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
         @endif
 
         <section class="input-card">

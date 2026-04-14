@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\BarangStatusHistory;
+use App\Models\Kategori;
 use App\Services\ReportImageCleaner;
+use App\Support\Media\OptimizedImageUploader;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +18,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FoundItemController extends Controller
 {
+    public function __construct(private readonly OptimizedImageUploader $imageUploader)
+    {
+    }
+
     public function index(Request $request)
     {
         /** @var \App\Models\Admin $admin */
@@ -99,6 +105,82 @@ class FoundItemController extends Controller
         ]);
 
         return view('admin.pages.found-item-detail', compact('barang', 'admin'));
+    }
+
+    public function edit(Barang $barang): View
+    {
+        /** @var \App\Models\Admin $admin */
+        $admin = Auth::guard('admin')->user();
+        $kategoriOptions = Kategori::query()
+            ->orderBy('nama_kategori')
+            ->get(['id', 'nama_kategori']);
+
+        return view('admin.pages.found-item-edit', compact('barang', 'admin', 'kategoriOptions'));
+    }
+
+    public function update(Request $request, Barang $barang): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nama_barang' => ['required', 'string', 'max:255'],
+            'kategori_id' => ['nullable', 'integer', 'exists:kategoris,id'],
+            'deskripsi' => ['nullable', 'string', 'max:2000'],
+            'lokasi_ditemukan' => ['required', 'string', 'max:255'],
+            'tanggal_ditemukan' => ['required', 'date'],
+            'status_barang' => ['required', 'in:tersedia,dalam_proses_klaim,sudah_diklaim,sudah_dikembalikan'],
+            'lokasi_pengambilan' => ['nullable', 'string', 'max:255'],
+            'alamat_pengambilan' => ['nullable', 'string', 'max:255'],
+            'penanggung_jawab_pengambilan' => ['nullable', 'string', 'max:255'],
+            'kontak_pengambilan' => ['nullable', 'string', 'max:255'],
+            'jam_layanan_pengambilan' => ['nullable', 'string', 'max:255'],
+            'catatan_pengambilan' => ['nullable', 'string', 'max:2000'],
+            'foto_barang' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
+        ]);
+
+        $payload = [
+            'nama_barang' => $validated['nama_barang'],
+            'kategori_id' => $validated['kategori_id'] ?? $barang->kategori_id,
+            'deskripsi' => isset($validated['deskripsi']) && trim((string) $validated['deskripsi']) !== ''
+                ? trim((string) $validated['deskripsi'])
+                : ((string) ($barang->deskripsi ?? '')),
+            'lokasi_ditemukan' => $validated['lokasi_ditemukan'],
+            'tanggal_ditemukan' => $validated['tanggal_ditemukan'],
+            'status_barang' => $validated['status_barang'],
+            'lokasi_pengambilan' => isset($validated['lokasi_pengambilan']) && trim((string) $validated['lokasi_pengambilan']) !== ''
+                ? trim((string) $validated['lokasi_pengambilan'])
+                : null,
+            'alamat_pengambilan' => isset($validated['alamat_pengambilan']) && trim((string) $validated['alamat_pengambilan']) !== ''
+                ? trim((string) $validated['alamat_pengambilan'])
+                : null,
+            'penanggung_jawab_pengambilan' => isset($validated['penanggung_jawab_pengambilan']) && trim((string) $validated['penanggung_jawab_pengambilan']) !== ''
+                ? trim((string) $validated['penanggung_jawab_pengambilan'])
+                : null,
+            'kontak_pengambilan' => isset($validated['kontak_pengambilan']) && trim((string) $validated['kontak_pengambilan']) !== ''
+                ? trim((string) $validated['kontak_pengambilan'])
+                : null,
+            'jam_layanan_pengambilan' => isset($validated['jam_layanan_pengambilan']) && trim((string) $validated['jam_layanan_pengambilan']) !== ''
+                ? trim((string) $validated['jam_layanan_pengambilan'])
+                : null,
+            'catatan_pengambilan' => isset($validated['catatan_pengambilan']) && trim((string) $validated['catatan_pengambilan']) !== ''
+                ? trim((string) $validated['catatan_pengambilan'])
+                : null,
+        ];
+
+        $oldPhotoPath = null;
+        $photo = $request->file('foto_barang');
+        if ($photo) {
+            $oldPhotoPath = $barang->foto_barang;
+            $payload['foto_barang'] = $this->imageUploader->upload($photo, 'barang-temuan/' . now()->format('Y/m'));
+        }
+
+        $barang->update($payload);
+
+        if (!empty($oldPhotoPath)) {
+            ReportImageCleaner::purgeIfOrphaned($oldPhotoPath);
+        }
+
+        return redirect()
+            ->route('admin.found-items.show', $barang->id)
+            ->with('status', 'Data barang temuan berhasil diperbarui.');
     }
 
     public function updateStatus(Request $request, Barang $barang): RedirectResponse

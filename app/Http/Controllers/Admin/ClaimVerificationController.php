@@ -185,6 +185,13 @@ class ClaimVerificationController extends Controller
         $tanggalLaporan = $barang?->tanggal_ditemukan ?? $laporanHilang?->tanggal_hilang ?? $klaim->created_at;
         $deskripsi = $barang?->deskripsi ?? $laporanHilang?->keterangan ?? 'Belum ada deskripsi.';
         $fotoUrl = $this->resolveItemImageUrl((string) ($barang?->foto_barang ?? $laporanHilang?->foto_barang ?? ''));
+        $statusBarangMap = [
+            'tersedia' => ['Tersedia', 'status-dalam_peninjauan'],
+            'dalam_proses_klaim' => ['Dalam Proses Klaim', 'status-diproses'],
+            'sudah_diklaim' => ['Sudah Diklaim', 'status-selesai'],
+            'sudah_dikembalikan' => ['Selesai', 'status-selesai'],
+        ];
+        [$statusBarangLabel, $statusBarangClass] = $statusBarangMap[(string) ($barang?->status_barang ?? '')] ?? ['Tidak tersedia', 'status-dalam_peninjauan'];
 
         $pelapor = $klaim->user;
         $pelaporNama = $pelapor?->nama ?? $pelapor?->name ?? 'Pengguna';
@@ -201,6 +208,8 @@ class ClaimVerificationController extends Controller
             'tanggalLaporan',
             'deskripsi',
             'fotoUrl',
+            'statusBarangLabel',
+            'statusBarangClass',
             'pelaporNama',
             'pelaporEmail'
         ));

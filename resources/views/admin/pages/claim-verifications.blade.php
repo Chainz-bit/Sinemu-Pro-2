@@ -38,7 +38,7 @@
                     </select>
                     <select name="status" class="filter-btn">
                         <option value="">Semua Status</option>
-                        <option value="pending" @selected(request('status') === 'pending')>Sedang Ditinjau</option>
+                        <option value="pending" @selected(request('status') === 'pending')>Menunggu Verifikasi</option>
                         <option value="disetujui" @selected(request('status') === 'disetujui')>Disetujui</option>
                         <option value="ditolak" @selected(request('status') === 'ditolak')>Ditolak</option>
                     </select>
@@ -89,7 +89,7 @@
                             <td>
                                 @php
                                     $statusMap = [
-                                        'pending' => ['SEDANG DITINJAU', 'status-diproses'],
+                                        'pending' => ['MENUNGGU VERIFIKASI', 'status-dalam_peninjauan'],
                                         'disetujui' => ['DISETUJUI', 'status-selesai'],
                                         'ditolak' => ['DITOLAK', 'status-ditolak'],
                                     ];
@@ -105,8 +105,9 @@
                                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3zm0 5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3zm0 5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3z" fill="currentColor"/></svg>
                                 </button>
                                 <div class="row-menu" id="menu-claim-{{ $index }}">
-                                    <a href="{{ route('admin.claim-verifications.show', $claim->id) }}">Lihat Detail</a>
-                                    <a href="{{ route('admin.claim-verifications.show', $claim->id) }}">Tinjau Klaim</a>
+                                    <a href="{{ route('admin.claim-verifications.show', $claim->id) }}">
+                                        {{ $claim->status_klaim === 'pending' ? 'Tinjau Klaim' : 'Lihat Detail' }}
+                                    </a>
                                     @php
                                         $isPublished = (bool) ($claim->barang_tampil_di_home ?? false) || (bool) ($claim->laporan_hilang_tampil_di_home ?? false);
                                         $uploadType = !empty($claim->barang_id) ? 'temuan' : (!empty($claim->laporan_hilang_id) ? 'hilang' : null);

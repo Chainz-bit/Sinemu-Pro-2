@@ -137,10 +137,32 @@
     transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
 }
 
-.top-actions > button:hover {
+.top-actions > button:hover,
+.top-actions > .top-action-link:hover {
     border-color: #d8e2ef;
     background: #f8fbff;
     color: #5f7087;
+}
+
+.top-actions > .top-action-link {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    color: #8491a4;
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.top-actions > .top-action-link.active {
+    border-color: #9ec5ff;
+    background: #eff6ff;
+    color: #2563eb;
 }
 
 .top-actions svg,

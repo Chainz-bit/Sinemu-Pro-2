@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
-use App\Models\Kategori;
 use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
 use App\Services\ReportImageCleaner;
@@ -50,16 +49,11 @@ class DashboardController extends Controller
             (int) $request->query('page', 1),
             8
         );
-        $kategoriOptions = Kategori::query()
-            ->orderBy('nama_kategori')
-            ->get(['id', 'nama_kategori']);
-
         return view('admin.pages.dashboard', compact(
             'totalHilang',
             'totalTemuan',
             'menungguVerifikasi',
             'latestReports',
-            'kategoriOptions',
             'admin',
             'search',
             'statusFilter'
@@ -306,11 +300,11 @@ class DashboardController extends Controller
             ->limit(10)
             ->get()
             ->map(function ($report) {
-                $status = match ($report->latest_claim_status) {
-                    'disetujui' => 'selesai',
-                    'ditolak' => 'ditolak',
-                    'pending' => 'dalam_peninjauan',
-                    default => 'diproses',
+                $statusPayload = match ($report->latest_claim_status) {
+                    'disetujui' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'DITEMUKAN'],
+                    'ditolak' => ['status' => 'ditolak', 'status_class' => 'status-ditolak', 'status_text' => 'DITOLAK'],
+                    'pending' => ['status' => 'diproses', 'status_class' => 'status-diproses', 'status_text' => 'DALAM PENINJAUAN'],
+                    default => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'BELUM DITEMUKAN'],
                 };
 
                 $pelapor = $report->user?->nama ?? $report->user?->name ?? 'Pengguna';
@@ -328,13 +322,15 @@ class DashboardController extends Controller
                     'incident_date' => $report->tanggal_hilang,
                     'created_at' => $report->created_at,
                     'activity_at' => $activityAt,
-                    'status' => $status,
+                    'status' => $statusPayload['status'],
+                    'status_class' => $statusPayload['status_class'],
+                    'status_text' => $statusPayload['status_text'],
                     'status_label' => 'Laporan Hilang',
                     'avatar' => 'H',
                     'avatar_class' => 'avatar-sand',
                     'foto_barang' => $report->foto_barang,
                     'detail_url' => route('admin.lost-items.show', $report->id),
-                    'edit_url' => route('admin.lost-items.show', $report->id),
+                    'edit_url' => route('admin.lost-items.edit', $report->id),
                     'edit_nama_barang' => $report->nama_barang,
                     'edit_lokasi_hilang' => $report->lokasi_hilang,
                     'edit_tanggal_hilang' => $report->tanggal_hilang,
@@ -377,10 +373,12 @@ class DashboardController extends Controller
             ->limit(10)
             ->get()
             ->map(function ($report) {
-                $status = match ($report->status_barang) {
-                    'dalam_proses_klaim' => 'dalam_peninjauan',
-                    'sudah_diklaim', 'sudah_dikembalikan' => 'selesai',
-                    default => 'diproses',
+                $statusPayload = match ($report->status_barang) {
+                    'tersedia' => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'TERSEDIA'],
+                    'dalam_proses_klaim' => ['status' => 'diproses', 'status_class' => 'status-diproses', 'status_text' => 'DALAM PROSES KLAIM'],
+                    'sudah_diklaim' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'SUDAH DIKLAIM'],
+                    'sudah_dikembalikan' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'SELESAI'],
+                    default => ['status' => 'diproses', 'status_class' => 'status-diproses', 'status_text' => 'UNKNOWN'],
                 };
 
                 $pelapor = $report->admin?->nama ?? 'Admin';
@@ -395,13 +393,15 @@ class DashboardController extends Controller
                     'incident_date' => $report->tanggal_ditemukan,
                     'created_at' => $report->created_at,
                     'activity_at' => $activityAt,
-                    'status' => $status,
+                    'status' => $statusPayload['status'],
+                    'status_class' => $statusPayload['status_class'],
+                    'status_text' => $statusPayload['status_text'],
                     'status_label' => 'Barang Temuan',
                     'avatar' => 'T',
                     'avatar_class' => 'avatar-mint',
                     'foto_barang' => $report->foto_barang,
                     'detail_url' => route('admin.found-items.show', $report->id),
-                    'edit_url' => route('admin.found-items.show', $report->id),
+                    'edit_url' => route('admin.found-items.edit', $report->id),
                     'edit_nama_barang' => $report->nama_barang,
                     'edit_kategori_id' => $report->kategori_id,
                     'edit_deskripsi' => $report->deskripsi,
@@ -446,10 +446,10 @@ class DashboardController extends Controller
             ->limit(10)
             ->get()
             ->map(function ($claim) {
-                $status = match ($claim->status_klaim) {
-                    'disetujui' => 'selesai',
-                    'ditolak' => 'ditolak',
-                    default => 'dalam_peninjauan',
+                $statusPayload = match ($claim->status_klaim) {
+                    'disetujui' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'DISETUJUI'],
+                    'ditolak' => ['status' => 'ditolak', 'status_class' => 'status-ditolak', 'status_text' => 'DITOLAK'],
+                    default => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'MENUNGGU VERIFIKASI'],
                 };
 
                 $namaBarang = $claim->barang?->nama_barang
@@ -487,7 +487,9 @@ class DashboardController extends Controller
                     'incident_date' => $claim->created_at,
                     'created_at' => $claim->created_at,
                     'activity_at' => $activityAt,
-                    'status' => $status,
+                    'status' => $statusPayload['status'],
+                    'status_class' => $statusPayload['status_class'],
+                    'status_text' => $statusPayload['status_text'],
                     'status_label' => 'Verifikasi Klaim',
                     'avatar' => 'K',
                     'avatar_class' => 'avatar-claim',

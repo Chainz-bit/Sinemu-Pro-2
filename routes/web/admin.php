@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\FoundItemController;
 use App\Http\Controllers\Admin\InputItemController;
 use App\Http\Controllers\Admin\LostItemController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -27,11 +28,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('barang-hilang', [LostItemController::class, 'index'])->name('lost-items');
         Route::get('barang-hilang/{laporanBarangHilang}', [LostItemController::class, 'show'])->name('lost-items.show');
+        Route::get('barang-hilang/{laporanBarangHilang}/edit', [LostItemController::class, 'edit'])->name('lost-items.edit');
+        Route::patch('barang-hilang/{laporanBarangHilang}', [LostItemController::class, 'update'])->name('lost-items.update');
         Route::patch('barang-hilang/{laporanBarangHilang}/status', [LostItemController::class, 'updateStatus'])->name('lost-items.update-status');
         Route::delete('barang-hilang/{laporanBarangHilang}', [LostItemController::class, 'destroy'])->name('lost-items.destroy');
 
         Route::get('barang-temuan', [FoundItemController::class, 'index'])->name('found-items');
         Route::get('barang-temuan/{barang}', [FoundItemController::class, 'show'])->name('found-items.show');
+        Route::get('barang-temuan/{barang}/edit', [FoundItemController::class, 'edit'])->name('found-items.edit');
+        Route::patch('barang-temuan/{barang}', [FoundItemController::class, 'update'])->name('found-items.update');
         Route::get('barang-temuan/{barang}/export', [FoundItemController::class, 'export'])->name('found-items.export');
         Route::patch('barang-temuan/{barang}/status', [FoundItemController::class, 'updateStatus'])->name('found-items.update-status');
         Route::delete('barang-temuan/{barang}', [FoundItemController::class, 'destroy'])->name('found-items.destroy');
@@ -47,6 +52,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('profil', [ProfileController::class, 'index'])->name('profile');
         Route::get('profil/edit', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('profil', [ProfileController::class, 'update'])->name('profile.update');
+        Route::get('pengaturan', [SettingsController::class, 'index'])->name('settings');
+        Route::put('pengaturan', [SettingsController::class, 'update'])->name('settings.update');
+        Route::get('pengaturan/log-aktivitas', [SettingsController::class, 'logs'])->name('settings.logs');
 
         Route::get('notifications', function () {
             return redirect()->route('admin.dashboard');

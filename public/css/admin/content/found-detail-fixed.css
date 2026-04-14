@@ -17,9 +17,13 @@ body.found-detail-page-mode .main-content {
 
 body.found-detail-page-mode .found-detail-page {
     flex: 1 1 auto;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
     min-height: 0;
     overflow-y: auto;
-    padding-right: 4px;
+    padding-right: 0;
 }
 
 body.found-detail-page-mode .found-detail-page::-webkit-scrollbar {

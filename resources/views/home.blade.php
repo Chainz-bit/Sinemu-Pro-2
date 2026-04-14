@@ -128,6 +128,14 @@
             <div class="hero-modern text-center" data-animate="1">
                 <h1 class="hero-modern-title mb-3">Kehilangan atau Menemukan <span>Barang</span> di <span>Indramayu?</span></h1>
                 <p class="hero-modern-subtitle mb-4">SiNemu bantu temukan barang berhargamu. Lapor dengan mudah, cari dengan cepat, dan klaim dengan aman.</p>
+                <div class="hero-modern-actions">
+                    <a href="#hilang-temuan" class="btn btn-sinemu btn-sinemu-primary">Cari Barang Sekarang</a>
+                    @auth
+                        <button type="button" class="btn btn-sinemu btn-sinemu-outline" data-action="open-lost-report">Lapor Kehilangan</button>
+                    @else
+                        <button type="button" class="btn btn-sinemu btn-sinemu-outline" data-bs-toggle="modal" data-bs-target="#loginPortalModal">Lapor Kehilangan</button>
+                    @endauth
+                </div>
             </div>
 
             <div class="surface-card filter-wrap" data-animate="2">

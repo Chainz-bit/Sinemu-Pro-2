@@ -40,6 +40,13 @@ class AppServiceProvider extends ServiceProvider
 
         // Data notifikasi global untuk semua halaman admin.
         View::composer('admin.partials.topbar', function ($view) {
+            $viewData = $view->getData();
+            if (($viewData['hideTopActions'] ?? false) === true) {
+                $view->with('adminNotifications', collect())
+                    ->with('adminUnreadNotificationsCount', 0);
+                return;
+            }
+
             $admin = Auth::guard('admin')->user();
 
             if (!$admin) {
@@ -50,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
 
             $notifications = $admin->notifications()
                 ->latest('created_at')
+                ->limit(20)
                 ->get();
 
             $unreadCount = $admin->notifications()

@@ -133,7 +133,7 @@
                                 </button>
                                 <div class="row-menu" id="menu-found-{{ $index }}">
                                     <a href="{{ route('admin.found-items.show', $item->id) }}">Lihat Detail</a>
-                                    <a href="#">Edit Data</a>
+                                    <a href="{{ route('admin.found-items.edit', $item->id) }}">Edit Data</a>
                                     @if(!($item->tampil_di_home ?? false))
                                         <form method="POST" action="{{ route('admin.dashboard.reports.publish-home', ['type' => 'temuan', 'id' => $item->id]) }}">
                                             @csrf

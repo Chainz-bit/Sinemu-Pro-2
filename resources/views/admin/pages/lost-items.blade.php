@@ -39,7 +39,7 @@
                     </select>
                     <select name="status" class="filter-btn">
                         <option value="">Semua Status</option>
-                        <option value="pending" @selected(request('status') === 'pending')>Belum Ditemukan</option>
+                        <option value="pending" @selected(request('status') === 'pending')>Dalam Peninjauan</option>
                         <option value="disetujui" @selected(request('status') === 'disetujui')>Ditemukan</option>
                         <option value="ditolak" @selected(request('status') === 'ditolak')>Ditolak</option>
                     </select>
@@ -118,9 +118,9 @@
                                 @php
                                     $statusMap = [
                                         null => ['BELUM DITEMUKAN', 'status-dalam_peninjauan'],
-                                        'pending' => ['BELUM DITEMUKAN', 'status-diproses'],
+                                        'pending' => ['DALAM PENINJAUAN', 'status-diproses'],
                                         'disetujui' => ['DITEMUKAN', 'status-selesai'],
-                                        'ditolak' => ['BELUM DITEMUKAN', 'status-ditolak'],
+                                        'ditolak' => ['DITOLAK', 'status-ditolak'],
                                     ];
                                     [$statusLabel, $statusClass] = $statusMap[$item->latest_claim_status] ?? ['UNKNOWN', 'status-diproses'];
                                 @endphp
@@ -132,7 +132,7 @@
                                 </button>
                                 <div class="row-menu" id="menu-{{ $index }}">
                                     <a href="{{ route('admin.lost-items.show', $item->id) }}">Lihat Detail</a>
-                                    <a href="#">Edit Data</a>
+                                    <a href="{{ route('admin.lost-items.edit', $item->id) }}">Edit Data</a>
                                     @if(!($item->tampil_di_home ?? false))
                                         <form method="POST" action="{{ route('admin.dashboard.reports.publish-home', ['type' => 'hilang', 'id' => $item->id]) }}">
                                             @csrf

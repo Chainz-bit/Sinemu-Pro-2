@@ -1,0 +1,262 @@
+@extends('admin.layouts.app')
+
+@php
+    $pageTitle = 'Edit Data Barang Temuan - SiNemu';
+    $activeMenu = 'found-items';
+    $hideSearch = true;
+    $hideSidebar = true;
+    $topbarBackUrl = route('admin.found-items');
+    $topbarBackLabel = 'Kembali ke Daftar Barang Temuan';
+    $statusOptionLabels = [
+        'tersedia' => 'Tersedia',
+        'dalam_proses_klaim' => 'Dalam Proses Klaim',
+        'sudah_diklaim' => 'Sudah Diklaim',
+        'sudah_dikembalikan' => 'Selesai',
+    ];
+    $statusSekarang = $statusOptionLabels[$barang->status_barang] ?? 'Tidak diketahui';
+    $fotoPath = trim((string) ($barang->foto_barang ?? ''), '/');
+    [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
+    $fotoUrl = !empty($fotoPath) && in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== ''
+        ? route('media.image', ['folder' => $folder, 'path' => $subPath], false)
+        : route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp'], false);
+    $createdAtLabel = !empty($barang->created_at)
+        ? \Illuminate\Support\Carbon::parse($barang->created_at)->format('d M Y, H:i')
+        : '-';
+    $updatedAtLabel = !empty($barang->updated_at)
+        ? \Illuminate\Support\Carbon::parse($barang->updated_at)->format('d M Y, H:i')
+        : '-';
+@endphp
+
+@section('page-content')
+    <section class="edit-report-page">
+        @if(session('status'))
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Berhasil</strong>
+                    <span>{{ session('status') }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Gagal</strong>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
+        @endif
+        @if($errors->any())
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
+                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
+                <div class="feedback-alert-body">
+                    <strong>Gagal</strong>
+                    <span>{{ $errors->first() }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
+        @endif
+
+        <div class="edit-report-top">
+            <div class="edit-report-header">
+                <p class="edit-report-breadcrumb">
+                    <a href="{{ route('admin.found-items') }}">Daftar Barang Temuan</a>
+                    <span>/</span>
+                    <strong>Edit Data</strong>
+                </p>
+                <h1>Edit Data Barang Temuan</h1>
+                <p class="edit-report-subtitle">Perbarui data laporan barang temuan lalu simpan perubahan.</p>
+                <div class="edit-report-meta">
+                    <span>Laporan #{{ $barang->id }}</span>
+                    <span>Dibuat {{ $createdAtLabel }} WIB</span>
+                    <span>Diperbarui {{ $updatedAtLabel }} WIB</span>
+                </div>
+            </div>
+
+            <aside class="edit-report-summary">
+                <span class="edit-summary-label">Foto Saat Ini</span>
+                <div class="edit-summary-photo-wrap">
+                    <img id="editCurrentPhotoPreview" src="{{ $fotoUrl }}" alt="{{ $barang->nama_barang }}">
+                </div>
+                <div class="edit-summary-grid">
+                    <div class="edit-summary-item">
+                        <small>Status</small>
+                        <strong>{{ $statusSekarang }}</strong>
+                    </div>
+                    <div class="edit-summary-item">
+                        <small>Kategori</small>
+                        <strong>{{ $barang->kategori?->nama_kategori ?? 'Tanpa Kategori' }}</strong>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <section class="report-card edit-report-card">
+            <header>
+                <h2>Form Edit Data Barang Temuan</h2>
+                <p>Laporan #{{ $barang->id }}</p>
+            </header>
+
+            <form method="POST" action="{{ route('admin.found-items.update', $barang->id) }}" enctype="multipart/form-data" class="edit-report-form">
+                @csrf
+                @method('PATCH')
+
+                <div class="edit-form-section">
+                    <h3>Informasi Utama</h3>
+                    <div class="edit-form-grid edit-form-grid-two">
+                        <div class="edit-form-col-full">
+                            <label class="edit-form-label" for="nama_barang">Nama Barang</label>
+                            <input class="form-input edit-form-input" id="nama_barang" name="nama_barang" type="text" required maxlength="255" value="{{ old('nama_barang', $barang->nama_barang) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="kategori_id">Kategori</label>
+                            <select class="form-input edit-form-input" id="kategori_id" name="kategori_id">
+                                <option value="">Pilih kategori</option>
+                                @foreach($kategoriOptions as $kategori)
+                                    <option value="{{ $kategori->id }}" @selected((string) old('kategori_id', $barang->kategori_id) === (string) $kategori->id)>{{ $kategori->nama_kategori }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="status_barang">Status Barang</label>
+                            <select class="form-input edit-form-input" id="status_barang" name="status_barang" required>
+                                <option value="tersedia" @selected(old('status_barang', $barang->status_barang) === 'tersedia')>Tersedia</option>
+                                <option value="dalam_proses_klaim" @selected(old('status_barang', $barang->status_barang) === 'dalam_proses_klaim')>Dalam Proses Klaim</option>
+                                <option value="sudah_diklaim" @selected(old('status_barang', $barang->status_barang) === 'sudah_diklaim')>Sudah Diklaim</option>
+                                <option value="sudah_dikembalikan" @selected(old('status_barang', $barang->status_barang) === 'sudah_dikembalikan')>Sudah Dikembalikan</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="tanggal_ditemukan">Tanggal Ditemukan</label>
+                            <input class="form-input edit-form-input" id="tanggal_ditemukan" name="tanggal_ditemukan" type="date" required value="{{ old('tanggal_ditemukan', !empty($barang->tanggal_ditemukan) ? \Illuminate\Support\Carbon::parse($barang->tanggal_ditemukan)->format('Y-m-d') : '') }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="lokasi_ditemukan">Lokasi Ditemukan</label>
+                            <input class="form-input edit-form-input" id="lokasi_ditemukan" name="lokasi_ditemukan" type="text" required maxlength="255" value="{{ old('lokasi_ditemukan', $barang->lokasi_ditemukan) }}">
+                        </div>
+
+                        <div class="edit-form-col-full">
+                            <label class="edit-form-label" for="deskripsi">Deskripsi/Ciri-ciri</label>
+                            <textarea class="form-input edit-form-input edit-form-textarea" id="deskripsi" name="deskripsi" maxlength="2000">{{ old('deskripsi', $barang->deskripsi) }}</textarea>
+                            <small class="edit-form-help">Jelaskan ciri penting agar barang mudah dikenali (warna, merek, ukuran, kondisi).</small>
+                            <small class="edit-form-counter" id="deskripsi_counter" aria-live="polite">0/2000 karakter</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-form-section">
+                    <h3>Informasi Pengambilan</h3>
+                    <div class="edit-form-grid edit-form-grid-two">
+                        <div>
+                            <label class="edit-form-label" for="lokasi_pengambilan">Lokasi Pengambilan</label>
+                            <input class="form-input edit-form-input" id="lokasi_pengambilan" name="lokasi_pengambilan" type="text" maxlength="255" value="{{ old('lokasi_pengambilan', $barang->lokasi_pengambilan) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="alamat_pengambilan">Alamat Pengambilan</label>
+                            <input class="form-input edit-form-input" id="alamat_pengambilan" name="alamat_pengambilan" type="text" maxlength="255" value="{{ old('alamat_pengambilan', $barang->alamat_pengambilan) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="penanggung_jawab_pengambilan">Penanggung Jawab</label>
+                            <input class="form-input edit-form-input" id="penanggung_jawab_pengambilan" name="penanggung_jawab_pengambilan" type="text" maxlength="255" value="{{ old('penanggung_jawab_pengambilan', $barang->penanggung_jawab_pengambilan) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="kontak_pengambilan">Kontak Pengambilan</label>
+                            <input class="form-input edit-form-input" id="kontak_pengambilan" name="kontak_pengambilan" type="text" maxlength="255" value="{{ old('kontak_pengambilan', $barang->kontak_pengambilan) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="jam_layanan_pengambilan">Jam Layanan</label>
+                            <input class="form-input edit-form-input" id="jam_layanan_pengambilan" name="jam_layanan_pengambilan" type="text" maxlength="255" value="{{ old('jam_layanan_pengambilan', $barang->jam_layanan_pengambilan) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="catatan_pengambilan">Catatan Pengambilan</label>
+                            <textarea class="form-input edit-form-input edit-form-textarea-sm" id="catatan_pengambilan" name="catatan_pengambilan" maxlength="2000">{{ old('catatan_pengambilan', $barang->catatan_pengambilan) }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="edit-form-section">
+                    <h3>Media</h3>
+                    <div class="edit-form-grid">
+                        <label class="edit-form-label" for="foto_barang">Foto Barang (Opsional)</label>
+                        <input class="form-input edit-form-input" id="foto_barang" name="foto_barang" type="file" accept=".jpg,.jpeg,.png,.webp">
+                        <small class="edit-form-help">Biarkan kosong jika tidak ingin mengganti foto.</small>
+                        <small class="edit-form-file-name" id="foto_barang_filename">Belum ada file dipilih.</small>
+                    </div>
+                </div>
+
+                <div class="edit-report-form-actions">
+                    <a href="{{ route('admin.found-items.show', $barang->id) }}" class="filter-btn">Batal</a>
+                    <button type="submit" class="filter-btn primary">Simpan Perubahan</button>
+                </div>
+            </form>
+        </section>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const photoInput = document.getElementById('foto_barang');
+            const photoPreview = document.getElementById('editCurrentPhotoPreview');
+            const photoFileName = document.getElementById('foto_barang_filename');
+            const deskripsi = document.getElementById('deskripsi');
+            const deskripsiCounter = document.getElementById('deskripsi_counter');
+            const maxDeskripsi = Number(deskripsi?.getAttribute('maxlength') || 2000);
+
+            function syncDeskripsiCounter() {
+                if (!deskripsi || !deskripsiCounter) return;
+                const count = deskripsi.value.length;
+                deskripsiCounter.textContent = `${count}/${maxDeskripsi} karakter`;
+            }
+
+            if (deskripsi) {
+                syncDeskripsiCounter();
+                deskripsi.addEventListener('input', syncDeskripsiCounter);
+            }
+
+            if (!photoInput || !photoPreview) return;
+
+            let objectUrl = null;
+
+            photoInput.addEventListener('change', function () {
+                const file = photoInput.files?.[0];
+                if (!file) {
+                    if (photoFileName) photoFileName.textContent = 'Belum ada file dipilih.';
+                    return;
+                }
+
+                if (photoFileName) {
+                    photoFileName.textContent = `File dipilih: ${file.name}`;
+                }
+
+                if (!file.type.startsWith('image/')) return;
+
+                if (objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                }
+
+                objectUrl = URL.createObjectURL(file);
+                photoPreview.src = objectUrl;
+            });
+        });
+    </script>
+@endsection
