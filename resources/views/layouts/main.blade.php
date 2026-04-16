@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Sinemu' }}</title>
+    <script>
+        (function () {
+            try {
+                if ('scrollRestoration' in window.history) {
+                    window.history.scrollRestoration = 'manual';
+                }
+
+                var navEntries = window.performance && typeof window.performance.getEntriesByType === 'function'
+                    ? window.performance.getEntriesByType('navigation')
+                    : [];
+                var isReload = navEntries.length > 0 && navEntries[0].type === 'reload';
+
+                if (isReload && window.location.hash && typeof window.history.replaceState === 'function') {
+                    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                }
+            } catch (error) {
+                // ignore
+            }
+        })();
+    </script>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +41,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
     <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
     <script type="module" src="{{ asset('js/home.js') }}?v={{ @filemtime(public_path('js/home.js')) }}"></script>
     @stack('scripts')

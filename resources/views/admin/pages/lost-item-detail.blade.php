@@ -49,6 +49,13 @@
     $updatedAtLabel = !empty($laporanBarangHilang->updated_at)
         ? \Illuminate\Support\Carbon::parse($laporanBarangHilang->updated_at)->format('d M Y, H:i')
         : '-';
+    $tanggalHilangLabel = !empty($laporanBarangHilang->tanggal_hilang)
+        ? \Illuminate\Support\Carbon::parse($laporanBarangHilang->tanggal_hilang)->format('d M Y')
+        : '-';
+    $waktuHilangRaw = (string) ($laporanBarangHilang->waktu_hilang ?? '');
+    $waktuHilangLabel = $waktuHilangRaw !== ''
+        ? (date('H:i', strtotime($waktuHilangRaw)) ?: $waktuHilangRaw)
+        : '-';
     $initials = collect(explode(' ', trim($pelaporName)))
         ->filter()
         ->take(2)
@@ -135,11 +142,11 @@
                         <div class="lost-detail-meta">
                             <div>
                                 <span>Kategori</span>
-                                <strong>Tidak Dikategorikan</strong>
+                                <strong>{{ $laporanBarangHilang->kategori_barang ?: 'Tidak Dikategorikan' }}</strong>
                             </div>
                             <div>
                                 <span>Tanggal Hilang</span>
-                                <strong>{{ !empty($laporanBarangHilang->tanggal_hilang) ? \Illuminate\Support\Carbon::parse($laporanBarangHilang->tanggal_hilang)->format('d M Y') : '-' }}</strong>
+                                <strong>{{ $tanggalHilangLabel }}</strong>
                             </div>
                             <div>
                                 <span>Lokasi Ditemukan Terakhir</span>
@@ -150,6 +157,46 @@
                                 <strong>#{{ $laporanBarangHilang->id }}</strong>
                             </div>
                         </div>
+
+                        <div class="lost-detail-meta">
+                            <div>
+                                <span>Warna</span>
+                                <strong>{{ $laporanBarangHilang->warna_barang ?: '-' }}</strong>
+                            </div>
+                            <div>
+                                <span>Merek</span>
+                                <strong>{{ $laporanBarangHilang->merek_barang ?: '-' }}</strong>
+                            </div>
+                            <div>
+                                <span>Nomor Seri / Kode</span>
+                                <strong>{{ $laporanBarangHilang->nomor_seri ?: '-' }}</strong>
+                            </div>
+                            <div>
+                                <span>No. WA Pelapor</span>
+                                <strong>{{ $laporanBarangHilang->kontak_pelapor ?: '-' }}</strong>
+                            </div>
+                        </div>
+
+                        @if(!empty($laporanBarangHilang->detail_lokasi_hilang) || !empty($laporanBarangHilang->ciri_khusus) || !empty($laporanBarangHilang->bukti_kepemilikan))
+                            <div class="lost-detail-meta">
+                                <div>
+                                    <span>Detail Lokasi Hilang</span>
+                                    <strong>{{ $laporanBarangHilang->detail_lokasi_hilang ?: '-' }}</strong>
+                                </div>
+                                <div>
+                                    <span>Ciri Unik</span>
+                                    <strong>{{ $laporanBarangHilang->ciri_khusus ?: '-' }}</strong>
+                                </div>
+                                <div>
+                                    <span>Bukti Kepemilikan</span>
+                                    <strong>{{ $laporanBarangHilang->bukti_kepemilikan ?: '-' }}</strong>
+                                </div>
+                                <div>
+                                    <span>Jam Hilang</span>
+                                    <strong>{{ $waktuHilangLabel }} WIB</strong>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </article>
@@ -213,7 +260,7 @@
                             </span>
                             <div>
                                 <small>Hilang Pada</small>
-                                <p><strong>{{ !empty($laporanBarangHilang->tanggal_hilang) ? \Illuminate\Support\Carbon::parse($laporanBarangHilang->tanggal_hilang)->format('d M Y, H:i') : '-' }} WIB</strong></p>
+                                <p><strong>{{ $tanggalHilangLabel }} {{ $waktuHilangLabel !== '-' ? ', '.$waktuHilangLabel : '' }} WIB</strong></p>
                             </div>
                         </div>
 

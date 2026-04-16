@@ -14,7 +14,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable, MustVerifyEmailTrait;
 
     protected $fillable = [
-        'name', 'nama', 'username', 'email', 'password', 'profil',
+        'name', 'nama', 'username', 'email', 'nomor_telepon', 'password', 'profil',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -54,5 +54,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function klaims()
     {
         return $this->hasMany(Klaim::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(UserNotification::class);
     }
 }

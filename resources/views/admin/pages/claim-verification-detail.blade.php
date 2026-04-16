@@ -22,6 +22,12 @@
     };
     $catatanPengaju = trim((string) ($klaim->laporanHilang?->keterangan ?? ''));
     $catatanAdmin = trim((string) ($klaim->catatan ?? ''));
+    $ciriKhususPengaju = trim((string) ($klaim->laporanHilang?->ciri_khusus ?? ''));
+    $buktiKepemilikanPengaju = trim((string) ($klaim->laporanHilang?->bukti_kepemilikan ?? ''));
+    $buktiFotoUrls = collect((array) ($klaim->bukti_foto ?? []))
+        ->filter(fn ($path) => is_string($path) && trim($path) !== '')
+        ->map(fn ($path) => asset('storage/' . ltrim((string) $path, '/')))
+        ->values();
 @endphp
 
 @section('page-content')
@@ -148,9 +154,33 @@
                                 <p>{{ $catatanPengaju }}</p>
                             </div>
                         @endif
+                        @if($ciriKhususPengaju !== '')
+                            <div class="claim-note-box claim-note-requester">
+                                <small>Ciri Unik Barang</small>
+                                <p>{{ $ciriKhususPengaju }}</p>
+                            </div>
+                        @endif
+                        @if($buktiKepemilikanPengaju !== '')
+                            <div class="claim-note-box claim-note-requester">
+                                <small>Bukti Kepemilikan</small>
+                                <p>{{ $buktiKepemilikanPengaju }}</p>
+                            </div>
+                        @endif
+                        @if($buktiFotoUrls->isNotEmpty())
+                            <div class="claim-proof-gallery">
+                                <small>Foto Bukti Kepemilikan</small>
+                                <div class="claim-proof-grid">
+                                    @foreach($buktiFotoUrls as $proofUrl)
+                                        <a href="{{ $proofUrl }}" target="_blank" rel="noopener noreferrer" class="claim-proof-item">
+                                            <img src="{{ $proofUrl }}" alt="Bukti kepemilikan klaim #{{ $klaim->id }}" loading="lazy" decoding="async">
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                         @if($catatanAdmin !== '')
                             <div class="claim-note-box">
-                                <small>Catatan Admin</small>
+                                <small>Catatan Klaim Tambahan</small>
                                 <p>{{ $catatanAdmin }}</p>
                             </div>
                         @endif

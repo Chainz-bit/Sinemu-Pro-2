@@ -1,0 +1,4 @@
+/* Bagian ini untuk override kecil tampilan user agar lebih tegas. */
+.sidebar-nav a.active {
+    border: 1px solid #bfd3f7;
+}

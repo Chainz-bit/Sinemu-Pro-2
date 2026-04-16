@@ -1,0 +1,118 @@
+/*
+|--------------------------------------------------------------------------
+| User Dashboard Styles
+|--------------------------------------------------------------------------
+| User memakai fondasi style admin agar visual konsisten,
+| lalu ditambah override kecil yang spesifik ke kebutuhan user.
+*/
+
+@import url('../admin/base.css');
+@import url('../admin/layout.css');
+@import url('../admin/topbar.css');
+@import url('../admin/content.css');
+@import url('../admin/responsive.css');
+@import url('./sidebar.css');
+
+.claim-history-card .claim-history-toolbar {
+    margin-bottom: 8px;
+}
+
+.claim-history-card .claim-history-search {
+    max-width: 360px;
+}
+
+.claim-history-card .claim-history-search .form-input {
+    width: 100%;
+}
+
+.claim-history-card.dashboard-report-card {
+    margin-top: 8px;
+}
+
+.claim-history-card .claim-history-table {
+    min-width: 760px;
+}
+
+.claim-history-card .claim-history-table .col-item {
+    width: 37%;
+}
+
+.claim-history-card .claim-history-table .col-date {
+    width: 20%;
+}
+
+.claim-history-card .claim-history-table .col-status {
+    width: 16%;
+}
+
+.claim-history-card .claim-history-table .col-pickup {
+    width: 21%;
+}
+
+.claim-history-card .claim-history-table .col-action {
+    width: 6%;
+}
+
+.claim-history-card .status-chip {
+    padding: 4px 8px;
+    font-size: 9.5px;
+    letter-spacing: 0.02em;
+}
+
+.claim-history-card .report-table td.menu-cell {
+    text-align: center;
+}
+
+.claim-history-card .menu-cell .row-menu {
+    right: 0;
+    min-width: 140px;
+}
+
+.claim-history-card .menu-cell .row-menu a,
+.claim-history-card .menu-cell .row-menu .menu-submit {
+    text-align: left;
+}
+
+.claim-history-card .avatar-claim-image {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.claim-history-card .avatar-claim-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.claim-history-card .claim-history-empty-row {
+    padding: 18px 14px;
+    text-align: center;
+}
+
+.claim-history-card .claim-history-empty-row strong {
+    display: block;
+    font-size: 13px;
+    color: #2f3d52;
+}
+
+.claim-history-card .claim-history-empty-row small {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #7a889b;
+}
+
+@media (max-width: 992px) {
+    .claim-history-card .claim-history-search {
+        max-width: 100%;
+    }
+
+    .claim-history-card .claim-history-table {
+        min-width: 700px;
+    }
+}

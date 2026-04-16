@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinemu</title>
+    <link rel="icon" type="image/png" href="http://127.0.0.1:8000/img/logo.png">
+    <link rel="apple-touch-icon" href="http://127.0.0.1:8000/img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="http://127.0.0.1:8000/css/page-transition.css?v=1775807722" rel="stylesheet">
+        <link rel="stylesheet" href="http://127.0.0.1:8000/css/auth/login.css?v=1776056455">
+</head>
+<body>
+        
+    <main class="login-shell login-body">
+        
+        <section class="login-left" aria-label="Informasi platform">
+            <div class="left-content">
+                <h1 class="left-title">Membantu menemukan barang berharga anda</h1>
+                <p class="left-subtitle">SiNemu adalah sistem restoratif premium untuk mengelola dan menemukan barang hilang dengan presisi tinggi.</p>
+
+                <div class="left-illustration" aria-hidden="true">
+                    <img
+                        src="http://127.0.0.1:8000/img/login-image.png"
+                        alt="Ilustrasi Login"
+                        class="left-illustration-img"
+                        loading="lazy"
+                        decoding="async"
+                    >
+                </div>
+            </div>
+        </section>
+        
+
+        
+        <section class="login-right" aria-label="Form login">
+            <div class="right-content">
+                <div class="brand-wrap">
+                    <img src="http://127.0.0.1:8000/img/logo.png" alt="Sinemu" class="brand-logo" width="130" height="40" fetchpriority="high">
+                </div>
+
+                <header class="login-header">
+                    <h2>Selamat datang kembali!</h2>
+                    <p>Masuk untuk melanjutkan ke akun Anda</p>
+                </header>
+
+                
+                
+                <form method="POST" action="http://127.0.0.1:8000/login" class="login-form" novalidate autocomplete="off">
+                    <input type="hidden" name="_token" value="eFgtbUuuv24dZ9hBda2MX0x5lTF2l5uYVBRNWMe0" autocomplete="off">
+                    <div class="field-group">
+                        <label for="login">Email atau Username</label>
+                        <div class="input-wrap">
+                            <span class="input-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Zm1.8-.2 5.85 4.45a.6.6 0 0 0 .7 0l5.85-4.45" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </span>
+                            <input id="login" type="text" name="login" value="" placeholder="nama@email.com atau username" required autofocus autocomplete="username" autocapitalize="off" spellcheck="false">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <div class="label-row">
+                            <label for="password">Kata Sandi</label>
+                                                            <a href="http://127.0.0.1:8000/forgot-password" class="small-link">Lupa Kata Sandi?</a>
+                                                    </div>
+
+                        <div class="input-wrap">
+                            <span class="input-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M8 11V8.5a4 4 0 0 1 8 0V11m-9.5 0h11a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 17.5 20h-11A1.5 1.5 0 0 1 5 18.5v-6A1.5 1.5 0 0 1 6.5 11Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </span>
+                            <input id="password" type="password" name="password" placeholder="********" required autocomplete="new-password">
+                            <button id="togglePassword" type="button" class="toggle-password" aria-label="Tampilkan kata sandi">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M2.8 12.2C4.3 8.7 7.7 6.5 12 6.5s7.7 2.2 9.2 5.7c-1.5 3.5-4.9 5.7-9.2 5.7s-7.7-2.2-9.2-5.7Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="12.2" r="2.2" stroke="currentColor" stroke-width="1.7"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <label class="remember-row">
+                        <input id="remember_me" type="checkbox" name="remember">
+                        <span>Ingat saya untuk 30 hari</span>
+                    </label>
+
+                    <button class="btn-submit" type="submit">Masuk</button>
+
+                    <div class="divider" role="presentation">ATAU</div>
+
+                    <button id="googleLoginBtn" class="btn-google" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M21.8 12.2c0-.7-.1-1.2-.2-1.8H12v3.4h5.5a4.7 4.7 0 0 1-2 3.1v2.5h3.2c1.9-1.7 3.1-4.2 3.1-7.2Z" fill="#4285F4"/>
+                            <path d="M12 22c2.7 0 4.9-.9 6.5-2.5l-3.2-2.5c-.9.6-2 .9-3.3.9-2.5 0-4.6-1.7-5.4-4H3.2v2.6A10 10 0 0 0 12 22Z" fill="#34A853"/>
+                            <path d="M6.6 13.9a5.8 5.8 0 0 1 0-3.8V7.5H3.2a10 10 0 0 0 0 9l3.4-2.6Z" fill="#FBBC05"/>
+                            <path d="M12 6.2c1.4 0 2.7.5 3.7 1.4l2.8-2.8A10 10 0 0 0 3.2 7.5l3.4 2.6c.8-2.3 2.9-4 5.4-4Z" fill="#EA4335"/>
+                        </svg>
+                        Masuk dengan Google
+                    </button>
+                </form>
+
+                <p class="register-link">
+                    Belum punya akun?
+                                            <a href="http://127.0.0.1:8000/register">Daftar Sekarang</a>
+                                    </p>
+            </div>
+        </section>
+        
+    </main>
+    
+    <script src="http://127.0.0.1:8000/js/page-transition.js?v=1775807722" defer></script>
+        <script src="http://127.0.0.1:8000/js/auth/login.js?v=1775615351" defer></script>
+</body>
+</html>

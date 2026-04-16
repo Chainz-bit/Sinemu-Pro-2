@@ -8,57 +8,85 @@
         {{-- Navbar Start --}}
         {{-- ========================================= --}}
         <nav class="navbar navbar-expand-lg floating-nav fixed-nav px-3 px-lg-4" id="mainNavBar">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ route('home') }}">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold order-1" href="{{ route('home') }}">
                 <img src="{{ asset('img/logo.png') }}" alt="Sinemu" class="brand-logo" width="160" height="50" fetchpriority="high">
             </a>
-            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler border-0 shadow-none order-2 ms-auto d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <iconify-icon icon="mdi:menu" aria-hidden="true"></iconify-icon>
             </button>
-            <div class="collapse navbar-collapse" id="mainNav">
-                <ul class="navbar-nav mx-auto mb-3 mb-lg-0 gap-lg-4 nav-centered">
+
+            <div class="collapse navbar-collapse order-4 order-lg-2" id="mainNav">
+                @auth
+                    <div class="dropdown profile-dropdown nav-profile order-1 order-lg-2">
+                        <button class="user-chip profile-chip profile-toggle d-none d-lg-inline-flex" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="profile-text">
+                                <div class="fw-semibold small">{{ $userName ?? 'Pengguna' }}</div>
+                                <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
+                            </div>
+                            <span class="avatar avatar-img">
+                                <img src="{{ asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async">
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end profile-menu">
+                            <li>
+                                <a class="dropdown-item" href="{{ route('user.dashboard') }}">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+
+                        <button
+                            class="user-chip profile-chip profile-toggle-mobile d-lg-none w-100"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#mobileProfileSubmenu"
+                            aria-expanded="false"
+                            aria-controls="mobileProfileSubmenu"
+                        >
+                            <div class="profile-text">
+                                <div class="fw-semibold small">{{ $userName ?? 'Pengguna' }}</div>
+                                <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
+                            </div>
+                            <span class="avatar avatar-img">
+                                <img src="{{ asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async">
+                            </span>
+                        </button>
+                        <div id="mobileProfileSubmenu" class="collapse profile-submenu-mobile d-lg-none">
+                            <a class="profile-submenu-item" href="{{ route('user.dashboard') }}">
+                                Dashboard
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="profile-submenu-item text-danger">
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <div class="nav-profile nav-guest order-1 order-lg-2">
+                        <button class="btn btn-sinemu btn-sinemu-primary btn-sm px-3 py-2" type="button" data-bs-toggle="modal" data-bs-target="#loginPortalModal">
+                            Masuk
+                        </button>
+                    </div>
+                @endauth
+
+                <ul class="navbar-nav mx-auto mb-0 mb-lg-0 gap-lg-4 nav-centered order-2 order-lg-1">
                     <li class="nav-item"><a class="nav-link" href="#pencarian">Pencarian</a></li>
                     <li class="nav-item"><a class="nav-link" href="#hilang-temuan">Hilang &amp; Temuan</a></li>
                     <li class="nav-item"><a class="nav-link" href="#klaim">Tutorial</a></li>
                     <li class="nav-item"><a class="nav-link" href="#lokasi-pengambilan">Lokasi</a></li>
                     <li class="nav-item"><a class="nav-link" href="#kontak">Kontak</a></li>
                 </ul>
-                <div class="d-flex align-items-center gap-3 nav-actions ms-lg-3">
-                    @auth
-                        <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
-                        <button class="icon-btn"><i class="fa-solid fa-gear"></i></button>
-                        <div class="dropdown profile-dropdown">
-                            <button class="user-chip profile-chip profile-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <div>
-                                    <div class="fw-semibold small">{{ $userName ?? 'Pengguna' }}</div>
-                                    <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
-                                </div>
-                                <span class="avatar avatar-img">
-                                    <img src="{{ asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async">
-                                </span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end profile-menu">
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('dashboard') }}">
-                                        <i class="fa-solid fa-gauge-high me-2"></i>Dashboard
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item text-danger">
-                                            <i class="fa-solid fa-right-from-bracket me-2"></i>Logout
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    @else
-                        <button class="btn btn-sinemu btn-sinemu-primary btn-sm px-3 py-2" type="button" data-bs-toggle="modal" data-bs-target="#loginPortalModal">
-                            Masuk
-                        </button>
-                    @endauth
-                </div>
             </div>
         </nav>
         {{-- Navbar End --}}
@@ -225,11 +253,6 @@
                         <h2 class="item-block-title mb-0">Daftar Barang Hilang Terkini</h2>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        @auth
-                            <button type="button" class="btn btn-sinemu btn-sinemu-primary btn-sm" data-action="open-lost-report">
-                                Lapor Barang Hilang
-                            </button>
-                        @endauth
                         <a href="#" class="item-link-more">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
                         <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
                             <i class="fa-solid fa-chevron-left"></i>
@@ -272,11 +295,6 @@
                         <h2 class="item-block-title mb-0">Barang Temuan Terbaru</h2>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        @auth
-                            <button type="button" class="btn btn-sinemu btn-sinemu-primary btn-sm" data-action="open-found-report">
-                                Lapor Barang Temuan
-                            </button>
-                        @endauth
                         <span class="item-chip item-chip-active">Terbaru</span>
                         <span class="item-chip">Terverifikasi</span>
                         <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
@@ -621,43 +639,86 @@
             </div>
 
             <div class="modal fade" id="claimModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <form method="POST" action="{{ route('user.claims.store') }}" class="modal-content">
+                <div class="modal-dialog claim-modal-dialog modal-dialog-centered">
+                    <form method="POST" action="{{ route('user.claims.store') }}" class="modal-content claim-modal-content" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="barang_id" id="claimBarangId">
-                        <div class="modal-header">
+                        <div class="modal-header claim-modal-header">
                             <h5 class="modal-title">Ajukan Klaim Barang</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">Barang Temuan</label>
-                                <input type="text" id="claimBarangName" class="form-control" readonly>
+                        <div class="modal-body claim-modal-body">
+                            @if(is_null(auth()->user()?->email_verified_at))
+                                <div class="claim-modal-note claim-modal-note-warning">
+                                    <strong>Email belum diverifikasi.</strong>
+                                    <span>Verifikasi email terlebih dahulu untuk mengajukan klaim.</span>
+                                </div>
+                            @endif
+                            <div class="claim-modal-highlight">
+                                <span class="claim-modal-highlight-label">Barang Temuan</span>
+                                <input type="text" id="claimBarangName" class="form-control claim-modal-input is-readonly" readonly>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">Nama Barang Hilang Anda</label>
-                                <input type="text" name="nama_barang_hilang" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Lokasi Hilang</label>
-                                <input type="text" name="lokasi_hilang" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Tanggal Hilang</label>
-                                <input type="date" name="tanggal_hilang" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Keterangan Barang</label>
-                                <textarea name="keterangan" class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="mb-0">
-                                <label class="form-label">Catatan Klaim</label>
-                                <textarea name="catatan" class="form-control" rows="2"></textarea>
+
+                            <div class="claim-modal-form-grid">
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Nama Barang Hilang Anda <span>*</span></label>
+                                    <input type="text" name="nama_barang_hilang" class="form-control claim-modal-input" value="{{ old('nama_barang_hilang') }}" required>
+                                </div>
+                                <div class="claim-modal-field">
+                                    <label class="form-label claim-modal-label">Lokasi Hilang <span>*</span></label>
+                                    <input type="text" name="lokasi_hilang" class="form-control claim-modal-input" value="{{ old('lokasi_hilang') }}" required>
+                                </div>
+                                <div class="claim-modal-field">
+                                    <label class="form-label claim-modal-label">Tanggal Hilang <span>*</span></label>
+                                    <input type="date" name="tanggal_hilang" class="form-control claim-modal-input" value="{{ old('tanggal_hilang') }}" required>
+                                </div>
+                                <div class="claim-modal-field">
+                                    <label class="form-label claim-modal-label">Warna Dominan</label>
+                                    <input type="text" name="warna_barang" class="form-control claim-modal-input" value="{{ old('warna_barang') }}" placeholder="Contoh: Hitam, Silver">
+                                </div>
+                                <div class="claim-modal-field">
+                                    <label class="form-label claim-modal-label">Merek / Brand</label>
+                                    <input type="text" name="merek_barang" class="form-control claim-modal-input" value="{{ old('merek_barang') }}" placeholder="Contoh: Samsung, Casio">
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Nomor Seri / Kode Unik</label>
+                                    <input type="text" name="nomor_seri" class="form-control claim-modal-input" value="{{ old('nomor_seri') }}" placeholder="Contoh: IMEI, nomor seri, atau kode produksi">
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Detail Lokasi Hilang <span>*</span></label>
+                                    <textarea name="detail_lokasi_hilang" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Contoh: Jatuh di dekat parkiran sebelah ATM, sekitar pukul 18.30." required>{{ old('detail_lokasi_hilang') }}</textarea>
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Keterangan Barang <span>*</span></label>
+                                    <textarea name="keterangan" class="form-control claim-modal-textarea" rows="3" placeholder="Jelaskan jenis barang dan kondisi umumnya agar admin bisa mencocokkan dengan data temuan." required>{{ old('keterangan') }}</textarea>
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Ciri Unik Barang <span>*</span></label>
+                                    <textarea name="ciri_khusus" class="form-control claim-modal-textarea" rows="3" placeholder="Contoh: Ada goresan kecil di sudut kanan, strap sudah diganti, ada stiker tertentu." required>{{ old('ciri_khusus') }}</textarea>
+                                </div>
+                                <div class="claim-modal-field">
+                                    <label class="form-label claim-modal-label">No. WA yang Bisa Dihubungi <span>*</span></label>
+                                    <input type="text" name="kontak_pelapor" class="form-control claim-modal-input" value="{{ old('kontak_pelapor', auth()->user()?->nomor_telepon) }}" placeholder="Contoh: 081234567890" required>
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Bukti Kepemilikan <span>*</span></label>
+                                    <textarea name="bukti_kepemilikan" class="form-control claim-modal-textarea" rows="3" placeholder="Tuliskan bukti yang hanya pemilik asli tahu: isi barang, foto saat dipakai, nomor seri, nota, atau detail lain." required>{{ old('bukti_kepemilikan') }}</textarea>
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Foto Bukti Kepemilikan <span>*</span></label>
+                                    <input type="file" name="bukti_foto[]" id="claimBuktiFoto" class="form-control claim-modal-input-file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple required>
+                                    <small class="claim-modal-file-hint">Unggah 1-3 foto (JPG, PNG, WEBP), maksimal 2MB per file.</small>
+                                    <div id="claimBuktiPreview" class="claim-modal-file-preview" aria-live="polite"></div>
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Catatan Klaim</label>
+                                    <textarea name="catatan" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Tambahkan keterangan pendukung jika diperlukan.">{{ old('catatan') }}</textarea>
+                                </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Ajukan Klaim</button>
+                        <div class="modal-footer claim-modal-footer">
+                            <button type="button" class="btn btn-secondary claim-modal-cancel" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary claim-modal-submit" @disabled(is_null(auth()->user()?->email_verified_at))>Ajukan Klaim</button>
                         </div>
                     </form>
                 </div>
@@ -721,4 +782,5 @@
         </div>
     </footer>
     {{-- Footer End --}}
+
 @endsection

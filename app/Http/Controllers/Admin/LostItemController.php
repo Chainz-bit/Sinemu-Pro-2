@@ -9,6 +9,7 @@ use App\Models\LaporanBarangHilang;
 use App\Services\Admin\LostItems\LostItemExportService;
 use App\Services\Admin\LostItems\LostItemQueryService;
 use App\Services\ReportImageCleaner;
+use App\Services\UserNotificationService;
 use App\Support\Media\OptimizedImageUploader;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
@@ -81,18 +82,44 @@ class LostItemController extends Controller
 
         $validated = $request->validate([
             'nama_barang' => ['required', 'string', 'max:255'],
+            'kategori_barang' => ['nullable', 'string', 'max:100'],
+            'warna_barang' => ['nullable', 'string', 'max:100'],
+            'merek_barang' => ['nullable', 'string', 'max:120'],
+            'nomor_seri' => ['nullable', 'string', 'max:150'],
             'lokasi_hilang' => ['required', 'string', 'max:255'],
+            'detail_lokasi_hilang' => ['nullable', 'string', 'max:2000'],
             'tanggal_hilang' => ['required', 'date'],
-            'keterangan' => ['nullable', 'string', 'max:2000'],
+            'waktu_hilang' => ['nullable', 'date_format:H:i'],
+            'keterangan' => ['required', 'string', 'max:2000'],
+            'ciri_khusus' => ['nullable', 'string', 'max:2000'],
+            'kontak_pelapor' => ['nullable', 'string', 'max:50'],
+            'bukti_kepemilikan' => ['nullable', 'string', 'max:2000'],
             'foto_barang' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
         ]);
 
         $payload = [
             'nama_barang' => $validated['nama_barang'],
+            'kategori_barang' => $validated['kategori_barang'] ?? null,
+            'warna_barang' => $validated['warna_barang'] ?? null,
+            'merek_barang' => $validated['merek_barang'] ?? null,
+            'nomor_seri' => $validated['nomor_seri'] ?? null,
             'lokasi_hilang' => $validated['lokasi_hilang'],
+            'detail_lokasi_hilang' => isset($validated['detail_lokasi_hilang']) && trim((string) $validated['detail_lokasi_hilang']) !== ''
+                ? trim((string) $validated['detail_lokasi_hilang'])
+                : null,
             'tanggal_hilang' => $validated['tanggal_hilang'],
+            'waktu_hilang' => $validated['waktu_hilang'] ?? null,
             'keterangan' => isset($validated['keterangan']) && trim((string) $validated['keterangan']) !== ''
                 ? trim((string) $validated['keterangan'])
+                : null,
+            'ciri_khusus' => isset($validated['ciri_khusus']) && trim((string) $validated['ciri_khusus']) !== ''
+                ? trim((string) $validated['ciri_khusus'])
+                : null,
+            'kontak_pelapor' => isset($validated['kontak_pelapor']) && trim((string) $validated['kontak_pelapor']) !== ''
+                ? trim((string) $validated['kontak_pelapor'])
+                : null,
+            'bukti_kepemilikan' => isset($validated['bukti_kepemilikan']) && trim((string) $validated['bukti_kepemilikan']) !== ''
+                ? trim((string) $validated['bukti_kepemilikan'])
                 : null,
         ];
 
@@ -173,6 +200,23 @@ class LostItemController extends Controller
             } elseif ($validated['status_klaim'] === 'ditolak' && $latestKlaim->barang->status_barang === 'dalam_proses_klaim') {
                 $latestKlaim->barang->update(['status_barang' => 'tersedia']);
             }
+        }
+
+        if (!is_null($laporanBarangHilang->user_id)) {
+            $statusLabel = match ($validated['status_klaim']) {
+                'disetujui' => 'disetujui',
+                'ditolak' => 'ditolak',
+                default => 'diperbarui ke menunggu verifikasi',
+            };
+
+            UserNotificationService::notifyUser(
+                userId: (int) $laporanBarangHilang->user_id,
+                type: 'status_laporan_hilang',
+                title: 'Status Laporan Diperbarui',
+                message: 'Admin memperbarui status laporan '.$laporanBarangHilang->nama_barang.' menjadi '.$statusLabel.'.',
+                actionUrl: route('user.dashboard'),
+                meta: ['laporan_hilang_id' => $laporanBarangHilang->id]
+            );
         }
 
         return back()->with('status', 'Status barang hilang berhasil diperbarui.');

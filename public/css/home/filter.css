@@ -9,7 +9,7 @@
 }
 
 .filter-wrap {
-    padding: 1.15rem 1.35rem 1.25rem;
+    padding: 1rem 1.3rem 1.1rem;
     background: rgba(255, 255, 255, 0.5);
     position: relative;
     z-index: 21;
@@ -35,7 +35,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 1rem;
+    margin-bottom: 0.65rem;
 }
 
 .filter-head-left {
@@ -70,32 +70,61 @@
     font-weight: 800;
     color: var(--sinemu-text);
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.93rem;
     line-height: 1.2;
 }
 
 .filter-subtitle {
     color: var(--sinemu-muted);
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     margin: 0;
-    line-height: 1.35;
+    line-height: 1.3;
     max-width: 560px;
 }
 
 .chevron-btn {
-    border: none;
-    background: transparent;
+    border: 1px solid rgba(17, 24, 39, 0.12);
+    background: rgba(255, 255, 255, 0.72);
     width: 30px;
     height: 30px;
     border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--sinemu-muted);
+    color: #7c7269;
+    transition: all 0.2s ease;
 }
 
 .chevron-btn:hover {
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(90, 63, 246, 0.08);
+    border-color: rgba(90, 63, 246, 0.22);
+    color: var(--sinemu-primary);
+}
+
+.chevron-btn i {
+    transition: transform 0.22s ease;
+}
+
+#filterForm {
+    max-height: 420px;
+    opacity: 1;
+    overflow: hidden;
+    transition: max-height 0.26s ease, opacity 0.2s ease, margin-top 0.2s ease;
+}
+
+.filter-wrap.is-collapsed .filter-header {
+    margin-bottom: 0;
+}
+
+.filter-wrap.is-collapsed #filterForm {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0 !important;
+    pointer-events: none;
+}
+
+.filter-wrap.is-collapsed .chevron-btn i {
+    transform: rotate(0deg);
 }
 
 .form-label {
@@ -263,5 +292,17 @@
 }
 
 .filter-search-btn {
-    min-height: 46px;
+    min-height: 44px;
+    border-radius: 999px;
+    box-shadow: 0 7px 16px rgba(90, 63, 246, 0.2) !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+}
+
+@media (min-width: 1200px) {
+    .filter-search-btn {
+        max-width: 186px;
+        margin-left: auto;
+    }
 }

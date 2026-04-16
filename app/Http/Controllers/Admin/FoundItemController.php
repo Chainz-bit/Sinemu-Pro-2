@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\BarangStatusHistory;
 use App\Models\Kategori;
 use App\Services\ReportImageCleaner;
+use App\Services\UserNotificationService;
 use App\Support\Media\OptimizedImageUploader;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
@@ -123,9 +124,17 @@ class FoundItemController extends Controller
         $validated = $request->validate([
             'nama_barang' => ['required', 'string', 'max:255'],
             'kategori_id' => ['nullable', 'integer', 'exists:kategoris,id'],
+            'warna_barang' => ['nullable', 'string', 'max:100'],
+            'merek_barang' => ['nullable', 'string', 'max:120'],
+            'nomor_seri' => ['nullable', 'string', 'max:150'],
             'deskripsi' => ['nullable', 'string', 'max:2000'],
+            'ciri_khusus' => ['nullable', 'string', 'max:2000'],
+            'nama_penemu' => ['nullable', 'string', 'max:150'],
+            'kontak_penemu' => ['nullable', 'string', 'max:50'],
             'lokasi_ditemukan' => ['required', 'string', 'max:255'],
+            'detail_lokasi_ditemukan' => ['nullable', 'string', 'max:2000'],
             'tanggal_ditemukan' => ['required', 'date'],
+            'waktu_ditemukan' => ['nullable', 'date_format:H:i'],
             'status_barang' => ['required', 'in:tersedia,dalam_proses_klaim,sudah_diklaim,sudah_dikembalikan'],
             'lokasi_pengambilan' => ['nullable', 'string', 'max:255'],
             'alamat_pengambilan' => ['nullable', 'string', 'max:255'],
@@ -139,11 +148,27 @@ class FoundItemController extends Controller
         $payload = [
             'nama_barang' => $validated['nama_barang'],
             'kategori_id' => $validated['kategori_id'] ?? $barang->kategori_id,
+            'warna_barang' => $validated['warna_barang'] ?? null,
+            'merek_barang' => $validated['merek_barang'] ?? null,
+            'nomor_seri' => $validated['nomor_seri'] ?? null,
             'deskripsi' => isset($validated['deskripsi']) && trim((string) $validated['deskripsi']) !== ''
                 ? trim((string) $validated['deskripsi'])
                 : ((string) ($barang->deskripsi ?? '')),
+            'ciri_khusus' => isset($validated['ciri_khusus']) && trim((string) $validated['ciri_khusus']) !== ''
+                ? trim((string) $validated['ciri_khusus'])
+                : null,
+            'nama_penemu' => isset($validated['nama_penemu']) && trim((string) $validated['nama_penemu']) !== ''
+                ? trim((string) $validated['nama_penemu'])
+                : null,
+            'kontak_penemu' => isset($validated['kontak_penemu']) && trim((string) $validated['kontak_penemu']) !== ''
+                ? trim((string) $validated['kontak_penemu'])
+                : null,
             'lokasi_ditemukan' => $validated['lokasi_ditemukan'],
+            'detail_lokasi_ditemukan' => isset($validated['detail_lokasi_ditemukan']) && trim((string) $validated['detail_lokasi_ditemukan']) !== ''
+                ? trim((string) $validated['detail_lokasi_ditemukan'])
+                : null,
             'tanggal_ditemukan' => $validated['tanggal_ditemukan'],
+            'waktu_ditemukan' => $validated['waktu_ditemukan'] ?? null,
             'status_barang' => $validated['status_barang'],
             'lokasi_pengambilan' => isset($validated['lokasi_pengambilan']) && trim((string) $validated['lokasi_pengambilan']) !== ''
                 ? trim((string) $validated['lokasi_pengambilan'])
@@ -206,6 +231,30 @@ class FoundItemController extends Controller
                 'status_baru' => $newStatus,
                 'catatan' => $validated['catatan_status'] ?? null,
             ]);
+
+            $statusLabel = match ($newStatus) {
+                'tersedia' => 'Tersedia',
+                'dalam_proses_klaim' => 'Dalam Proses Klaim',
+                'sudah_diklaim' => 'Sudah Diklaim',
+                'sudah_dikembalikan' => 'Sudah Dikembalikan',
+                default => $newStatus,
+            };
+
+            $barang->klaims()
+                ->select('user_id')
+                ->whereNotNull('user_id')
+                ->distinct()
+                ->pluck('user_id')
+                ->each(function ($userId) use ($barang, $statusLabel) {
+                    UserNotificationService::notifyUser(
+                        userId: (int) $userId,
+                        type: 'status_barang_temuan',
+                        title: 'Status Barang Temuan Diperbarui',
+                        message: 'Admin memperbarui status '.$barang->nama_barang.' menjadi '.$statusLabel.'.',
+                        actionUrl: route('user.dashboard'),
+                        meta: ['barang_id' => $barang->id]
+                    );
+                });
 
             return redirect()
                 ->route('admin.found-items.show', $barang->id)

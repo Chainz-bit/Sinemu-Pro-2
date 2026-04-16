@@ -67,5 +67,35 @@ class AppServiceProvider extends ServiceProvider
             $view->with('adminNotifications', $notifications)
                 ->with('adminUnreadNotificationsCount', $unreadCount);
         });
+
+        // Data notifikasi global untuk semua halaman dashboard user.
+        View::composer('user.partials.topbar', function ($view) {
+            $viewData = $view->getData();
+            if (($viewData['hideTopActions'] ?? false) === true) {
+                $view->with('userNotifications', collect())
+                    ->with('userUnreadNotificationsCount', 0);
+                return;
+            }
+
+            $user = Auth::user();
+
+            if (!$user) {
+                $view->with('userNotifications', collect())
+                    ->with('userUnreadNotificationsCount', 0);
+                return;
+            }
+
+            $notifications = $user->notifications()
+                ->latest('created_at')
+                ->limit(20)
+                ->get();
+
+            $unreadCount = $user->notifications()
+                ->whereNull('read_at')
+                ->count();
+
+            $view->with('userNotifications', $notifications)
+                ->with('userUnreadNotificationsCount', $unreadCount);
+        });
     }
 }

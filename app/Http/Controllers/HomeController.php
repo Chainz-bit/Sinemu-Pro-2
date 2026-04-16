@@ -14,6 +14,8 @@ use Illuminate\Support\Carbon;
 
 class HomeController extends Controller
 {
+    private const HOME_ITEMS_LIMIT = 24;
+
     public function index()
     {
         if (Auth::guard('admin')->check()) {
@@ -28,7 +30,16 @@ class HomeController extends Controller
             $lostTotalCount = (clone $lostQuery)->count();
 
             $lostItems = $lostQuery
+                ->select([
+                    'id',
+                    'nama_barang',
+                    'lokasi_hilang',
+                    'tanggal_hilang',
+                    'foto_barang',
+                    'updated_at',
+                ])
                 ->latest('updated_at')
+                ->limit(self::HOME_ITEMS_LIMIT)
                 ->get()
                 ->map(function ($item) {
                     return [
@@ -49,12 +60,23 @@ class HomeController extends Controller
         $foundItems = [];
         $foundTotalCount = 0;
         if (Schema::hasTable('barangs')) {
-            $foundQuery = Barang::query()->with('kategori:id,nama_kategori');
+            $foundQuery = Barang::query()
+                ->with('kategori:id,nama_kategori');
             $foundQuery = $this->resolveHomeScopeQuery($foundQuery, 'barangs');
             $foundTotalCount = (clone $foundQuery)->count();
 
             $foundItems = $foundQuery
+                ->select([
+                    'id',
+                    'kategori_id',
+                    'nama_barang',
+                    'lokasi_ditemukan',
+                    'tanggal_ditemukan',
+                    'foto_barang',
+                    'updated_at',
+                ])
                 ->latest('updated_at')
+                ->limit(self::HOME_ITEMS_LIMIT)
                 ->get()
                 ->map(function ($item) {
                     return [
@@ -78,15 +100,25 @@ class HomeController extends Controller
             $kategoriOptions = Kategori::query()
                 ->orderBy('nama_kategori')
                 ->get(['id', 'nama_kategori']);
+        }
 
-            $categories = array_merge(
-                ['Semua Kategori'],
-                $kategoriOptions
-                    ->pluck('nama_kategori')
-                    ->map(fn ($name) => ucwords(strtolower($name)))
-                    ->values()
-                    ->all()
-            );
+        // Fallback kategori dari data item jika master kategori kosong/tidak lengkap.
+        $categoryLabels = $kategoriOptions
+            ->pluck('nama_kategori')
+            ->merge(
+                collect($foundItems)
+                    ->pluck('category')
+                    ->map(fn ($label) => ucwords(strtolower((string) $label)))
+            )
+            ->map(fn ($label) => trim((string) $label))
+            ->filter(fn ($label) => $label !== '')
+            ->unique(fn ($label) => Str::lower($label))
+            ->sortBy(fn ($label) => Str::lower($label))
+            ->values()
+            ->all();
+
+        if (count($categoryLabels) > 0) {
+            $categories = array_merge(['Semua Kategori'], $categoryLabels);
         }
 
         $regions = ['Seluruh Wilayah'];
@@ -96,7 +128,17 @@ class HomeController extends Controller
                 ->orderBy('nama_wilayah')
                 ->get(['nama_wilayah', 'lat', 'lng']);
 
-            $regions = array_merge(['Seluruh Wilayah'], $wilayahs->pluck('nama_wilayah')->all());
+            $regionLabels = $wilayahs
+                ->pluck('nama_wilayah')
+                ->map(fn ($label) => trim((string) $label))
+                ->filter(fn ($label) => $label !== '')
+                ->unique(fn ($label) => Str::lower($label))
+                ->values()
+                ->all();
+
+            if (count($regionLabels) > 0) {
+                $regions = array_merge(['Seluruh Wilayah'], $regionLabels);
+            }
 
             $allLocations = collect(array_merge(
                 array_column($lostItems, 'location'),
@@ -117,6 +159,24 @@ class HomeController extends Controller
                     'active_points' => $activePoints,
                 ];
             })->values()->all();
+        }
+
+        // Fallback wilayah dari lokasi item saat tabel wilayah kosong.
+        if (count($regions) === 1) {
+            $regionFromItems = collect(array_merge(
+                array_column($lostItems, 'location'),
+                array_column($foundItems, 'location')
+            ))
+                ->map(fn ($label) => trim((string) $label))
+                ->filter(fn ($label) => $label !== '')
+                ->unique(fn ($label) => Str::lower($label))
+                ->sortBy(fn ($label) => Str::lower($label))
+                ->values()
+                ->all();
+
+            if (count($regionFromItems) > 0) {
+                $regions = array_merge(['Seluruh Wilayah'], $regionFromItems);
+            }
         }
 
         $pickupLocations = [];
@@ -280,9 +340,7 @@ class HomeController extends Controller
         }
 
         $publishedQuery = (clone $baseQuery)->where('tampil_di_home', true);
-        $publishedCount = (clone $publishedQuery)->count();
-
-        if ($publishedCount > 0) {
+        if ((clone $publishedQuery)->exists()) {
             return $publishedQuery;
         }
 

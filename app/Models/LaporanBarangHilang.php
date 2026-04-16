@@ -6,7 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class LaporanBarangHilang extends Model
 {
-    protected $fillable = ['user_id', 'nama_barang', 'lokasi_hilang', 'tanggal_hilang', 'keterangan', 'foto_barang', 'sumber_laporan', 'tampil_di_home'];
+    protected $fillable = [
+        'user_id',
+        'nama_barang',
+        'kategori_barang',
+        'warna_barang',
+        'merek_barang',
+        'nomor_seri',
+        'lokasi_hilang',
+        'detail_lokasi_hilang',
+        'tanggal_hilang',
+        'waktu_hilang',
+        'keterangan',
+        'ciri_khusus',
+        'kontak_pelapor',
+        'bukti_kepemilikan',
+        'foto_barang',
+        'sumber_laporan',
+        'tampil_di_home',
+    ];
 
     public function user()
     {

@@ -115,8 +115,33 @@
                         </div>
 
                         <div>
+                            <label class="edit-form-label" for="kategori_barang">Kategori Barang</label>
+                            <input class="form-input edit-form-input" id="kategori_barang" name="kategori_barang" type="text" maxlength="100" value="{{ old('kategori_barang', $laporanBarangHilang->kategori_barang) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="warna_barang">Warna Dominan</label>
+                            <input class="form-input edit-form-input" id="warna_barang" name="warna_barang" type="text" maxlength="100" value="{{ old('warna_barang', $laporanBarangHilang->warna_barang) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="merek_barang">Merek / Brand</label>
+                            <input class="form-input edit-form-input" id="merek_barang" name="merek_barang" type="text" maxlength="120" value="{{ old('merek_barang', $laporanBarangHilang->merek_barang) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="nomor_seri">Nomor Seri / Kode Unik</label>
+                            <input class="form-input edit-form-input" id="nomor_seri" name="nomor_seri" type="text" maxlength="150" value="{{ old('nomor_seri', $laporanBarangHilang->nomor_seri) }}">
+                        </div>
+
+                        <div>
                             <label class="edit-form-label" for="tanggal_hilang">Tanggal Hilang</label>
                             <input class="form-input edit-form-input" id="tanggal_hilang" name="tanggal_hilang" type="date" required value="{{ old('tanggal_hilang', !empty($laporanBarangHilang->tanggal_hilang) ? \Illuminate\Support\Carbon::parse($laporanBarangHilang->tanggal_hilang)->format('Y-m-d') : '') }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="waktu_hilang">Perkiraan Jam Hilang</label>
+                            <input class="form-input edit-form-input" id="waktu_hilang" name="waktu_hilang" type="time" value="{{ old('waktu_hilang', $laporanBarangHilang->waktu_hilang) }}">
                         </div>
 
                         <div>
@@ -125,10 +150,30 @@
                         </div>
 
                         <div class="edit-form-col-full">
-                            <label class="edit-form-label" for="keterangan">Keterangan</label>
-                            <textarea class="form-input edit-form-input edit-form-textarea" id="keterangan" name="keterangan" maxlength="2000">{{ old('keterangan', $laporanBarangHilang->keterangan) }}</textarea>
+                            <label class="edit-form-label" for="detail_lokasi_hilang">Detail Lokasi Hilang</label>
+                            <textarea class="form-input edit-form-input edit-form-textarea" id="detail_lokasi_hilang" name="detail_lokasi_hilang" maxlength="2000">{{ old('detail_lokasi_hilang', $laporanBarangHilang->detail_lokasi_hilang) }}</textarea>
+                        </div>
+
+                        <div class="edit-form-col-full">
+                            <label class="edit-form-label" for="keterangan">Deskripsi Barang dan Kronologi Singkat</label>
+                            <textarea class="form-input edit-form-input edit-form-textarea" id="keterangan" name="keterangan" maxlength="2000" required>{{ old('keterangan', $laporanBarangHilang->keterangan) }}</textarea>
                             <small class="edit-form-help">Tambahkan ciri khas barang (warna, merek, nomor seri, atau detail pembeda).</small>
                             <small class="edit-form-counter" id="keterangan_counter" aria-live="polite">0/2000 karakter</small>
+                        </div>
+
+                        <div class="edit-form-col-full">
+                            <label class="edit-form-label" for="ciri_khusus">Ciri Unik Barang</label>
+                            <textarea class="form-input edit-form-input edit-form-textarea" id="ciri_khusus" name="ciri_khusus" maxlength="2000">{{ old('ciri_khusus', $laporanBarangHilang->ciri_khusus) }}</textarea>
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="kontak_pelapor">No. WA Pelapor</label>
+                            <input class="form-input edit-form-input" id="kontak_pelapor" name="kontak_pelapor" type="text" maxlength="50" value="{{ old('kontak_pelapor', $laporanBarangHilang->kontak_pelapor) }}">
+                        </div>
+
+                        <div class="edit-form-col-full">
+                            <label class="edit-form-label" for="bukti_kepemilikan">Bukti Kepemilikan (Catatan)</label>
+                            <textarea class="form-input edit-form-input edit-form-textarea" id="bukti_kepemilikan" name="bukti_kepemilikan" maxlength="2000">{{ old('bukti_kepemilikan', $laporanBarangHilang->bukti_kepemilikan) }}</textarea>
                         </div>
                     </div>
                 </div>

@@ -24,6 +24,10 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
+        if ($request->hasSession()) {
+            $request->session()->regenerateToken();
+        }
+
         return view('auth.login');
     }
 

@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Klaim extends Model
 {
-    protected $fillable = ['laporan_hilang_id', 'barang_id', 'user_id', 'admin_id', 'status_klaim', 'catatan'];
+    protected $fillable = ['laporan_hilang_id', 'barang_id', 'user_id', 'admin_id', 'status_klaim', 'catatan', 'bukti_foto'];
+
+    protected $casts = [
+        'bukti_foto' => 'array',
+    ];
 
     public function laporanHilang()
     {

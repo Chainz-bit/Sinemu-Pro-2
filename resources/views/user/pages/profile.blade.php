@@ -1,0 +1,143 @@
+@extends('user.layouts.app')
+
+@php
+    $pageTitle = 'Profil Saya - User - SiNemu';
+    $activeMenu = 'profile';
+    $hideSearch = true;
+    $hideSidebar = true;
+    $topbarBackUrl = route('user.dashboard');
+    $topbarBackLabel = 'Kembali ke Dashboard';
+@endphp
+
+@section('page-content')
+    <div class="profile-page-content">
+        @if(session('status') === 'verification-link-sent')
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
+                <span class="feedback-alert-icon" aria-hidden="true">
+                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                </span>
+                <div class="feedback-alert-body">
+                    <strong>Berhasil</strong>
+                    <span>Tautan verifikasi email sudah dikirim ulang.</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
+        @elseif(session('status'))
+            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
+                <span class="feedback-alert-icon" aria-hidden="true">
+                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
+                </span>
+                <div class="feedback-alert-body">
+                    <strong>Berhasil</strong>
+                    <span>{{ session('status') }}</span>
+                </div>
+                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
+                    <iconify-icon icon="mdi:close"></iconify-icon>
+                </button>
+                <span class="feedback-alert-progress" aria-hidden="true"></span>
+            </div>
+        @endif
+
+        <section class="profile-account-card">
+            <div class="profile-account-top">
+                <div class="profile-account-main">
+                    <img src="{{ $profileAvatar }}" alt="Foto profil {{ $user?->nama ?? $user?->name ?? 'Pengguna' }}" class="profile-account-avatar">
+                    <div class="profile-account-meta">
+                        <div class="profile-account-name-wrap">
+                            <h2>{{ $user?->nama ?? $user?->name ?? 'Pengguna' }}</h2>
+                            <span class="profile-verify-chip {{ $verificationClass }}">{{ $verificationLabel }}</span>
+                        </div>
+                        <p class="profile-role">Pengguna SiNemu - Pelapor Barang</p>
+                        <div class="profile-account-contact">
+                            <span>{{ $user?->email ?? '-' }}</span>
+                            @if(is_null($user?->email_verified_at))
+                                <form method="POST" action="{{ route('verification.send') }}" class="profile-inline-form">
+                                    @csrf
+                                    <button type="submit" class="profile-contact-button">
+                                        <iconify-icon icon="mdi:email-fast-outline" aria-hidden="true"></iconify-icon>
+                                        Kirim Ulang
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <a href="{{ route('profile.edit') }}" class="profile-action-secondary">
+                        Edit Profil
+                    </a>
+                </div>
+            </div>
+
+            <div class="profile-admin-info-grid user-profile-info-grid">
+                <article class="profile-info-card">
+                    <span class="profile-info-label">Akun</span>
+                    <strong class="profile-info-value">{{ $user?->username ?? '-' }}</strong>
+                </article>
+                <article class="profile-info-card">
+                    <span class="profile-info-label">Jenis Akun</span>
+                    <strong class="profile-info-value">Pelapor</strong>
+                </article>
+                <article class="profile-info-card">
+                    <span class="profile-info-label">Nomor Telepon</span>
+                    <strong class="profile-info-value">{{ $user?->nomor_telepon ?: '-' }}</strong>
+                </article>
+                <article class="profile-info-card">
+                    <span class="profile-info-label">Status Email</span>
+                    <strong class="profile-info-value">{{ !is_null($user?->email_verified_at) ? 'Terverifikasi' : 'Belum diverifikasi (verifikasi untuk klaim)' }}</strong>
+                </article>
+                <article class="profile-info-card">
+                    <span class="profile-info-label">Bergabung Sejak</span>
+                    <strong class="profile-info-value">{{ !empty($user?->created_at) ? \Carbon\Carbon::parse($user->created_at)->translatedFormat('d M Y') : '-' }}</strong>
+                </article>
+            </div>
+        </section>
+
+        <section class="profile-stats-grid">
+            <article class="profile-stat-card">
+                <span>Laporan Diajukan</span>
+                <strong>{{ $laporanDiajukan }}</strong>
+                <small>Total laporan hilang oleh akun ini</small>
+            </article>
+            <article class="profile-stat-card">
+                <span>Klaim Menunggu</span>
+                <strong>{{ $klaimMenunggu }}</strong>
+                <small>Masih menunggu verifikasi admin</small>
+            </article>
+            <article class="profile-stat-card">
+                <span>Klaim Diputuskan</span>
+                <strong>{{ $klaimSelesai }}</strong>
+                <small>Klaim sudah disetujui atau ditolak</small>
+            </article>
+        </section>
+
+        <section class="report-card profile-activity-card">
+            <header>
+                <h2>Aktivitas Terbaru</h2>
+                <a href="{{ route('user.dashboard') }}">Buka Dashboard</a>
+            </header>
+
+            <div class="profile-activity-list">
+                @forelse($recentActivities as $activity)
+                    <article class="profile-activity-item">
+                        <div class="profile-activity-main">
+                            <h3>{{ $activity->title }}</h3>
+                            <p>
+                                {{ \Carbon\Carbon::parse($activity->timestamp)->translatedFormat('d M Y, H:i') }} WIB
+                            </p>
+                        </div>
+                        <div class="profile-activity-right">
+                            <span class="status-chip status-{{ $activity->status_class }}">{{ $activity->status_label }}</span>
+                            <a href="{{ $activity->detail_url }}">Lihat Detail</a>
+                        </div>
+                    </article>
+                @empty
+                    <div class="profile-activity-empty">Belum ada aktivitas terbaru untuk ditampilkan.</div>
+                @endforelse
+            </div>
+        </section>
+    </div>
+@endsection

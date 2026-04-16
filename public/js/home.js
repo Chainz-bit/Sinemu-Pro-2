@@ -34,7 +34,14 @@ async function bootMap() {
     mod.initMap();
 }
 
+async function bootSectionScroll() {
+    if (!document.querySelector('#pencarian, #hilang-temuan, #klaim, #lokasi-pengambilan, #kontak')) return;
+    const mod = await import('./home/section-scroll.js?v=20260415b');
+    mod.initSectionScroll();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    void bootSectionScroll();
     void bootNavbar();
     void bootFilterAndCounts();
     void bootActions();

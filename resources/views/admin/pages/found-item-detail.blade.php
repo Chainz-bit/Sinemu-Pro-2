@@ -53,6 +53,20 @@
         ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
         ->implode('');
     $statusHistories = $barang->statusHistories->take(8);
+    $tanggalDitemukanLabel = !empty($barang->tanggal_ditemukan)
+        ? \Illuminate\Support\Carbon::parse($barang->tanggal_ditemukan)->format('d M Y')
+        : '-';
+    $waktuDitemukanRaw = (string) ($barang->waktu_ditemukan ?? '');
+    $waktuDitemukanLabel = $waktuDitemukanRaw !== ''
+        ? (date('H:i', strtotime($waktuDitemukanRaw)) ?: $waktuDitemukanRaw)
+        : '-';
+    $penemuName = $barang->nama_penemu ?: $petugasName;
+    $penemuContact = $barang->kontak_penemu ?: '-';
+    $penemuInitials = collect(explode(' ', trim((string) $penemuName)))
+        ->filter()
+        ->take(2)
+        ->map(fn ($part) => strtoupper(substr($part, 0, 1)))
+        ->implode('');
 @endphp
 
 @section('page-content')
@@ -138,7 +152,7 @@
                             </div>
                             <div>
                                 <span>Tanggal Ditemukan</span>
-                                <strong>{{ !empty($barang->tanggal_ditemukan) ? \Illuminate\Support\Carbon::parse($barang->tanggal_ditemukan)->format('d M Y') : '-' }}</strong>
+                                <strong>{{ $tanggalDitemukanLabel }}</strong>
                             </div>
                             <div>
                                 <span>Lokasi Ditemukan</span>
@@ -149,6 +163,38 @@
                                 <strong>#{{ $barang->id }}</strong>
                             </div>
                         </div>
+
+                        <div class="found-detail-meta">
+                            <div>
+                                <span>Warna</span>
+                                <strong>{{ $barang->warna_barang ?: '-' }}</strong>
+                            </div>
+                            <div>
+                                <span>Merek</span>
+                                <strong>{{ $barang->merek_barang ?: '-' }}</strong>
+                            </div>
+                            <div>
+                                <span>Nomor Seri / Kode</span>
+                                <strong>{{ $barang->nomor_seri ?: '-' }}</strong>
+                            </div>
+                            <div>
+                                <span>Jam Ditemukan</span>
+                                <strong>{{ $waktuDitemukanLabel !== '-' ? $waktuDitemukanLabel.' WIB' : '-' }}</strong>
+                            </div>
+                        </div>
+
+                        @if(!empty($barang->detail_lokasi_ditemukan) || !empty($barang->ciri_khusus))
+                            <div class="found-detail-meta">
+                                <div>
+                                    <span>Detail Lokasi Ditemukan</span>
+                                    <strong>{{ $barang->detail_lokasi_ditemukan ?: '-' }}</strong>
+                                </div>
+                                <div>
+                                    <span>Ciri Unik</span>
+                                    <strong>{{ $barang->ciri_khusus ?: '-' }}</strong>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </article>
@@ -181,17 +227,17 @@
                     <header><h2>Informasi Penemu</h2></header>
                     <div class="found-detail-panel-body">
                         <div class="found-person-row">
-                            <span class="found-person-avatar">{{ $initials ?: 'AD' }}</span>
+                            <span class="found-person-avatar">{{ $penemuInitials ?: ($initials ?: 'US') }}</span>
                             <div>
-                                <p><strong>{{ $petugasName }}</strong></p>
-                                <small>Petugas Keamanan</small>
+                                <p><strong>{{ $penemuName }}</strong></p>
+                                <small>Pelapor / Penemu</small>
                             </div>
                         </div>
                         <div class="found-contact-actions">
                             <a href="{{ $hubungiHref }}" class="filter-btn {{ $hasPetugasEmail ? '' : 'is-disabled' }}">Hubungi</a>
                             <a href="{{ $emailContactHref }}" class="filter-btn {{ $hasPetugasEmail ? '' : 'is-disabled' }}">Email</a>
                         </div>
-                        <p>{{ $petugasEmail }}</p>
+                        <p>{{ $penemuContact !== '-' ? ('WA: '.$penemuContact) : $petugasEmail }}</p>
                     </div>
                 </article>
 
@@ -204,7 +250,7 @@
                             </span>
                             <div>
                                 <small>Ditemukan</small>
-                                <p><strong>{{ !empty($barang->tanggal_ditemukan) ? \Illuminate\Support\Carbon::parse($barang->tanggal_ditemukan)->format('d M Y, H:i') : '-' }} WIB</strong></p>
+                                <p><strong>{{ $tanggalDitemukanLabel }}{{ $waktuDitemukanLabel !== '-' ? ', '.$waktuDitemukanLabel : '' }} WIB</strong></p>
                             </div>
                         </div>
                         <div class="found-info-item">

@@ -132,6 +132,21 @@
                         </div>
 
                         <div>
+                            <label class="edit-form-label" for="warna_barang">Warna Dominan</label>
+                            <input class="form-input edit-form-input" id="warna_barang" name="warna_barang" type="text" maxlength="100" value="{{ old('warna_barang', $barang->warna_barang) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="merek_barang">Merek / Brand</label>
+                            <input class="form-input edit-form-input" id="merek_barang" name="merek_barang" type="text" maxlength="120" value="{{ old('merek_barang', $barang->merek_barang) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="nomor_seri">Nomor Seri / Kode Unik</label>
+                            <input class="form-input edit-form-input" id="nomor_seri" name="nomor_seri" type="text" maxlength="150" value="{{ old('nomor_seri', $barang->nomor_seri) }}">
+                        </div>
+
+                        <div>
                             <label class="edit-form-label" for="status_barang">Status Barang</label>
                             <select class="form-input edit-form-input" id="status_barang" name="status_barang" required>
                                 <option value="tersedia" @selected(old('status_barang', $barang->status_barang) === 'tersedia')>Tersedia</option>
@@ -147,8 +162,18 @@
                         </div>
 
                         <div>
+                            <label class="edit-form-label" for="waktu_ditemukan">Perkiraan Jam Ditemukan</label>
+                            <input class="form-input edit-form-input" id="waktu_ditemukan" name="waktu_ditemukan" type="time" value="{{ old('waktu_ditemukan', !empty($barang->waktu_ditemukan) ? date('H:i', strtotime($barang->waktu_ditemukan)) : '') }}">
+                        </div>
+
+                        <div>
                             <label class="edit-form-label" for="lokasi_ditemukan">Lokasi Ditemukan</label>
                             <input class="form-input edit-form-input" id="lokasi_ditemukan" name="lokasi_ditemukan" type="text" required maxlength="255" value="{{ old('lokasi_ditemukan', $barang->lokasi_ditemukan) }}">
+                        </div>
+
+                        <div class="edit-form-col-full">
+                            <label class="edit-form-label" for="detail_lokasi_ditemukan">Detail Lokasi Ditemukan</label>
+                            <textarea class="form-input edit-form-input edit-form-textarea" id="detail_lokasi_ditemukan" name="detail_lokasi_ditemukan" maxlength="2000">{{ old('detail_lokasi_ditemukan', $barang->detail_lokasi_ditemukan) }}</textarea>
                         </div>
 
                         <div class="edit-form-col-full">
@@ -156,6 +181,21 @@
                             <textarea class="form-input edit-form-input edit-form-textarea" id="deskripsi" name="deskripsi" maxlength="2000">{{ old('deskripsi', $barang->deskripsi) }}</textarea>
                             <small class="edit-form-help">Jelaskan ciri penting agar barang mudah dikenali (warna, merek, ukuran, kondisi).</small>
                             <small class="edit-form-counter" id="deskripsi_counter" aria-live="polite">0/2000 karakter</small>
+                        </div>
+
+                        <div class="edit-form-col-full">
+                            <label class="edit-form-label" for="ciri_khusus">Ciri Unik Barang</label>
+                            <textarea class="form-input edit-form-input edit-form-textarea" id="ciri_khusus" name="ciri_khusus" maxlength="2000">{{ old('ciri_khusus', $barang->ciri_khusus) }}</textarea>
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="nama_penemu">Nama Penemu</label>
+                            <input class="form-input edit-form-input" id="nama_penemu" name="nama_penemu" type="text" maxlength="150" value="{{ old('nama_penemu', $barang->nama_penemu) }}">
+                        </div>
+
+                        <div>
+                            <label class="edit-form-label" for="kontak_penemu">No. WA Penemu</label>
+                            <input class="form-input edit-form-input" id="kontak_penemu" name="kontak_penemu" type="text" maxlength="50" value="{{ old('kontak_penemu', $barang->kontak_penemu) }}">
                         </div>
                     </div>
                 </div>

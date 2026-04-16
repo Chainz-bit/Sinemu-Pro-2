@@ -55,6 +55,36 @@ function initModernDatepicker(dateInput) {
     });
 }
 
+function initFilterPanelToggle(filterWrap, filterForm) {
+    if (!filterWrap || !filterForm) return;
+
+    const toggleButton = filterWrap.querySelector('.chevron-btn');
+    if (!toggleButton) return;
+
+    const icon = toggleButton.querySelector('i');
+    const collapseClass = 'is-collapsed';
+    const panelId = filterForm.id || 'filterForm';
+
+    toggleButton.setAttribute('aria-controls', panelId);
+
+    function setCollapsed(collapsed) {
+        filterWrap.classList.toggle(collapseClass, collapsed);
+        toggleButton.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        toggleButton.setAttribute('aria-label', collapsed ? 'Buka panel filter' : 'Tutup panel filter');
+
+        if (icon) {
+            icon.classList.toggle('fa-chevron-up', !collapsed);
+            icon.classList.toggle('fa-chevron-down', collapsed);
+        }
+    }
+
+    setCollapsed(false);
+
+    toggleButton.addEventListener('click', function () {
+        setCollapsed(!filterWrap.classList.contains(collapseClass));
+    });
+}
+
 export function initFilterAndCounts() {
     const keywordInput = document.getElementById('keywordInput');
     const categorySelect = document.getElementById('categorySelect');
@@ -67,6 +97,7 @@ export function initFilterAndCounts() {
     const regionDropdownToggle = document.getElementById('regionDropdownToggle');
     const regionDropdownMenu = document.getElementById('regionDropdownMenu');
     const filterForm = document.getElementById('filterForm');
+    const filterWrap = document.querySelector('.filter-wrap');
 
     const groups = {
         lost: Array.from(document.querySelectorAll('[data-list="lost"]')),
@@ -75,6 +106,7 @@ export function initFilterAndCounts() {
     const dropdownRoots = Array.from(document.querySelectorAll('.filter-dropdown'));
 
     initModernDatepicker(dateInput);
+    initFilterPanelToggle(filterWrap, filterForm);
 
     function applyFilters() {
         if (!keywordInput || !categorySelect || !dateInput || !regionSelect) return;
@@ -112,12 +144,8 @@ export function initFilterAndCounts() {
         updateCountText(groupName, dbCount);
     });
 
-    if (keywordInput && categorySelect && dateInput && regionSelect) {
-        keywordInput.addEventListener('input', applyFilters);
-        categorySelect.addEventListener('change', applyFilters);
-        dateInput.addEventListener('change', applyFilters);
-        regionSelect.addEventListener('change', applyFilters);
-    }
+    // Filter dijalankan hanya ketika user submit form (klik tombol "Cari"),
+    // bukan saat user mengetik atau mengubah pilihan dropdown.
 
     function initCustomDropdown(dropdown, toggle, menu, select) {
         if (!dropdown || !toggle || !menu || !select) return;
@@ -164,7 +192,6 @@ export function initFilterAndCounts() {
             toggle.textContent = value;
             setActiveOption(value);
             closeDropdown();
-            select.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
         document.addEventListener('click', function (event) {

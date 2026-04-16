@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Klaim;
+use App\Services\UserNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Str;
@@ -134,6 +136,18 @@ class ClaimVerificationController extends Controller
             if ($klaim->barang) {
                 $klaim->barang->update(['status_barang' => 'sudah_diklaim']);
             }
+
+            if (!is_null($klaim->user_id)) {
+                $namaBarang = $klaim->barang?->nama_barang ?? $klaim->laporanHilang?->nama_barang ?? 'barang Anda';
+                UserNotificationService::notifyUser(
+                    userId: (int) $klaim->user_id,
+                    type: 'klaim_disetujui',
+                    title: 'Klaim Disetujui',
+                    message: 'Admin menyetujui klaim untuk '.$namaBarang.'.',
+                    actionUrl: route('user.dashboard'),
+                    meta: ['klaim_id' => $klaim->id]
+                );
+            }
         }
 
         return redirect()->back()->with('status', 'Klaim berhasil disetujui.');
@@ -152,6 +166,18 @@ class ClaimVerificationController extends Controller
             if ($klaim->barang && $klaim->barang->status_barang === 'dalam_proses_klaim') {
                 $klaim->barang->update(['status_barang' => 'tersedia']);
             }
+
+            if (!is_null($klaim->user_id)) {
+                $namaBarang = $klaim->barang?->nama_barang ?? $klaim->laporanHilang?->nama_barang ?? 'barang Anda';
+                UserNotificationService::notifyUser(
+                    userId: (int) $klaim->user_id,
+                    type: 'klaim_ditolak',
+                    title: 'Klaim Ditolak',
+                    message: 'Admin menolak klaim untuk '.$namaBarang.'.',
+                    actionUrl: route('user.dashboard'),
+                    meta: ['klaim_id' => $klaim->id]
+                );
+            }
         }
 
         return redirect()->back()->with('status', 'Klaim berhasil ditolak.');
@@ -165,7 +191,7 @@ class ClaimVerificationController extends Controller
 
         $klaim->load([
             'barang.kategori:id,nama_kategori',
-            'laporanHilang:id,nama_barang,lokasi_hilang,tanggal_hilang,keterangan,foto_barang',
+            'laporanHilang:id,nama_barang,lokasi_hilang,tanggal_hilang,keterangan,foto_barang,ciri_khusus,bukti_kepemilikan',
             'user:id,name,nama,email',
             'admin:id,nama,email',
         ]);
@@ -218,6 +244,13 @@ class ClaimVerificationController extends Controller
     public function destroy(Klaim $klaim): RedirectResponse
     {
         abort_if(!Auth::guard('admin')->check(), 403);
+
+        foreach ((array) ($klaim->bukti_foto ?? []) as $path) {
+            if (is_string($path) && trim($path) !== '') {
+                Storage::disk('public')->delete($path);
+            }
+        }
+
         $klaim->delete();
 
         return redirect()->back()->with('status', 'Data klaim berhasil dihapus.');
