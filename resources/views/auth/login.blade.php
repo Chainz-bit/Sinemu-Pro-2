@@ -38,14 +38,6 @@
                     <p>Masuk untuk melanjutkan ke akun Anda</p>
                 </header>
 
-                @if (session('status'))
-                    <div class="alert-box alert-info">{{ session('status') }}</div>
-                @endif
-
-                @if ($errors->any())
-                    <div class="alert-box alert-error">{{ $errors->first() }}</div>
-                @endif
-
                 <form method="POST" action="{{ route('login') }}" class="login-form" novalidate autocomplete="off">
                     @csrf
 
@@ -116,4 +108,3 @@
 @push('scripts')
     <script src="{{ asset('js/auth/login.js') }}?v={{ @filemtime(public_path('js/auth/login.js')) }}" defer></script>
 @endpush
-

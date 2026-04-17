@@ -10,18 +10,6 @@ const DEFAULT_SECTION_ID = 'pencarian';
 const STORAGE_SECTION_KEY = 'sinemu_home_active_section';
 const STORAGE_SCROLL_Y_KEY = 'sinemu_home_scroll_y';
 
-function getNavigationType() {
-    const entries = window.performance && typeof window.performance.getEntriesByType === 'function'
-        ? window.performance.getEntriesByType('navigation')
-        : [];
-
-    if (!entries.length) {
-        return '';
-    }
-
-    return entries[0].type || '';
-}
-
 function isValidSectionId(sectionId) {
     return SECTION_IDS.includes(sectionId);
 }
@@ -31,30 +19,11 @@ function getNavbarOffset() {
     return navBar ? navBar.offsetHeight + 16 : 16;
 }
 
-function getSavedScrollY() {
-    try {
-        const value = sessionStorage.getItem(STORAGE_SCROLL_Y_KEY);
-        if (value === null) return null;
-        const parsed = Number(value);
-        return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
-    } catch (error) {
-        return null;
-    }
-}
-
 function saveScrollY() {
     try {
         sessionStorage.setItem(STORAGE_SCROLL_Y_KEY, String(Math.max(0, Math.round(window.scrollY || 0))));
     } catch (error) {
         // ignore storage failures
-    }
-}
-
-function getSavedSectionId() {
-    try {
-        return sessionStorage.getItem(STORAGE_SECTION_KEY) || '';
-    } catch (error) {
-        return '';
     }
 }
 
@@ -110,16 +79,15 @@ function persistCurrentPosition() {
     saveSectionId(getClosestSectionId());
 }
 
-function forceScrollY(top) {
-    window.scrollTo({ top: top, left: 0, behavior: 'auto' });
+function forceScrollTop() {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 
-    // Browser kadang melakukan hash-jump setelah layout stabil; paksa ulang.
     setTimeout(function () {
-        window.scrollTo({ top: top, left: 0, behavior: 'auto' });
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }, 0);
 
     setTimeout(function () {
-        window.scrollTo({ top: top, left: 0, behavior: 'auto' });
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     }, 120);
 }
 
@@ -128,11 +96,7 @@ export function initSectionScroll() {
         window.history.scrollRestoration = 'manual';
     }
 
-    const navigationType = getNavigationType();
     const hashId = window.location.hash ? window.location.hash.slice(1) : '';
-    const savedScrollY = getSavedScrollY();
-    const savedSectionId = getSavedSectionId();
-    const isReload = navigationType === 'reload';
 
     let ticking = false;
     window.addEventListener(
@@ -155,26 +119,29 @@ export function initSectionScroll() {
     window.addEventListener('pagehide', persistCurrentPosition);
 
     function applyInitialScroll() {
-        if (isReload && savedScrollY !== null) {
-            forceScrollY(savedScrollY);
-            return;
-        }
-
-        if (isReload && isValidSectionId(savedSectionId)) {
-            scrollToSection(savedSectionId);
-            return;
-        }
-
-        if (!isReload && isValidSectionId(hashId)) {
+        if (isValidSectionId(hashId)) {
             scrollToSection(hashId);
             persistCurrentPosition();
             return;
         }
 
+        try {
+            sessionStorage.removeItem(STORAGE_SECTION_KEY);
+            sessionStorage.removeItem(STORAGE_SCROLL_Y_KEY);
+        } catch (error) {
+            // ignore storage failures
+        }
+
+        forceScrollTop();
         scrollToSection(DEFAULT_SECTION_ID);
         persistCurrentPosition();
     }
 
     window.requestAnimationFrame(applyInitialScroll);
     window.addEventListener('load', applyInitialScroll, { once: true });
+    window.addEventListener('pageshow', function () {
+        if (!window.location.hash) {
+            forceScrollTop();
+        }
+    });
 }

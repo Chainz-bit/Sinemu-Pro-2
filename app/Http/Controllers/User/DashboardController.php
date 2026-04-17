@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Barang;
 use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
 use Illuminate\Http\Request;
@@ -11,6 +12,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -25,6 +28,7 @@ class DashboardController extends Controller
         $search = trim((string) $request->query('search', ''));
         $statusFilter = trim((string) $request->query('status', 'semua'));
         $hasSourceColumn = Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan');
+        $hasFoundUserColumn = Schema::hasColumn('barangs', 'user_id');
 
         // BAGIAN: Statistik ringkas user.
         [$totalLaporHilang, $totalPengajuanKlaim, $menungguVerifikasi] = Cache::remember(
@@ -51,7 +55,7 @@ class DashboardController extends Controller
         $latestActivities = Cache::remember(
             $this->activitiesCacheKey($userId),
             now()->addSeconds(self::DASHBOARD_CACHE_TTL_SECONDS),
-            fn () => $this->buildLatestActivities($userId, $hasSourceColumn)
+            fn () => $this->buildLatestActivities($userId, $hasSourceColumn, $hasFoundUserColumn)
         );
         $latestActivities = $this->filterLatestActivities($latestActivities, $search, $statusFilter);
         $latestActivities = $this->paginateItems(
@@ -71,14 +75,14 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function buildLatestActivities(int $userId, bool $hasSourceColumn): Collection
+    private function buildLatestActivities(int $userId, bool $hasSourceColumn, bool $hasFoundUserColumn): Collection
     {
         $lostReports = LaporanBarangHilang::query()
             ->where('user_id', $userId)
             ->when($hasSourceColumn, function ($query) {
                 $query->where('sumber_laporan', 'lapor_hilang');
             })
-            ->select(['id', 'nama_barang', 'lokasi_hilang', 'tanggal_hilang', 'created_at', 'updated_at'])
+            ->select(['id', 'nama_barang', 'lokasi_hilang', 'tanggal_hilang', 'foto_barang', 'created_at', 'updated_at'])
             ->selectSub(
                 Klaim::query()
                     ->whereColumn('laporan_hilang_id', 'laporan_barang_hilangs.id')
@@ -114,18 +118,58 @@ class DashboardController extends Controller
                     'status_text' => $statusPayload['status_text'],
                     'avatar' => 'H',
                     'avatar_class' => 'avatar-sand',
-                    'detail_url' => $this->resolveActionUrl('lost_report', $statusPayload['status'], (int) $report->id),
+                    'image_url' => $this->resolveItemImageUrl((string) ($report->foto_barang ?? ''), 'barang-hilang'),
+                    'detail_url' => $this->resolveLostReportActionUrl((int) $report->id, $statusPayload['status']),
                     'action_label' => $this->resolveActionLabel('lost_report', $statusPayload['status']),
                     'can_delete' => $this->canDeleteLostReport($statusPayload['status']),
                     'delete_url' => route('user.lost-reports.destroy', $report->id),
                 ];
             });
 
+        $foundReports = collect();
+        if ($hasFoundUserColumn) {
+            $foundReports = Barang::query()
+                ->where('user_id', $userId)
+                ->select(['id', 'nama_barang', 'lokasi_ditemukan', 'tanggal_ditemukan', 'status_barang', 'foto_barang', 'created_at', 'updated_at'])
+                ->latest('updated_at')
+                ->limit(16)
+                ->get()
+                ->map(function (Barang $item) {
+                    $statusPayload = match ((string) $item->status_barang) {
+                        'dalam_proses_klaim' => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'DALAM PROSES KLAIM'],
+                        'sudah_diklaim', 'sudah_dikembalikan' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'SELESAI'],
+                        default => ['status' => 'diproses', 'status_class' => 'status-diproses', 'status_text' => 'TERKIRIM'],
+                    };
+
+                    $activityAt = strtotime((string) ($item->updated_at ?? $item->created_at));
+
+                    return (object) [
+                        'type' => 'found_report',
+                        'report_id' => (int) $item->id,
+                        'item_name' => (string) $item->nama_barang,
+                        'item_detail' => 'Laporan Temuan - ' . (string) $item->lokasi_ditemukan,
+                        'incident_date' => (string) $item->tanggal_ditemukan,
+                        'created_at' => $item->created_at,
+                        'activity_at' => $activityAt,
+                        'status' => $statusPayload['status'],
+                        'status_class' => $statusPayload['status_class'],
+                        'status_text' => $statusPayload['status_text'],
+                        'avatar' => 'T',
+                        'avatar_class' => 'avatar-mint',
+                        'image_url' => $this->resolveItemImageUrl((string) ($item->foto_barang ?? ''), 'barang-temuan'),
+                        'detail_url' => route('home.found-detail', $item->id),
+                        'action_label' => 'Lihat Laporan',
+                        'can_delete' => false,
+                        'delete_url' => null,
+                    ];
+                });
+        }
+
         $claims = Klaim::query()
             ->where('user_id', $userId)
             ->with([
-                'barang:id,nama_barang,lokasi_ditemukan',
-                'laporanHilang:id,nama_barang,lokasi_hilang',
+                'barang:id,nama_barang,lokasi_ditemukan,foto_barang',
+                'laporanHilang:id,nama_barang,lokasi_hilang,foto_barang',
             ])
             ->select(['id', 'status_klaim', 'created_at', 'updated_at', 'barang_id', 'laporan_hilang_id'])
             ->latest('updated_at')
@@ -155,7 +199,11 @@ class DashboardController extends Controller
                     'status_text' => $statusPayload['status_text'],
                     'avatar' => 'K',
                     'avatar_class' => 'avatar-claim',
-                    'detail_url' => $this->resolveActionUrl('claim', $statusPayload['status']),
+                    'image_url' => $this->resolveItemImageUrl(
+                        (string) ($claim->barang?->foto_barang ?? $claim->laporanHilang?->foto_barang ?? ''),
+                        $claim->barang ? 'barang-temuan' : 'barang-hilang'
+                    ),
+                    'detail_url' => $this->resolveClaimActionUrl($claim),
                     'action_label' => $this->resolveActionLabel('claim', $statusPayload['status']),
                     'can_delete' => false,
                     'delete_url' => null,
@@ -163,6 +211,7 @@ class DashboardController extends Controller
             });
 
         return $lostReports
+            ->merge($foundReports)
             ->merge($claims)
             ->sortByDesc('activity_at')
             ->values();
@@ -217,7 +266,7 @@ class DashboardController extends Controller
     {
         if ($type === 'claim') {
             return match ($status) {
-                'ditolak' => 'Perbaiki Data',
+                'ditolak' => 'Lihat Detail',
                 'selesai' => 'Lihat Hasil',
                 'dalam_peninjauan' => 'Lihat Status',
                 default => 'Lihat Detail',
@@ -233,19 +282,25 @@ class DashboardController extends Controller
         };
     }
 
-    private function resolveActionUrl(string $type, string $status, ?int $reportId = null): string
+    private function resolveLostReportActionUrl(int $reportId, string $status): string
     {
-        if ($type === 'claim') {
-            return match ($status) {
-                'ditolak' => route('user.lost-reports.create'),
-                default => route('home') . '#hilang-temuan',
-            };
-        }
-
         return match ($status) {
             'diproses', 'ditolak' => route('user.lost-reports.create', ['edit' => $reportId]),
-            default => route('home') . '#hilang-temuan',
+            default => route('home.lost-detail', $reportId),
         };
+    }
+
+    private function resolveClaimActionUrl(Klaim $claim): string
+    {
+        if (!is_null($claim->barang_id)) {
+            return route('home.found-detail', $claim->barang_id);
+        }
+
+        if (!is_null($claim->laporan_hilang_id)) {
+            return route('home.lost-detail', $claim->laporan_hilang_id);
+        }
+
+        return route('user.claim-history');
     }
 
     private function canDeleteLostReport(string $status): bool
@@ -261,5 +316,38 @@ class DashboardController extends Controller
     private function activitiesCacheKey(int $userId): string
     {
         return 'user_dashboard:activities:' . $userId;
+    }
+
+    private function resolveItemImageUrl(string $fotoPath, string $defaultFolder): string
+    {
+        $cleanPath = str_replace('\\', '/', trim($fotoPath, '/'));
+        if ($cleanPath === '') {
+            return '';
+        }
+
+        if (Str::startsWith($cleanPath, ['http://', 'https://', 'data:'])) {
+            return $cleanPath;
+        }
+
+        if (Str::startsWith($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        } elseif (Str::startsWith($cleanPath, 'public/')) {
+            $cleanPath = substr($cleanPath, 7);
+        }
+
+        [$folder, $subPath] = array_pad(explode('/', $cleanPath, 2), 2, '');
+        if (in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== '') {
+            $relative = $folder . '/' . $subPath;
+            return Storage::disk('public')->exists($relative)
+                ? asset('storage/' . $relative)
+                : route('media.image', ['folder' => $folder, 'path' => $subPath]);
+        }
+
+        $relative = $defaultFolder . '/' . ltrim($cleanPath, '/');
+        if (Storage::disk('public')->exists($relative)) {
+            return asset('storage/' . $relative);
+        }
+
+        return '';
     }
 }

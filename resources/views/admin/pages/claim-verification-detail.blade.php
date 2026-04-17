@@ -26,7 +26,28 @@
     $buktiKepemilikanPengaju = trim((string) ($klaim->laporanHilang?->bukti_kepemilikan ?? ''));
     $buktiFotoUrls = collect((array) ($klaim->bukti_foto ?? []))
         ->filter(fn ($path) => is_string($path) && trim($path) !== '')
-        ->map(fn ($path) => asset('storage/' . ltrim((string) $path, '/')))
+        ->map(function ($path) {
+            $cleanPath = str_replace('\\', '/', ltrim((string) $path, '/'));
+            if ($cleanPath === '') {
+                return null;
+            }
+
+            if (\Illuminate\Support\Str::startsWith($cleanPath, ['http://', 'https://'])) {
+                return $cleanPath;
+            }
+
+            if (\Illuminate\Support\Str::startsWith($cleanPath, 'storage/')) {
+                $cleanPath = substr($cleanPath, 8);
+            } elseif (\Illuminate\Support\Str::startsWith($cleanPath, 'public/')) {
+                $cleanPath = substr($cleanPath, 7);
+            }
+
+            [$folder, $subPath] = array_pad(explode('/', $cleanPath, 2), 2, '');
+            return in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim', 'profil-admin', 'profil-user'], true) && $subPath !== ''
+                ? route('media.image', ['folder' => $folder, 'path' => $subPath])
+                : asset('storage/' . $cleanPath);
+        })
+        ->filter()
         ->values();
 @endphp
 
@@ -47,36 +68,7 @@
                 </div>
             </div>
         </div>
-
-        @if(session('status'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="2800" style="--autoclose-ms: 2800ms;" role="status" aria-live="polite">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Berhasil</strong>
-                    <span>{{ session('status') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Gagal</strong>
-                    <span>{{ session('error') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        <section class="claim-detail-layout">
+<section class="claim-detail-layout">
             <article class="report-card claim-main-card">
                 <header class="claim-main-head">
                     <div>
@@ -203,11 +195,21 @@
 
         @if($klaim->status_klaim === 'pending')
             <div class="claim-detail-bottom-actions">
-                <form method="POST" action="{{ route('admin.claim-verifications.reject', $klaim->id) }}" data-confirm-delete data-confirm-message="Tolak klaim ini? Pastikan alasan penolakan sudah sesuai.">
+                <form method="POST" action="{{ route('admin.claim-verifications.reject', $klaim->id) }}"
+                    data-confirm-delete
+                    data-confirm-title="Konfirmasi Tolak Klaim"
+                    data-confirm-message="Tolak klaim ini? Pastikan alasan penolakan sudah sesuai."
+                    data-confirm-submit-label="Tolak Klaim"
+                    data-confirm-submit-variant="danger">
                     @csrf
                     <button type="submit" class="claim-action-btn danger">Tolak Klaim</button>
                 </form>
-                <form method="POST" action="{{ route('admin.claim-verifications.approve', $klaim->id) }}" data-confirm-delete data-confirm-message="Setujui klaim ini? Barang akan ditandai sesuai proses verifikasi.">
+                <form method="POST" action="{{ route('admin.claim-verifications.approve', $klaim->id) }}"
+                    data-confirm-delete
+                    data-confirm-title="Konfirmasi Setujui Klaim"
+                    data-confirm-message="Setujui klaim ini? Barang akan ditandai sesuai proses verifikasi."
+                    data-confirm-submit-label="Setujui Klaim"
+                    data-confirm-submit-variant="primary">
                     @csrf
                     <button type="submit" class="claim-action-btn success">Setujui Klaim</button>
                 </form>

@@ -1,7 +1,9 @@
 <header class="topbar {{ ($hideSearch ?? false) ? 'topbar-no-search' : '' }}">
     @if(!empty($topbarBackUrl))
         <a href="{{ $topbarBackUrl }}" class="topbar-back-link" aria-label="{{ $topbarBackLabel ?? 'Kembali' }}">
-            <iconify-icon icon="mdi:arrow-left"></iconify-icon>
+            <svg class="topbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 18l-6-6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
         </a>
     @endif
 
@@ -25,14 +27,11 @@
     @if(!($hideTopActions ?? false))
         <div class="top-actions">
             <button type="button" class="notification-trigger" aria-label="Notifikasi" aria-expanded="false" aria-controls="user-notification-modal">
-                <iconify-icon icon="mdi:bell-outline"></iconify-icon>
+                <iconify-icon icon="mdi:bell-outline" class="topbar-icon" aria-hidden="true"></iconify-icon>
                 @if(($userUnreadNotificationsCount ?? 0) > 0)
                     <span class="notification-badge">{{ $userUnreadNotificationsCount > 9 ? '9+' : $userUnreadNotificationsCount }}</span>
                 @endif
             </button>
-            <a href="{{ route('user.profile') }}" class="top-action-link" aria-label="Pengaturan">
-                <iconify-icon icon="mdi:cog-outline"></iconify-icon>
-            </a>
 
             <div class="notification-modal" id="user-notification-modal">
                 <div class="notification-head">
@@ -72,7 +71,11 @@
                             </a>
                             <details class="notification-menu-wrap">
                                 <summary class="notification-menu-trigger" aria-label="Aksi notifikasi">
-                                    <iconify-icon icon="mdi:dots-vertical"></iconify-icon>
+                                    <svg class="topbar-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                        <circle cx="12" cy="5" r="1.8" fill="currentColor"/>
+                                        <circle cx="12" cy="12" r="1.8" fill="currentColor"/>
+                                        <circle cx="12" cy="19" r="1.8" fill="currentColor"/>
+                                    </svg>
                                 </summary>
 
                                 <div class="notification-menu">

@@ -10,18 +10,7 @@
 
 @section('page-content')
     <div class="dashboard-page-content">
-        @if(session('status'))
-            <div class="report-card" style="margin-bottom:12px;">
-                <header><h2 style="font-size:14px;">{{ session('status') }}</h2></header>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="report-card" style="margin-bottom:12px;">
-                <header><h2 style="font-size:14px;color:#b91c1c;">{{ session('error') }}</h2></header>
-            </div>
-        @endif
-
-        {{-- BAGIAN: Pembuka --}}
+{{-- BAGIAN: Pembuka --}}
         <section class="intro">
             <h1>Ringkasan Dashboard Admin</h1>
             <p>Selamat Datang, {{ $admin?->nama ?? 'Admin' }}! Kelola barang hilang &amp; temuan dengan efisien.</p>
@@ -118,26 +107,52 @@
                                     <div class="item-cell">
                                         <div class="item-avatar {{ $report->avatar_class ?? '' }}">
                                             <span class="item-avatar-fallback">{{ $report->avatar ?? '?' }}</span>
-                                            @if(!empty($report->foto_barang))
-                                                @php
-                                                    $fotoPath = trim((string) $report->foto_barang, '/');
-                                                    [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
-                                                    $fotoUrl = in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== ''
-                                                        ? route('media.image', ['folder' => $folder, 'path' => $subPath], false)
-                                                        : asset('storage/' . $fotoPath);
-                                                @endphp
+                                            @php
+                                                $fotoUrlDefault = asset('img/login-image.png');
+                                                $fotoSrc = null;
+                                                $rawFotoPath = str_replace('\\', '/', trim((string) ($report->foto_barang ?? '')));
+                                                $localFotoPath = null;
+
+                                                if ($rawFotoPath !== '') {
+                                                    if (\Illuminate\Support\Str::startsWith($rawFotoPath, ['http://', 'https://'])) {
+                                                        $fotoSrc = $rawFotoPath;
+                                                    } else {
+                                                        $fotoPath = ltrim($rawFotoPath, '/');
+                                                        if (\Illuminate\Support\Str::startsWith($fotoPath, 'storage/')) {
+                                                            $fotoPath = substr($fotoPath, 8);
+                                                        } elseif (\Illuminate\Support\Str::startsWith($fotoPath, 'public/')) {
+                                                            $fotoPath = substr($fotoPath, 7);
+                                                        }
+                                                        $localFotoPath = $fotoPath;
+                                                    }
+                                                }
+
+                                                if (!empty($localFotoPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($localFotoPath)) {
+                                                    $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path($localFotoPath);
+                                                    $mimeType = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($localFotoPath) ?: 'image/jpeg';
+                                                    $binary = @file_get_contents($absolutePath);
+                                                    if ($binary !== false) {
+                                                        $fotoSrc = 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+                                                    }
+                                                }
+
+                                                if (!$fotoSrc) {
+                                                    $fotoSrc = $fotoUrlDefault;
+                                                }
+                                            @endphp
+                                            @if($fotoSrc)
                                                 <img
-                                                    src="{{ $fotoUrl }}"
+                                                    src="{{ $fotoSrc }}"
                                                     alt="{{ $report->item_name ?? 'Barang' }}"
                                                     loading="lazy"
                                                     decoding="async"
                                                     width="30"
                                                     height="30"
-                                                    onerror="this.remove()"
+                                                    onerror="this.onerror=null;this.src='{{ $fotoUrlDefault }}';"
                                                 >
                                             @elseif(($report->type ?? null) === 'temuan')
                                                 <img
-                                                    src="{{ route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp'], false) }}"
+                                                    src="{{ route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp']) }}"
                                                     alt="{{ $report->item_name ?? 'Barang' }}"
                                                     loading="lazy"
                                                     decoding="async"
@@ -153,7 +168,7 @@
                                                 )
                                             )
                                                 <img
-                                                    src="{{ route('media.image', ['folder' => 'barang-hilang', 'path' => 'dompet.webp'], false) }}"
+                                                    src="{{ route('media.image', ['folder' => 'barang-hilang', 'path' => 'dompet.webp']) }}"
                                                     alt="{{ $report->item_name ?? 'Barang Hilang' }}"
                                                     loading="lazy"
                                                     decoding="async"

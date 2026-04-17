@@ -10,17 +10,7 @@
 
 @section('page-content')
     <div class="input-page-content">
-        @if(session('status'))
-            <div class="feedback-alert success">{{ session('status') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="feedback-alert error">{{ session('error') }}</div>
-        @endif
-        @if($errors->any())
-            <div class="feedback-alert error">{{ $errors->first() }}</div>
-        @endif
-
-        {{-- BAGIAN: Header halaman --}}
+{{-- BAGIAN: Header halaman --}}
         <section class="intro">
             <h1>Lapor Barang Temuan</h1>
             <p>Laporkan barang temuan agar pemilik dapat dihubungi dan proses pengambilan berjalan tertib.</p>

@@ -24,7 +24,7 @@
                                 <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
                             </div>
                             <span class="avatar avatar-img">
-                                <img src="{{ asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async">
+                                <img src="{{ $userAvatar ?? asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ asset('img/profil.jpg') }}';">
                             </span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end profile-menu">
@@ -57,7 +57,7 @@
                                 <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
                             </div>
                             <span class="avatar avatar-img">
-                                <img src="{{ asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async">
+                                <img src="{{ $userAvatar ?? asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ asset('img/profil.jpg') }}';">
                             </span>
                         </button>
                         <div id="mobileProfileSubmenu" class="collapse profile-submenu-mobile d-lg-none">
@@ -189,47 +189,36 @@
                         </div>
                     </div>
                     <div class="col-md-6 col-xl">
-                        <label for="categoryDropdownToggle" class="form-label ps-2 py-2">KATEGORI</label>
-                        <div class="filter-dropdown" id="categoryDropdown">
-                            <button id="categoryDropdownToggle" class="form-select text-start filter-dropdown-toggle" type="button" aria-expanded="false">
-                                {{ data_get($categories, 0, 'Semua Kategori') }}
-                            </button>
-                            <ul id="categoryDropdownMenu" class="filter-dropdown-menu" role="listbox">
-                                @foreach ($categories as $category)
-                                    <li>
-                                        <button type="button" class="filter-option" data-value="{{ $category }}">{{ $category }}</button>
-                                    </li>
-                                @endforeach
-                            </ul>
-                            <select id="categorySelect" class="d-none">
+                        <label for="categorySelect" class="form-label ps-2 py-2">KATEGORI</label>
+                        <div class="select-with-icon">
+                            <select id="categorySelect" class="form-select filter-select">
                                 @foreach ($categories as $category)
                                     <option value="{{ $category }}">{{ $category }}</option>
                                 @endforeach
                             </select>
+                            <span class="field-icon field-icon-right" aria-hidden="true">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </span>
                         </div>
                     </div>
                     <div class="col-md-6 col-xl">
                         <label for="dateInput" class="form-label ps-2 py-2">WAKTU PENEMUAN</label>
-                        <input id="dateInput" type="text" class="form-control modern-date-input" placeholder="dd/mm/yyyy" inputmode="numeric" autocomplete="off">
+                        <div class="input-with-icon input-with-icon-date">
+                            <i class="fa-regular fa-calendar"></i>
+                            <input id="dateInput" type="text" class="form-control modern-date-input" placeholder="dd/mm/yyyy" inputmode="numeric" autocomplete="off">
+                        </div>
                     </div>
                     <div class="col-md-6 col-xl">
-                        <label for="regionDropdownToggle" class="form-label ps-2 py-2">WILAYAH</label>
-                        <div class="filter-dropdown" id="regionDropdown">
-                            <button id="regionDropdownToggle" class="form-select text-start filter-dropdown-toggle" type="button" aria-expanded="false">
-                                {{ data_get($regions, 0, 'Seluruh Wilayah') }}
-                            </button>
-                            <ul id="regionDropdownMenu" class="filter-dropdown-menu" role="listbox">
-                                @foreach ($regions as $region)
-                                    <li>
-                                        <button type="button" class="filter-option" data-value="{{ $region }}">{{ $region }}</button>
-                                    </li>
-                                @endforeach
-                            </ul>
-                            <select id="regionSelect" class="d-none filter-region-select">
+                        <label for="regionSelect" class="form-label ps-2 py-2">WILAYAH</label>
+                        <div class="select-with-icon">
+                            <select id="regionSelect" class="form-select filter-region-select filter-select">
                                 @foreach ($regions as $region)
                                     <option value="{{ $region }}">{{ $region }}</option>
                                 @endforeach
                             </select>
+                            <span class="field-icon field-icon-right" aria-hidden="true">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </span>
                         </div>
                     </div>
                     <div class="col-md-6 col-xl-2 d-flex">
@@ -250,10 +239,9 @@
                 <div class="item-block-head mb-3">
                     <div>
                         <div class="item-kicker item-kicker-danger">Informasi Terkini</div>
-                        <h2 class="item-block-title mb-0">Daftar Barang Hilang Terkini</h2>
+                        <h2 class="item-block-title mb-0 fs-5">Daftar Barang Hilang Terkini</h2>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <a href="#" class="item-link-more">Lihat Semua <i class="fa-solid fa-chevron-right"></i></a>
                         <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
@@ -272,11 +260,12 @@
                             data-region="{{ strtolower($item['location']) }}"
                             data-date="{{ $item['date'] }}">
                             <div class="item-media">
-                                <img src="{{ $item['image_url'] ?? asset('img/login-image.png') }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="600" height="360">
-                                <span class="item-status item-status-danger">Belum Ditemukan</span>
+                                <img src="{{ $item['image_url'] ?? asset('img/login-image.png') }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="600" height="360" onerror="this.onerror=null;this.src='{{ asset('img/login-image.png') }}';">
+                                <span class="item-status {{ $item['status_class'] ?? 'item-status-danger' }}">{{ $item['status_label'] ?? 'Belum Ditemukan' }}</span>
                             </div>
                             <div class="item-body">
                                 <h3 class="item-name">{{ $item['name'] }}</h3>
+                                <p class="item-category"><i class="fa-solid fa-tag"></i> {{ ucwords(strtolower($item['category'])) }}</p>
                                 <p class="item-meta"><i class="fa-solid fa-location-dot"></i> {{ $item['location'] }}</p>
                                 <p class="item-meta"><i class="fa-regular fa-clock"></i> {{ $item['date_label'] ?? $item['date'] }}</p>
                                 <a href="{{ $item['detail_url'] }}" class="btn item-action-btn">Lihat Detail Laporan</a>
@@ -292,11 +281,9 @@
                 <div class="item-block-head mb-3">
                     <div>
                         <div class="item-kicker item-kicker-success">Update Terbaru</div>
-                        <h2 class="item-block-title mb-0">Barang Temuan Terbaru</h2>
+                        <h2 class="item-block-title mb-0 fs-5">Barang Temuan Terbaru</h2>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <span class="item-chip item-chip-active">Terbaru</span>
-                        <span class="item-chip">Terverifikasi</span>
                         <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
@@ -308,6 +295,16 @@
 
                 <div class="carousel-track carousel-draggable" id="foundItemsList">
                     @forelse ($foundItems as $item)
+                        @php
+                            $statusKey = (string) ($item['claim_status_key'] ?? 'available');
+                            $statusClass = match ($statusKey) {
+                                'in_progress' => 'item-status-warning',
+                                'claimed', 'returned' => 'item-status-muted',
+                                default => 'item-status-success',
+                            };
+                            $isClaimable = (bool) ($item['is_claimable'] ?? true);
+                            $claimButtonLabel = $isClaimable ? 'Klaim Barang Ini' : 'Tidak Tersedia untuk Klaim';
+                        @endphp
                         <article class="carousel-item item-card-v2 filter-item"
                             data-list="found"
                             data-category="{{ strtoupper($item['category']) }}"
@@ -315,8 +312,8 @@
                             data-region="{{ strtolower($item['location']) }}"
                             data-date="{{ $item['date'] }}">
                             <div class="item-media">
-                                <img src="{{ $item['image_url'] ?? asset('img/login-image.png') }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="600" height="360">
-                                <span class="item-status item-status-success">Sudah Ditemukan</span>
+                                <img src="{{ $item['image_url'] ?? asset('img/login-image.png') }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="600" height="360" onerror="this.onerror=null;this.src='{{ asset('img/login-image.png') }}';">
+                                <span class="item-status {{ $statusClass }}">{{ $item['claim_status_label'] ?? 'Tersedia untuk Diklaim' }}</span>
                             </div>
                             <div class="item-body">
                                 <h3 class="item-name">{{ $item['name'] }}</h3>
@@ -324,16 +321,29 @@
                                 <p class="item-meta"><i class="fa-regular fa-clock"></i> {{ $item['date_label'] ?? $item['date'] }}</p>
                                 <a href="{{ $item['detail_url'] }}" class="item-detail-link">Lihat Detail Laporan</a>
                                 @auth
-                                    <button
-                                        class="btn item-action-btn claim-button"
-                                        type="button"
-                                        data-barang-id="{{ $item['id'] }}"
-                                        data-barang-name="{{ $item['name'] }}"
-                                    >
-                                        Klaim Barang Ini
-                                    </button>
+                                    @if($isClaimable)
+                                        <button
+                                            class="btn item-action-btn claim-button"
+                                            type="button"
+                                            data-barang-id="{{ $item['id'] }}"
+                                            data-barang-name="{{ $item['name'] }}"
+                                            data-barang-status="{{ $item['claim_status_label'] ?? 'Tersedia untuk Diklaim' }}"
+                                        >
+                                            {{ $claimButtonLabel }}
+                                        </button>
+                                    @else
+                                        <button class="btn item-action-btn item-action-btn-disabled" type="button" disabled aria-disabled="true">
+                                            {{ $claimButtonLabel }}
+                                        </button>
+                                    @endif
                                 @else
-                                    <button class="btn item-action-btn" type="button" data-bs-toggle="modal" data-bs-target="#loginPortalModal">Klaim Barang Ini</button>
+                                    @if($isClaimable)
+                                        <button class="btn item-action-btn" type="button" data-bs-toggle="modal" data-bs-target="#loginPortalModal">{{ $claimButtonLabel }}</button>
+                                    @else
+                                        <button class="btn item-action-btn item-action-btn-disabled" type="button" disabled aria-disabled="true">
+                                            {{ $claimButtonLabel }}
+                                        </button>
+                                    @endif
                                 @endauth
                             </div>
                         </article>
@@ -380,7 +390,7 @@
                             <div class="step-number">3</div>
                             <div>
                                 <h3 class="h5 fw-bold mb-2">Verifikasi Admin</h3>
-                                <p class="text-muted fs-6 mb-0">Tim admin kami akan memproses klaim Anda dalam waktu 1x24 jam untuk memastikan keabsahan kepemilikan barang.</p>
+                                <p class="text-muted fs-6 mb-0">Tim admin kami akan memproses klaim Anda maksimal 24 jam untuk memastikan keabsahan kepemilikan barang.</p>
                             </div>
                         </div>
                     </div>
@@ -394,8 +404,13 @@
                         </div>
                     </div>
                 </div>
+                <div class="claim-outcome-note mt-4 text-center" role="note" aria-label="Catatan hasil verifikasi">
+                    Klaim dapat <strong>disetujui</strong> atau <strong>ditolak</strong> jika bukti kepemilikan belum memadai.
+                </div>
                 <div class="claim-help mt-4 text-center">
-                    <a href="#" class="claim-help-link">Butuh bantuan lebih lanjut dalam proses klaim? Hubungi Support Center Kami</a>
+                    <a href="https://wa.me/6281234567890" target="_blank" rel="noopener noreferrer" class="claim-help-link">
+                        <i class="fa-brands fa-whatsapp me-2" aria-hidden="true"></i>Hubungi Support Center Kami
+                    </a>
                 </div>
             </div>
         </section>
@@ -427,6 +442,7 @@
                         <div class="lokasi-contact-chip mb-3">
                             <span class="lokasi-chip-icon"><i class="fa-solid fa-location-dot"></i></span>
                             <div>
+                                <small class="lokasi-manager-label" id="selectedLocationManager">Admin Pengelola</small>
                                 <p class="mb-0 fw-bold" id="selectedLocationName">Sinemu Center Indramayu</p>
                                 <small id="selectedLocationAddress">Jl. Jenderal Sudirman No. 88, Indramayu</small>
                             </div>
@@ -495,14 +511,18 @@
                                 <article class="contact-info-card h-100">
                                     <span class="contact-info-icon bg-email"><i class="fa-regular fa-envelope"></i></span>
                                     <p class="contact-info-label">EMAIL</p>
-                                    <p class="contact-info-text mb-0">support@sinemu.id</p>
+                                    <p class="contact-info-text mb-0">
+                                        <a href="mailto:support@sinemu.id" class="contact-info-link">support@sinemu.id</a>
+                                    </p>
                                 </article>
                             </div>
                             <div class="col-6">
                                 <article class="contact-info-card h-100">
                                     <span class="contact-info-icon bg-phone"><i class="fa-solid fa-phone"></i></span>
                                     <p class="contact-info-label">TELEPON</p>
-                                    <p class="contact-info-text mb-0">+62 21 1234 5678</p>
+                                    <p class="contact-info-text mb-0">
+                                        <a href="tel:+6281234567890" class="contact-info-link">0812-3456-7890</a>
+                                    </p>
                                 </article>
                             </div>
                             <div class="col-6">
@@ -526,20 +546,21 @@
                         <form id="contactForm" class="contact-form-card h-100" novalidate>
                             <div class="mb-3">
                                 <label for="contactName" class="form-label">Nama Lengkap</label>
-                                <input id="contactName" type="text" class="form-control" placeholder="Masukkan nama">
+                                <input id="contactName" name="name" type="text" class="form-control" placeholder="Masukkan nama" required>
                             </div>
                             <div class="mb-3">
                                 <label for="contactEmail" class="form-label">Alamat Email</label>
-                                <input id="contactEmail" type="email" class="form-control" placeholder="Masukkan email">
+                                <input id="contactEmail" name="email" type="email" class="form-control" placeholder="Masukkan email" required>
                             </div>
                             <div class="mb-3">
                                 <label for="contactPhone" class="form-label">Telepon</label>
-                                <input id="contactPhone" type="text" class="form-control" placeholder="Masukkan nomor telepon">
+                                <input id="contactPhone" name="phone" type="text" class="form-control" placeholder="Masukkan nomor telepon" required>
                             </div>
                             <div class="mb-3">
                                 <label for="contactMessage" class="form-label">Pesan</label>
-                                <textarea id="contactMessage" class="form-control contact-textarea" rows="3" placeholder="Tuliskan pesan Anda"></textarea>
+                                <textarea id="contactMessage" name="message" class="form-control contact-textarea" rows="3" placeholder="Tuliskan pesan Anda" required></textarea>
                             </div>
+                            <div id="contactFormFeedback" class="contact-form-feedback" aria-live="polite"></div>
                             <button type="submit" class="btn btn-sinemu btn-sinemu-primary w-100 contact-submit-btn">
                                 <i class="fa-solid fa-paper-plane me-2"></i>Kirim Pesan
                             </button>
@@ -552,12 +573,23 @@
 
         @push('styles')
             <link
-                rel="stylesheet"
+                rel="preload"
+                as="style"
                 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
                 integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
                 crossorigin=""
+                onload="this.onload=null;this.rel='stylesheet'"
             >
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+            <noscript>
+                <link
+                    rel="stylesheet"
+                    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+                    crossorigin=""
+                >
+            </noscript>
+            <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" onload="this.onload=null;this.rel='stylesheet'">
+            <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"></noscript>
         @endpush
 
         @auth
@@ -648,61 +680,105 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body claim-modal-body">
-                            @if(is_null(auth()->user()?->email_verified_at))
-                                <div class="claim-modal-note claim-modal-note-warning">
-                                    <strong>Email belum diverifikasi.</strong>
-                                    <span>Verifikasi email terlebih dahulu untuk mengajukan klaim.</span>
-                                </div>
-                            @endif
                             <div class="claim-modal-highlight">
                                 <span class="claim-modal-highlight-label">Barang Temuan</span>
                                 <input type="text" id="claimBarangName" class="form-control claim-modal-input is-readonly" readonly>
                             </div>
+                            <div class="claim-modal-highlight">
+                                <span class="claim-modal-highlight-label">Status Barang Temuan</span>
+                                <input type="text" id="claimBarangStatus" class="form-control claim-modal-input is-readonly" readonly>
+                            </div>
 
                             <div class="claim-modal-form-grid">
                                 <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Nama Barang Hilang Anda <span>*</span></label>
-                                    <input type="text" name="nama_barang_hilang" class="form-control claim-modal-input" value="{{ old('nama_barang_hilang') }}" required>
+                                    <label class="claim-modal-check">
+                                        <input type="checkbox" name="claim_without_report" id="claimWithoutReport" value="1" @checked(old('claim_without_report'))>
+                                        <span>Saya belum pernah membuat laporan barang hilang, isi data klaim langsung di sini.</span>
+                                    </label>
                                 </div>
-                                <div class="claim-modal-field">
-                                    <label class="form-label claim-modal-label">Lokasi Hilang <span>*</span></label>
-                                    <input type="text" name="lokasi_hilang" class="form-control claim-modal-input" value="{{ old('lokasi_hilang') }}" required>
-                                </div>
-                                <div class="claim-modal-field">
-                                    <label class="form-label claim-modal-label">Tanggal Hilang <span>*</span></label>
-                                    <input type="date" name="tanggal_hilang" class="form-control claim-modal-input" value="{{ old('tanggal_hilang') }}" required>
-                                </div>
-                                <div class="claim-modal-field">
-                                    <label class="form-label claim-modal-label">Warna Dominan</label>
-                                    <input type="text" name="warna_barang" class="form-control claim-modal-input" value="{{ old('warna_barang') }}" placeholder="Contoh: Hitam, Silver">
-                                </div>
-                                <div class="claim-modal-field">
-                                    <label class="form-label claim-modal-label">Merek / Brand</label>
-                                    <input type="text" name="merek_barang" class="form-control claim-modal-input" value="{{ old('merek_barang') }}" placeholder="Contoh: Samsung, Casio">
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Nomor Seri / Kode Unik</label>
-                                    <input type="text" name="nomor_seri" class="form-control claim-modal-input" value="{{ old('nomor_seri') }}" placeholder="Contoh: IMEI, nomor seri, atau kode produksi">
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Detail Lokasi Hilang <span>*</span></label>
-                                    <textarea name="detail_lokasi_hilang" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Contoh: Jatuh di dekat parkiran sebelah ATM, sekitar pukul 18.30." required>{{ old('detail_lokasi_hilang') }}</textarea>
+                                <div class="claim-modal-field claim-modal-field-full" id="claimReportSelectorWrap">
+                                    <label class="form-label claim-modal-label">Pilih Laporan Barang Hilang Anda <span>*</span></label>
+                                    <select name="laporan_hilang_id" id="claimLostReportId" class="form-select claim-modal-input" @required(!old('claim_without_report'))>
+                                        <option value="">Pilih laporan Anda</option>
+                                        @foreach(($claimableLostReports ?? collect()) as $report)
+                                            <option
+                                                value="{{ $report->id }}"
+                                                data-report-name="{{ $report->nama_barang }}"
+                                                data-report-location="{{ $report->lokasi_hilang }}"
+                                                data-report-date="{{ !empty($report->tanggal_hilang) ? \Carbon\Carbon::parse((string) $report->tanggal_hilang)->format('d/m/Y') : '-' }}"
+                                                data-report-contact="{{ $report->kontak_pelapor ?? '' }}"
+                                                data-report-ownership="{{ $report->bukti_kepemilikan ?? '' }}"
+                                                @selected((string) old('laporan_hilang_id') === (string) $report->id)
+                                            >
+                                                {{ $report->nama_barang }} - {{ $report->lokasi_hilang }} ({{ !empty($report->tanggal_hilang) ? \Carbon\Carbon::parse((string) $report->tanggal_hilang)->format('d/m/Y') : '-' }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <small class="claim-modal-file-hint">Pilih laporan yang sudah ada, atau centang opsi di atas jika belum pernah membuat laporan.</small>
                                 </div>
                                 <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Keterangan Barang <span>*</span></label>
-                                    <textarea name="keterangan" class="form-control claim-modal-textarea" rows="3" placeholder="Jelaskan jenis barang dan kondisi umumnya agar admin bisa mencocokkan dengan data temuan." required>{{ old('keterangan') }}</textarea>
+                                    <div class="claim-modal-summary" id="claimLostReportSummary" hidden>
+                                        <div class="claim-modal-summary-title">Ringkasan Laporan Hilang</div>
+                                        <div class="claim-modal-summary-row"><span>Barang</span><strong id="claimSummaryName">-</strong></div>
+                                        <div class="claim-modal-summary-row"><span>Lokasi</span><strong id="claimSummaryLocation">-</strong></div>
+                                        <div class="claim-modal-summary-row"><span>Tanggal</span><strong id="claimSummaryDate">-</strong></div>
+                                    </div>
                                 </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Ciri Unik Barang <span>*</span></label>
-                                    <textarea name="ciri_khusus" class="form-control claim-modal-textarea" rows="3" placeholder="Contoh: Ada goresan kecil di sudut kanan, strap sudah diganti, ada stiker tertentu." required>{{ old('ciri_khusus') }}</textarea>
+                                <div class="claim-modal-field claim-modal-field-full" id="claimManualFields" @if(!old('claim_without_report')) hidden @endif>
+                                    <div class="claim-modal-summary">
+                                        <div class="claim-modal-summary-title">Data Barang Hilang Anda</div>
+                                        <div class="claim-modal-form-grid">
+                                            <div class="claim-modal-field claim-modal-field-full">
+                                                <label class="form-label claim-modal-label">Nama Barang Hilang <span>*</span></label>
+                                                <input type="text" name="lost_nama_barang" id="claimLostNamaBarang" class="form-control claim-modal-input" value="{{ old('lost_nama_barang') }}" placeholder="Contoh: Tas ransel hitam" @required(old('claim_without_report'))>
+                                                <small class="claim-modal-file-hint">Otomatis terisi dari nama barang temuan, silakan koreksi jika berbeda.</small>
+                                            </div>
+                                            <div class="claim-modal-field">
+                                                <label class="form-label claim-modal-label">Kategori</label>
+                                                <input type="text" name="lost_kategori_barang" class="form-control claim-modal-input" value="{{ old('lost_kategori_barang') }}" placeholder="Contoh: Tas, Dompet, Dokumen">
+                                            </div>
+                                            <div class="claim-modal-field">
+                                                <label class="form-label claim-modal-label">Warna Dominan</label>
+                                                <input type="text" name="lost_warna_barang" class="form-control claim-modal-input" value="{{ old('lost_warna_barang') }}" placeholder="Contoh: Hitam">
+                                            </div>
+                                            <div class="claim-modal-field">
+                                                <label class="form-label claim-modal-label">Merek / Brand</label>
+                                                <input type="text" name="lost_merek_barang" class="form-control claim-modal-input" value="{{ old('lost_merek_barang') }}" placeholder="Contoh: Eiger, Samsung">
+                                            </div>
+                                            <div class="claim-modal-field">
+                                                <label class="form-label claim-modal-label">Nomor Seri / Kode Unik</label>
+                                                <input type="text" name="lost_nomor_seri" class="form-control claim-modal-input" value="{{ old('lost_nomor_seri') }}" placeholder="Contoh: IMEI, nomor seri">
+                                            </div>
+                                            <div class="claim-modal-field">
+                                                <label class="form-label claim-modal-label">Lokasi Hilang <span>*</span></label>
+                                                <input type="text" name="lost_lokasi_hilang" id="claimLostLokasiHilang" class="form-control claim-modal-input" value="{{ old('lost_lokasi_hilang') }}" placeholder="Contoh: Terminal Sindang" @required(old('claim_without_report'))>
+                                            </div>
+                                            <div class="claim-modal-field">
+                                                <label class="form-label claim-modal-label">Tanggal Hilang <span>*</span></label>
+                                                <input type="date" name="lost_tanggal_hilang" id="claimLostTanggalHilang" class="form-control claim-modal-input" value="{{ old('lost_tanggal_hilang') }}" @required(old('claim_without_report'))>
+                                            </div>
+                                            <div class="claim-modal-field claim-modal-field-full">
+                                                <label class="form-label claim-modal-label">Detail Lokasi Hilang</label>
+                                                <textarea name="lost_detail_lokasi_hilang" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Contoh: Jatuh dekat parkiran sebelah ATM.">{{ old('lost_detail_lokasi_hilang') }}</textarea>
+                                            </div>
+                                            <div class="claim-modal-field claim-modal-field-full">
+                                                <label class="form-label claim-modal-label">Deskripsi dan Kronologi Singkat <span>*</span></label>
+                                                <textarea name="lost_keterangan" id="claimLostKeterangan" class="form-control claim-modal-textarea" rows="3" placeholder="Jelaskan barang, kapan terakhir terlihat, dan kronologi singkatnya." @required(old('claim_without_report'))>{{ old('lost_keterangan') }}</textarea>
+                                            </div>
+                                            <div class="claim-modal-field claim-modal-field-full">
+                                                <label class="form-label claim-modal-label">Ciri Unik Barang</label>
+                                                <textarea name="lost_ciri_khusus" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Contoh: Ada stiker, goresan, isi dompet tertentu.">{{ old('lost_ciri_khusus') }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="claim-modal-field">
                                     <label class="form-label claim-modal-label">No. WA yang Bisa Dihubungi <span>*</span></label>
-                                    <input type="text" name="kontak_pelapor" class="form-control claim-modal-input" value="{{ old('kontak_pelapor', auth()->user()?->nomor_telepon) }}" placeholder="Contoh: 081234567890" required>
+                                    <input type="text" name="kontak_pelapor" id="claimKontakPelapor" class="form-control claim-modal-input" value="{{ old('kontak_pelapor', auth()->user()?->nomor_telepon) }}" placeholder="Contoh: 081234567890" required>
                                 </div>
                                 <div class="claim-modal-field claim-modal-field-full">
                                     <label class="form-label claim-modal-label">Bukti Kepemilikan <span>*</span></label>
-                                    <textarea name="bukti_kepemilikan" class="form-control claim-modal-textarea" rows="3" placeholder="Tuliskan bukti yang hanya pemilik asli tahu: isi barang, foto saat dipakai, nomor seri, nota, atau detail lain." required>{{ old('bukti_kepemilikan') }}</textarea>
+                                    <textarea name="bukti_kepemilikan" id="claimBuktiKepemilikan" class="form-control claim-modal-textarea" rows="3" placeholder="Tuliskan bukti yang hanya pemilik asli tahu: isi barang, foto saat dipakai, nomor seri, nota, atau detail lain." required>{{ old('bukti_kepemilikan') }}</textarea>
                                 </div>
                                 <div class="claim-modal-field claim-modal-field-full">
                                     <label class="form-label claim-modal-label">Foto Bukti Kepemilikan <span>*</span></label>
@@ -714,11 +790,24 @@
                                     <label class="form-label claim-modal-label">Catatan Klaim</label>
                                     <textarea name="catatan" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Tambahkan keterangan pendukung jika diperlukan.">{{ old('catatan') }}</textarea>
                                 </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="claim-modal-check">
+                                        <input type="checkbox" id="claimPersetujuanKlaim" name="persetujuan_klaim" value="1" @checked(old('persetujuan_klaim')) required>
+                                        <span>Saya menyatakan data klaim ini benar dan siap diverifikasi oleh admin.</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer claim-modal-footer">
                             <button type="button" class="btn btn-secondary claim-modal-cancel" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary claim-modal-submit" @disabled(is_null(auth()->user()?->email_verified_at))>Ajukan Klaim</button>
+                            <button
+                                id="claimSubmitButton"
+                                type="submit"
+                                class="btn btn-primary claim-modal-submit"
+                                @disabled(!old('persetujuan_klaim'))
+                            >
+                                Ajukan Klaim
+                            </button>
                         </div>
                     </form>
                 </div>

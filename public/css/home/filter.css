@@ -165,6 +165,51 @@
     padding-left: 42px;
 }
 
+.input-with-icon-date .fa-calendar {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sinemu-muted-soft);
+    pointer-events: none;
+}
+
+.input-with-icon-date input {
+    padding-left: 42px;
+}
+
+.select-with-icon {
+    position: relative;
+}
+
+.filter-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 42px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.field-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--sinemu-muted-soft);
+    pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.field-icon-right {
+    right: 15px;
+}
+
+.field-icon-right i {
+    font-size: 0.78rem;
+}
+
 .form-control::-webkit-input-placeholder {
     font-size: 0.875rem;
 }
@@ -178,6 +223,7 @@
 .modern-date-input,
 .flatpickr-input.form-control {
     cursor: pointer;
+    padding-right: 16px;
 }
 
 .flatpickr-calendar {

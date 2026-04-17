@@ -1,7 +1,19 @@
 /* section: topbar */
 .main-content {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    min-height: 0;
     padding: 0 18px 22px;
     min-width: 0;
+    overflow: hidden;
+}
+
+.main-content-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding-top: 12px;
 }
 
 .topbar {
@@ -44,7 +56,7 @@
     color: #3f5572;
 }
 
-.topbar-back-link iconify-icon {
+.topbar-back-link .topbar-icon {
     width: 18px;
     height: 18px;
     color: currentColor;
@@ -167,12 +179,12 @@
 
 .top-actions svg,
 .top-actions img,
-.top-actions iconify-icon {
+.top-actions .topbar-icon {
     width: 16px;
     height: 16px;
 }
 
-.top-actions iconify-icon {
+.top-actions .topbar-icon {
     color: currentColor;
     display: inline-block;
 }
@@ -391,7 +403,7 @@
     color: #45566f;
 }
 
-.notification-menu-trigger iconify-icon {
+.notification-menu-trigger .topbar-icon {
     width: 16px;
     height: 16px;
 }

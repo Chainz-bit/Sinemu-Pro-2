@@ -182,23 +182,33 @@ class RiwayatKlaimController extends Controller
             return route('home.lost-detail', $claim->laporan_hilang_id);
         }
 
-        return route('home') . '#hilang-temuan';
+        return route('home');
     }
 
     private function resolveItemImageUrl(string $fotoPath, string $defaultFolder): string
     {
-        $cleanPath = trim($fotoPath, '/');
+        $cleanPath = str_replace('\\', '/', trim($fotoPath, '/'));
         if ($cleanPath === '') {
             return asset('img/login-image.png');
         }
 
+        if (\Illuminate\Support\Str::startsWith($cleanPath, ['http://', 'https://'])) {
+            return $cleanPath;
+        }
+
+        if (\Illuminate\Support\Str::startsWith($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        } elseif (\Illuminate\Support\Str::startsWith($cleanPath, 'public/')) {
+            $cleanPath = substr($cleanPath, 7);
+        }
+
         [$folder, $subPath] = array_pad(explode('/', $cleanPath, 2), 2, '');
         if (in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== '') {
-            return route('media.image', ['folder' => $folder, 'path' => $subPath], false);
+            return route('media.image', ['folder' => $folder, 'path' => $subPath]);
         }
 
         if ($subPath !== '') {
-            return route('media.image', ['folder' => $defaultFolder, 'path' => $cleanPath], false);
+            return route('media.image', ['folder' => $defaultFolder, 'path' => $cleanPath]);
         }
 
         return asset('storage/' . $cleanPath);

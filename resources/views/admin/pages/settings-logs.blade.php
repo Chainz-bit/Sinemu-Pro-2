@@ -11,21 +11,7 @@
 
 @section('page-content')
     <section class="settings-log-page">
-        @if(session('status'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Berhasil</strong>
-                    <span>{{ session('status') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        <header class="settings-log-header">
+<header class="settings-log-header">
             <h1>Log Aktivitas</h1>
             <p>Riwayat notifikasi dan perubahan yang tercatat untuk akun admin.</p>
         </header>

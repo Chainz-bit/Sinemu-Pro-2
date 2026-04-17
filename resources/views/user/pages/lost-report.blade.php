@@ -10,17 +10,7 @@
 
 @section('page-content')
     <div class="input-page-content">
-        @if(session('status'))
-            <div class="feedback-alert success">{{ session('status') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="feedback-alert error">{{ session('error') }}</div>
-        @endif
-        @if($errors->any())
-            <div class="feedback-alert error">{{ $errors->first() }}</div>
-        @endif
-
-        {{-- BAGIAN: Header halaman --}}
+{{-- BAGIAN: Header halaman --}}
         <section class="intro">
             <h1>{{ $editingReport ? 'Edit Laporan Barang Hilang' : 'Lapor Barang Hilang' }}</h1>
             <p>{{ $editingReport ? 'Perbarui data laporan agar admin dapat meninjau ulang dengan cepat.' : 'Isi data secara lengkap agar tim SiNemu lebih cepat membantu proses pencarian.' }}</p>
@@ -40,13 +30,20 @@
 
                 <div class="form-col-6 form-group">
                     <label class="form-label" for="kategori_barang">Kategori Barang</label>
-                    <input id="kategori_barang" name="kategori_barang" type="text" class="form-input" value="{{ old('kategori_barang', $editingReport?->kategori_barang) }}" list="lost-category-list" placeholder="Pilih atau ketik kategori">
-                    <datalist id="lost-category-list">
-                        @foreach(($lostCategoryOptions ?? collect()) as $categoryName)
-                            <option value="{{ $categoryName }}"></option>
+                    @php
+                        $selectedLostCategory = (string) old('kategori_barang', $editingReport?->kategori_barang);
+                        $lostCategoryNames = collect($lostCategoryOptions ?? [])->map(fn ($name) => trim((string) $name))->filter()->values();
+                        $hasSelectedLostCategory = $selectedLostCategory !== '' && $lostCategoryNames->contains($selectedLostCategory);
+                    @endphp
+                    <select id="kategori_barang" name="kategori_barang" class="form-input">
+                        <option value="">Pilih kategori</option>
+                        @foreach($lostCategoryNames as $categoryName)
+                            <option value="{{ $categoryName }}" @selected($selectedLostCategory === $categoryName)>{{ $categoryName }}</option>
                         @endforeach
-                        <option value="Lainnya"></option>
-                    </datalist>
+                        @if($selectedLostCategory !== '' && !$hasSelectedLostCategory)
+                            <option value="{{ $selectedLostCategory }}" selected>{{ $selectedLostCategory }}</option>
+                        @endif
+                    </select>
                 </div>
 
                 <div class="form-col-6 form-group">

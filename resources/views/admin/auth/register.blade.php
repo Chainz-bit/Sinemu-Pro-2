@@ -38,10 +38,6 @@
                     <p>Lengkapi data berikut untuk mengakses dashboard admin</p>
                 </header>
 
-                @if ($errors->any())
-                    <div class="alert-box alert-error">{{ $errors->first() }}</div>
-                @endif
-
                 <form method="POST" action="{{ route('admin.register') }}" class="login-form" novalidate>
                     @csrf
 
@@ -62,6 +58,16 @@
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M4 7.5A2.5 2.5 0 0 1 6.5 5h11A2.5 2.5 0 0 1 20 7.5v9a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5v-9Zm1.8-.2 5.85 4.45a.6.6 0 0 0 .7 0l5.85-4.45" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
                             <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="admin@email.com" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label for="nomor_telepon">Nomor Telepon</label>
+                        <div class="input-wrap">
+                            <span class="input-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none"><path d="M6.5 3.5h3A1.5 1.5 0 0 1 11 5v14a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 5 19V5a1.5 1.5 0 0 1 1.5-1.5Zm6.5 3h4.5A1.5 1.5 0 0 1 19 8v8a1.5 1.5 0 0 1-1.5 1.5H13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            </span>
+                            <input id="nomor_telepon" type="text" name="nomor_telepon" value="{{ old('nomor_telepon') }}" placeholder="Contoh: 081234567890" required autocomplete="tel">
                         </div>
                     </div>
 

@@ -10,8 +10,17 @@
     $fotoPath = trim((string) ($laporanBarangHilang->foto_barang ?? ''), '/');
     [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
     $fotoUrl = !empty($fotoPath) && in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== ''
-        ? route('media.image', ['folder' => $folder, 'path' => $subPath], false)
-        : route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp'], false);
+        ? route('media.image', ['folder' => $folder, 'path' => $subPath])
+        : route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp']);
+    $fotoDataUri = null;
+    if (!empty($fotoPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($fotoPath)) {
+        $absoluteFotoPath = \Illuminate\Support\Facades\Storage::disk('public')->path($fotoPath);
+        $fotoBinary = @file_get_contents($absoluteFotoPath);
+        if ($fotoBinary !== false) {
+            $mimeType = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($fotoPath) ?: 'image/jpeg';
+            $fotoDataUri = 'data:' . $mimeType . ';base64,' . base64_encode($fotoBinary);
+        }
+    }
     $createdAtLabel = !empty($laporanBarangHilang->created_at)
         ? \Illuminate\Support\Carbon::parse($laporanBarangHilang->created_at)->format('d M Y, H:i')
         : '-';
@@ -22,47 +31,7 @@
 
 @section('page-content')
     <section class="edit-report-page">
-        @if(session('status'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Berhasil</strong>
-                    <span>{{ session('status') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Gagal</strong>
-                    <span>{{ session('error') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-        @if($errors->any())
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Gagal</strong>
-                    <span>{{ $errors->first() }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        <div class="edit-report-top">
+<div class="edit-report-top">
             <div class="edit-report-header">
                 <p class="edit-report-breadcrumb">
                     <a href="{{ route('admin.lost-items') }}">Daftar Barang Hilang</a>
@@ -81,7 +50,7 @@
             <aside class="edit-report-summary">
                 <span class="edit-summary-label">Foto Saat Ini</span>
                 <div class="edit-summary-photo-wrap">
-                    <img id="editCurrentPhotoPreview" src="{{ $fotoUrl }}" alt="{{ $laporanBarangHilang->nama_barang }}">
+                    <img id="editCurrentPhotoPreview" src="{{ $fotoDataUri ?? $fotoUrl }}" alt="{{ $laporanBarangHilang->nama_barang }}" onerror="this.onerror=null;this.src='{{ route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp']) }}';">
                 </div>
                 <div class="edit-summary-grid">
                     <div class="edit-summary-item">
@@ -116,7 +85,20 @@
 
                         <div>
                             <label class="edit-form-label" for="kategori_barang">Kategori Barang</label>
-                            <input class="form-input edit-form-input" id="kategori_barang" name="kategori_barang" type="text" maxlength="100" value="{{ old('kategori_barang', $laporanBarangHilang->kategori_barang) }}">
+                            @php
+                                $selectedLostCategory = (string) old('kategori_barang', $laporanBarangHilang->kategori_barang);
+                                $lostCategoryNames = collect($lostCategoryOptions ?? [])->map(fn ($name) => trim((string) $name))->filter()->values();
+                                $hasSelectedLostCategory = $selectedLostCategory !== '' && $lostCategoryNames->contains($selectedLostCategory);
+                            @endphp
+                            <select class="form-input edit-form-input" id="kategori_barang" name="kategori_barang">
+                                <option value="">Pilih kategori</option>
+                                @foreach($lostCategoryNames as $categoryName)
+                                    <option value="{{ $categoryName }}" @selected($selectedLostCategory === $categoryName)>{{ $categoryName }}</option>
+                                @endforeach
+                                @if($selectedLostCategory !== '' && !$hasSelectedLostCategory)
+                                    <option value="{{ $selectedLostCategory }}" selected>{{ $selectedLostCategory }}</option>
+                                @endif
+                            </select>
                         </div>
 
                         <div>
@@ -183,7 +165,7 @@
                     <div class="edit-form-grid">
                         <label class="edit-form-label" for="foto_barang">Foto Barang (Opsional)</label>
                         <input class="form-input edit-form-input" id="foto_barang" name="foto_barang" type="file" accept=".jpg,.jpeg,.png,.webp">
-                        <small class="edit-form-help">Biarkan kosong jika tidak ingin mengganti foto.</small>
+                        <small class="edit-form-help">Biarkan kosong jika tidak ingin mengganti foto. Foto Saat Ini tetap foto kiriman user sampai perubahan disimpan.</small>
                         <small class="edit-form-file-name" id="foto_barang_filename">Belum ada file dipilih.</small>
                     </div>
                 </div>
@@ -199,7 +181,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const photoInput = document.getElementById('foto_barang');
-            const photoPreview = document.getElementById('editCurrentPhotoPreview');
             const photoFileName = document.getElementById('foto_barang_filename');
             const keterangan = document.getElementById('keterangan');
             const keteranganCounter = document.getElementById('keterangan_counter');
@@ -216,9 +197,7 @@
                 keterangan.addEventListener('input', syncKeteranganCounter);
             }
 
-            if (!photoInput || !photoPreview) return;
-
-            let objectUrl = null;
+            if (!photoInput) return;
 
             photoInput.addEventListener('change', function () {
                 const file = photoInput.files?.[0];
@@ -230,15 +209,6 @@
                 if (photoFileName) {
                     photoFileName.textContent = `File dipilih: ${file.name}`;
                 }
-
-                if (!file.type.startsWith('image/')) return;
-
-                if (objectUrl) {
-                    URL.revokeObjectURL(objectUrl);
-                }
-
-                objectUrl = URL.createObjectURL(file);
-                photoPreview.src = objectUrl;
             });
         });
     </script>

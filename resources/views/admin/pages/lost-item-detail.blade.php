@@ -10,13 +10,45 @@
     $topbarBackUrl = route('admin.lost-items');
     $topbarBackLabel = 'Kembali ke Daftar Barang Hilang';
 
-    $fotoPath = trim((string) ($laporanBarangHilang->foto_barang ?? ''), '/');
-    [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
-    $fotoUrl = !empty($fotoPath) && in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== ''
-        ? route('media.image', ['folder' => $folder, 'path' => $subPath], false)
-        : (str_contains(strtolower((string) $laporanBarangHilang->nama_barang), 'dompet')
-            ? route('media.image', ['folder' => 'barang-hilang', 'path' => 'dompet.webp'], false)
-            : route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp'], false));
+    $fotoUrlDefault = str_contains(strtolower((string) $laporanBarangHilang->nama_barang), 'dompet')
+        ? route('media.image', ['folder' => 'barang-hilang', 'path' => 'dompet.webp'])
+        : route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp']);
+    $fotoUrl = $fotoUrlDefault;
+    $fotoSrc = $fotoUrlDefault;
+    $localFotoPath = null;
+
+    $rawFotoPath = str_replace('\\', '/', trim((string) ($laporanBarangHilang->foto_barang ?? '')));
+    if ($rawFotoPath !== '') {
+        if (\Illuminate\Support\Str::startsWith($rawFotoPath, ['http://', 'https://'])) {
+            $fotoUrl = $rawFotoPath;
+        } else {
+            $fotoPath = ltrim($rawFotoPath, '/');
+            if (\Illuminate\Support\Str::startsWith($fotoPath, 'storage/')) {
+                $fotoPath = substr($fotoPath, 8);
+            } elseif (\Illuminate\Support\Str::startsWith($fotoPath, 'public/')) {
+                $fotoPath = substr($fotoPath, 7);
+            }
+
+            [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
+            $fotoUrl = in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== ''
+                ? route('media.image', ['folder' => $folder, 'path' => $subPath])
+                : asset('storage/' . $fotoPath);
+            $localFotoPath = $fotoPath;
+        }
+    }
+
+    if (!empty($localFotoPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($localFotoPath)) {
+        $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path($localFotoPath);
+        $mimeType = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($localFotoPath) ?: 'image/jpeg';
+        $binary = @file_get_contents($absolutePath);
+        if ($binary !== false) {
+            $fotoSrc = 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+        } else {
+            $fotoSrc = $fotoUrl;
+        }
+    } else {
+        $fotoSrc = $fotoUrl;
+    }
 
     $statusMap = [
         null => ['BELUM DITEMUKAN', 'status-dalam_peninjauan'],
@@ -65,47 +97,7 @@
 
 @section('page-content')
     <section class="lost-detail-page">
-        @if(session('status'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Berhasil</strong>
-                    <span>{{ session('status') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-        @if(session('error'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Gagal</strong>
-                    <span>{{ session('error') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-        @if($errors->any())
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Gagal</strong>
-                    <span>{{ $errors->first() }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        <div class="lost-detail-header">
+<div class="lost-detail-header">
             <div>
                 <p class="lost-detail-breadcrumb">
                     <a href="{{ route('admin.lost-items') }}">Daftar Barang Hilang</a>
@@ -127,11 +119,12 @@
                     <div class="lost-detail-image-wrap">
                         <span class="lost-detail-image-label">Foto Barang</span>
                         <img
-                            src="{{ $fotoUrl }}"
+                            src="{{ $fotoSrc }}"
                             alt="{{ $laporanBarangHilang->nama_barang }}"
                             class="lost-detail-image"
                             loading="lazy"
                             decoding="async"
+                            onerror="this.onerror=null;this.src='{{ $fotoUrlDefault }}';"
                         >
                     </div>
 

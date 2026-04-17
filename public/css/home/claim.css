@@ -78,16 +78,38 @@
     padding: 1.05rem 1.4rem;
 }
 
+.claim-outcome-note {
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 14px;
+    background: rgba(239, 246, 255, 0.9);
+    color: #334155;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    padding: 0.72rem 0.95rem;
+}
+
 .claim-help-link {
-    color: var(--sinemu-primary);
-    font-size: 0.97rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(37, 99, 235, 0.9);
+    background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff;
+    font-size: 0.94rem;
     font-weight: 700;
     letter-spacing: -0.01em;
     text-decoration: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
 }
 
 .claim-help-link:hover {
-    text-decoration: underline;
+    color: #ffffff;
+    background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(30, 64, 175, 0.25);
 }
 
 .admin-register-card {
@@ -294,6 +316,68 @@
 .claim-modal-file-chip iconify-icon {
     font-size: 0.92rem;
     color: #2c5ea6;
+}
+
+.claim-modal-summary {
+    border: 1px solid var(--sinemu-border);
+    border-radius: 16px;
+    background: #f8fbff;
+    padding: 0.8rem 0.9rem;
+}
+
+.claim-modal-summary-title {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--sinemu-muted-soft);
+    margin-bottom: 0.45rem;
+    text-transform: uppercase;
+}
+
+.claim-modal-summary-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-size: 0.83rem;
+    margin-bottom: 0.3rem;
+}
+
+.claim-modal-summary-row:last-child {
+    margin-bottom: 0;
+}
+
+.claim-modal-summary-row span {
+    color: var(--sinemu-muted-soft);
+}
+
+.claim-modal-summary-row strong {
+    color: var(--sinemu-text);
+    text-align: right;
+}
+
+.claim-modal-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    border: 1px solid var(--sinemu-border);
+    border-radius: 14px;
+    background: #ffffff;
+    padding: 0.75rem 0.85rem;
+    cursor: pointer;
+}
+
+.claim-modal-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin-top: 2px;
+    accent-color: var(--sinemu-primary);
+}
+
+.claim-modal-check span {
+    font-size: 0.83rem;
+    line-height: 1.45;
+    color: var(--sinemu-text);
 }
 
 .claim-modal-textarea {

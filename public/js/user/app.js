@@ -19,6 +19,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const notificationTrigger = document.querySelector('.notification-trigger');
     const notificationModal = document.getElementById('user-notification-modal');
     const rowMenuTriggers = document.querySelectorAll('.row-menu-trigger');
+    const confirmBackdrop = document.getElementById('confirm-modal-backdrop');
+    const confirmTitle = document.getElementById('confirm-modal-title');
+    const confirmMessage = document.getElementById('confirm-modal-message');
+    const confirmCancel = document.getElementById('confirm-modal-cancel');
+    const confirmSubmit = document.getElementById('confirm-modal-submit');
+    const deleteForms = document.querySelectorAll('form[data-confirm-delete]');
+    let pendingDeleteForm = null;
 
     const profile = createProfileMenu(profileWrap, profileTrigger, profileMenu);
     const rowMenu = createRowMenu(rowMenuTriggers);
@@ -35,148 +42,62 @@ document.addEventListener('DOMContentLoaded', function () {
         closeProfile: profile.close,
     });
 
-    function layoutFeedbackPopups() {
-        let offsetTop = 72;
-        const gap = 10;
-        const popups = Array.from(document.querySelectorAll('.feedback-alert.feedback-alert-popup'))
-            .filter(function (alertEl) {
-                return !alertEl.classList.contains('is-fading');
-            });
+    function openConfirmModal(form) {
+        if (!confirmBackdrop || !confirmMessage) return;
 
-        popups.forEach(function (alertEl) {
-            alertEl.style.top = offsetTop + 'px';
-            offsetTop += alertEl.offsetHeight + gap;
-        });
-    }
+        pendingDeleteForm = form;
+        const title = form.getAttribute('data-confirm-title') || 'Konfirmasi Hapus';
+        const submitLabel = form.getAttribute('data-confirm-submit-label') || 'Hapus';
+        const submitVariant = form.getAttribute('data-confirm-submit-variant') || 'danger';
 
-    function closeFeedbackAlert(alertEl) {
-        if (!alertEl || alertEl.dataset.feedbackClosing === '1') {
-            return;
+        if (confirmTitle) {
+            confirmTitle.textContent = title;
         }
-
-        alertEl.dataset.feedbackClosing = '1';
-        alertEl.classList.add('is-fading');
-        window.setTimeout(function () {
-            alertEl.remove();
-            layoutFeedbackPopups();
-        }, 280);
-    }
-
-    function scheduleFeedbackAutoClose(alertEl) {
-        if (!alertEl || alertEl.dataset.feedbackAutoCloseBound === '1') {
-            return;
+        confirmMessage.textContent = form.getAttribute('data-confirm-message') || 'Yakin ingin menghapus data ini?';
+        if (confirmSubmit) {
+            confirmSubmit.textContent = submitLabel;
+            confirmSubmit.classList.toggle('confirm-btn-danger', submitVariant === 'danger');
+            confirmSubmit.classList.toggle('confirm-btn-primary', submitVariant !== 'danger');
         }
-
-        const delayRaw = Number(alertEl.getAttribute('data-autoclose'));
-        const delay = Number.isFinite(delayRaw) && delayRaw > 0 ? delayRaw : 3200;
-        alertEl.dataset.feedbackAutoCloseBound = '1';
-
-        window.setTimeout(function () {
-            closeFeedbackAlert(alertEl);
-        }, delay);
+        confirmBackdrop.hidden = false;
     }
 
-    function bindFeedbackCloseButtons() {
-        const closeButtons = Array.from(document.querySelectorAll('[data-alert-close]'));
-        closeButtons.forEach(function (buttonEl) {
-            if (buttonEl.dataset.feedbackCloseBound === '1') {
+    function closeConfirmModal() {
+        if (!confirmBackdrop) return;
+        confirmBackdrop.hidden = true;
+        pendingDeleteForm = null;
+    }
+
+    deleteForms.forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (form.dataset.confirmed === '1') {
+                form.dataset.confirmed = '0';
                 return;
             }
 
-            buttonEl.dataset.feedbackCloseBound = '1';
-            buttonEl.addEventListener('click', function () {
-                const alertEl = buttonEl.closest('.feedback-alert');
-                closeFeedbackAlert(alertEl);
-            });
+            event.preventDefault();
+            notification.close();
+            openConfirmModal(form);
         });
-    }
-
-    function normalizeFeedbackAlerts() {
-        const feedbackAlerts = Array.from(document.querySelectorAll('.feedback-alert'));
-
-        feedbackAlerts.forEach(function (alertEl) {
-            const isError = alertEl.classList.contains('error');
-            const titleText = isError ? 'Gagal' : 'Berhasil';
-
-            if (!alertEl.classList.contains('feedback-alert-toast')) {
-                const messageText = alertEl.textContent.trim();
-                alertEl.textContent = '';
-
-                const iconWrap = document.createElement('span');
-                iconWrap.className = 'feedback-alert-icon';
-                const iconEl = document.createElement('iconify-icon');
-                iconEl.setAttribute('icon', isError ? 'mdi:alert-circle' : 'mdi:check-circle');
-                iconWrap.appendChild(iconEl);
-
-                const bodyWrap = document.createElement('div');
-                bodyWrap.className = 'feedback-alert-body';
-                const bodyTitle = document.createElement('strong');
-                bodyTitle.textContent = titleText;
-                const bodyMessage = document.createElement('span');
-                bodyMessage.textContent = messageText;
-                bodyWrap.appendChild(bodyTitle);
-                bodyWrap.appendChild(bodyMessage);
-
-                alertEl.appendChild(iconWrap);
-                alertEl.appendChild(bodyWrap);
-            }
-
-            if (!alertEl.querySelector('[data-alert-close]')) {
-                const closeBtn = document.createElement('button');
-                closeBtn.type = 'button';
-                closeBtn.className = 'feedback-alert-close';
-                closeBtn.setAttribute('data-alert-close', '');
-                closeBtn.setAttribute('aria-label', 'Tutup notifikasi');
-
-                const closeIcon = document.createElement('iconify-icon');
-                closeIcon.setAttribute('icon', 'mdi:close');
-                closeBtn.appendChild(closeIcon);
-                alertEl.appendChild(closeBtn);
-            }
-
-            if (!alertEl.querySelector('.feedback-alert-progress')) {
-                const progressBar = document.createElement('span');
-                progressBar.className = 'feedback-alert-progress';
-                progressBar.setAttribute('aria-hidden', 'true');
-                alertEl.appendChild(progressBar);
-            }
-
-            alertEl.classList.add('feedback-alert-toast', 'feedback-alert-popup');
-            if (!alertEl.hasAttribute('data-autoclose')) {
-                alertEl.setAttribute('data-autoclose', isError ? '3600' : '3200');
-            }
-
-            scheduleFeedbackAutoClose(alertEl);
-        });
-
-        bindFeedbackCloseButtons();
-        layoutFeedbackPopups();
-    }
-
-    normalizeFeedbackAlerts();
-    window.addEventListener('pageshow', normalizeFeedbackAlerts);
-
-    const feedbackObserver = new MutationObserver(function (mutations) {
-        let hasNewAlert = false;
-
-        mutations.forEach(function (mutation) {
-            mutation.addedNodes.forEach(function (node) {
-                if (!(node instanceof HTMLElement)) {
-                    return;
-                }
-
-                if (node.classList.contains('feedback-alert') || node.querySelector('.feedback-alert')) {
-                    hasNewAlert = true;
-                }
-            });
-        });
-
-        if (hasNewAlert) {
-            normalizeFeedbackAlerts();
-        }
     });
 
-    feedbackObserver.observe(document.body, { childList: true, subtree: true });
+    confirmSubmit?.addEventListener('click', function () {
+        if (!pendingDeleteForm) return;
+        const form = pendingDeleteForm;
+        form.dataset.confirmed = '1';
+        closeConfirmModal();
+        form.requestSubmit();
+    });
+
+    confirmCancel?.addEventListener('click', function () {
+        closeConfirmModal();
+    });
+
+    confirmBackdrop?.addEventListener('click', function (event) {
+        if (event.target === confirmBackdrop) {
+            closeConfirmModal();
+        }
+    });
 
     document.addEventListener('click', function () {
         rowMenu.close();
@@ -190,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
             profile.close();
             sidebar.close();
             notification.close();
+            closeConfirmModal();
         }
     });
 });

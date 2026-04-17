@@ -18,6 +18,11 @@ class MediaController extends Controller
         $absolutePath = Storage::disk('public')->path($relativePath);
         $mimeType = Storage::disk('public')->mimeType($relativePath) ?: 'application/octet-stream';
 
+        // Pastikan tidak ada output liar (spasi/BOM) sebelum binary image.
+        while (\ob_get_level() > 0) {
+            \ob_end_clean();
+        }
+
         return response()->file($absolutePath, [
             'Content-Type' => $mimeType,
             'Cache-Control' => 'public, max-age=604800',

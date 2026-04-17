@@ -15,18 +15,6 @@
                 </form>
             </div>
 
-            @if (session('status'))
-                <div style="margin-bottom:10px;background:#ecfeff;color:#0f766e;border:1px solid #a5f3fc;border-radius:10px;padding:10px;font-size:.86rem;">
-                    {{ session('status') }}
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div style="margin-bottom:10px;background:#fee2e2;color:#991b1b;border:1px solid #fecaca;border-radius:10px;padding:10px;font-size:.86rem;">
-                    {{ $errors->first() }}
-                </div>
-            @endif
-
             <div style="display:grid;gap:10px;">
                 @forelse($admins as $admin)
                     @php

@@ -14,20 +14,8 @@
         <h1>Daftar Barang Hilang</h1>
         <p>Kelola daftar barang yang hilang dan menunggu klaim pemiliknya.</p>
     </section>
-
-    @if(session('status'))
-        <div class="report-card" style="margin-bottom:12px;">
-            <header><h2 style="font-size:14px;">{{ session('status') }}</h2></header>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="report-card" style="margin-bottom:12px;">
-            <header><h2 style="font-size:14px;color:#b91c1c;">{{ session('error') }}</h2></header>
-        </div>
-    @endif
-
-    {{-- BAGIAN: Toolbar + Tabel --}}
-    <section class="report-card">
+{{-- BAGIAN: Toolbar + Tabel --}}
+    <section class="report-card report-card-scrollable">
         <header>
             <form class="lost-toolbar" method="GET" action="{{ route('admin.lost-items') }}">
                 <div class="lost-toolbar-left">
@@ -76,32 +64,64 @@
                                 <div class="item-cell">
                                     <div class="item-avatar avatar-sand">
                                         <span class="item-avatar-fallback">{{ strtoupper(substr($item->nama_barang, 0, 1)) }}</span>
-                                        @if(!empty($item->foto_barang))
-                                            @php
-                                                $fotoPath = trim((string) $item->foto_barang, '/');
-                                                [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
-                                                $fotoUrl = in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== ''
-                                                    ? route('media.image', ['folder' => $folder, 'path' => $subPath], false)
-                                                    : asset('storage/' . $fotoPath);
-                                            @endphp
+                                        @php
+                                            $fotoUrlDefault = asset('img/login-image.png');
+                                            $fotoUrl = null;
+                                            $fotoSrc = null;
+                                            $localFotoPath = null;
+                                            $rawFotoPath = str_replace('\\', '/', trim((string) ($item->foto_barang ?? '')));
+
+                                            if ($rawFotoPath !== '') {
+                                                if (\Illuminate\Support\Str::startsWith($rawFotoPath, ['http://', 'https://'])) {
+                                                    $fotoUrl = $rawFotoPath;
+                                                } else {
+                                                    $fotoPath = ltrim($rawFotoPath, '/');
+                                                    if (\Illuminate\Support\Str::startsWith($fotoPath, 'storage/')) {
+                                                        $fotoPath = substr($fotoPath, 8);
+                                                    } elseif (\Illuminate\Support\Str::startsWith($fotoPath, 'public/')) {
+                                                        $fotoPath = substr($fotoPath, 7);
+                                                    }
+
+                                                    [$folder, $subPath] = array_pad(explode('/', $fotoPath, 2), 2, '');
+                                                    $fotoUrl = in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== ''
+                                                        ? route('media.image', ['folder' => $folder, 'path' => $subPath])
+                                                        : asset('storage/' . $fotoPath);
+                                                    $localFotoPath = $fotoPath;
+                                                }
+                                            }
+
+                                            if (!empty($localFotoPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($localFotoPath)) {
+                                                $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path($localFotoPath);
+                                                $mimeType = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($localFotoPath) ?: 'image/jpeg';
+                                                $binary = @file_get_contents($absolutePath);
+                                                if ($binary !== false) {
+                                                    $fotoSrc = 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+                                                }
+                                            }
+
+                                            if (!$fotoSrc) {
+                                                $fotoSrc = $fotoUrl ?: $fotoUrlDefault;
+                                            }
+                                        @endphp
+                                        @if($fotoSrc)
                                             <img
-                                                src="{{ $fotoUrl }}"
+                                                src="{{ $fotoSrc }}"
                                                 alt="{{ $item->nama_barang }}"
                                                 loading="lazy"
                                                 decoding="async"
                                                 width="30"
                                                 height="30"
-                                                onerror="this.remove()"
+                                                onerror="this.onerror=null;this.src='{{ $fotoUrlDefault }}';"
                                             >
-                                        @elseif(\Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower((string) $item->nama_barang), 'dompet'))
+                                        @else
                                             <img
-                                                src="{{ route('media.image', ['folder' => 'barang-hilang', 'path' => 'dompet.webp'], false) }}"
+                                                src="{{ $fotoUrlDefault }}"
                                                 alt="{{ $item->nama_barang }}"
                                                 loading="lazy"
                                                 decoding="async"
                                                 width="30"
                                                 height="30"
-                                                onerror="this.remove()"
+                                                onerror="this.onerror=null;"
                                             >
                                         @endif
                                     </div>

@@ -21,15 +21,46 @@ class ProfileController extends Controller
         $user = $request->user();
         abort_unless($user, 403);
 
+        $defaultAvatar = asset('img/profil.jpg');
         $profilePath = trim((string) ($user->profil ?? ''));
         if ($profilePath === '') {
-            $profileAvatar = asset('img/profil.jpg');
+            $profileAvatar = $defaultAvatar;
         } elseif (str_starts_with($profilePath, 'http://') || str_starts_with($profilePath, 'https://')) {
             $profileAvatar = $profilePath;
-        } elseif (str_starts_with($profilePath, '/')) {
-            $profileAvatar = asset(ltrim($profilePath, '/'));
         } else {
-            $profileAvatar = asset('storage/' . ltrim($profilePath, '/'));
+            $normalized = str_replace('\\', '/', ltrim($profilePath, '/'));
+            if (str_starts_with($normalized, 'storage/')) {
+                $normalized = substr($normalized, 8);
+            } elseif (str_starts_with($normalized, 'public/')) {
+                $normalized = substr($normalized, 7);
+            }
+
+            [$folder, $subPath] = array_pad(explode('/', $normalized, 2), 2, '');
+            $profileAvatar = in_array($folder, ['profil-admin', 'profil-user', 'barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== ''
+                ? (Storage::disk('public')->exists($normalized)
+                    ? ((function () use ($normalized, $folder, $subPath) {
+                        $absolutePath = Storage::disk('public')->path($normalized);
+                        $mimeType = Storage::disk('public')->mimeType($normalized) ?: 'image/jpeg';
+                        $binary = @file_get_contents($absolutePath);
+                        if ($binary !== false) {
+                            return 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+                        }
+
+                        return route('media.image', ['folder' => $folder, 'path' => $subPath]);
+                    })())
+                    : $defaultAvatar)
+                : (Storage::disk('public')->exists($normalized)
+                    ? ((function () use ($normalized) {
+                        $absolutePath = Storage::disk('public')->path($normalized);
+                        $mimeType = Storage::disk('public')->mimeType($normalized) ?: 'image/jpeg';
+                        $binary = @file_get_contents($absolutePath);
+                        if ($binary !== false) {
+                            return 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+                        }
+
+                        return asset('storage/' . $normalized);
+                    })())
+                    : $defaultAvatar);
         }
 
         $verificationLabel = !is_null($user->email_verified_at) ? 'Terverifikasi' : 'Belum Verifikasi';

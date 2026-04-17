@@ -55,11 +55,13 @@ class RegisteredUserController extends Controller
         $request->merge([
             'password' => $request->input('password') !== null ? (string) $request->input('password') : null,
             'password_confirmation' => $request->input('password_confirmation') !== null ? (string) $request->input('password_confirmation') : null,
+            'nomor_telepon' => $request->input('nomor_telepon') !== null ? trim((string) $request->input('nomor_telepon')) : null,
         ]);
 
         $validated = $request->validate([
             'nama' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:admins,email'],
+            'nomor_telepon' => ['required', 'string', 'max:50'],
             'username' => ['required', 'string', 'max:255'],
             'instansi' => ['required', 'string', 'max:255'],
             'kecamatan' => ['required', 'string', 'max:100'],
@@ -83,17 +85,19 @@ class RegisteredUserController extends Controller
             'super_admin_id' => $superAdmin->id,
             'nama' => $validated['nama'],
             'email' => $validated['email'],
+            'nomor_telepon' => $validated['nomor_telepon'],
             'username' => $username,
             'instansi' => $validated['instansi'],
             'kecamatan' => $validated['kecamatan'],
             'alamat_lengkap' => $validated['alamat_lengkap'],
-            'status_verifikasi' => 'pending',
+            'status_verifikasi' => 'active',
+            'verified_at' => now(),
             'password' => Hash::make($validated['password']),
         ]);
 
         return redirect()
             ->route('admin.login')
-            ->with('status', 'Pendaftaran berhasil. Akun Anda akan diverifikasi oleh super admin dalam 1x24 jam.');
+            ->with('status', 'Pendaftaran admin berhasil. Silakan login.');
     }
 
     private function buildUniqueAdminUsername(string $usernameInput): string

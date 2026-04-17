@@ -8,7 +8,28 @@
     } elseif (str_starts_with($sidebarProfilePath, '/')) {
         $sidebarProfileAvatar = asset(ltrim($sidebarProfilePath, '/'));
     } else {
-        $sidebarProfileAvatar = asset('storage/' . ltrim($sidebarProfilePath, '/'));
+        $normalizedPath = str_replace('\\', '/', ltrim($sidebarProfilePath, '/'));
+        if (str_starts_with($normalizedPath, 'storage/')) {
+            $normalizedPath = substr($normalizedPath, 8);
+        } elseif (str_starts_with($normalizedPath, 'public/')) {
+            $normalizedPath = substr($normalizedPath, 7);
+        }
+
+        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($normalizedPath)) {
+            $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path($normalizedPath);
+            $mimeType = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($normalizedPath) ?: 'image/jpeg';
+            $binary = @file_get_contents($absolutePath);
+            if ($binary !== false) {
+                $sidebarProfileAvatar = 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+            } else {
+                [$avatarFolder, $avatarSubPath] = array_pad(explode('/', $normalizedPath, 2), 2, '');
+                $sidebarProfileAvatar = in_array($avatarFolder, ['profil-admin', 'profil-user', 'barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $avatarSubPath !== ''
+                    ? route('media.image', ['folder' => $avatarFolder, 'path' => $avatarSubPath])
+                    : asset('storage/' . $normalizedPath);
+            }
+        } else {
+            $sidebarProfileAvatar = asset('img/profil.jpg');
+        }
     }
 
     // BAGIAN: Daftar menu sidebar admin.
@@ -34,7 +55,7 @@
     {{-- BAGIAN: Menu profil admin --}}
     <div class="profile-menu-wrap">
         <button type="button" class="admin-card profile-menu-trigger" aria-expanded="false" aria-controls="profile-menu">
-            <img src="{{ $sidebarProfileAvatar }}" alt="Admin">
+            <img src="{{ $sidebarProfileAvatar }}" alt="Admin" onerror="this.onerror=null;this.src='{{ asset('img/profil.jpg') }}';">
             <div class="profile-meta">
                 <strong>{{ $admin?->nama ?? 'Admin' }}</strong>
                 <small>Pengelola Sistem</small>

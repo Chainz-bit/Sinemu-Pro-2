@@ -52,6 +52,7 @@ class ClaimVerificationController extends Controller
                 DB::raw($pelaporSelect.' as pelapor_nama'),
                 DB::raw('COALESCE(laporan_barang_hilangs.nama_barang, "-") as barang_hilang'),
                 DB::raw('COALESCE(barangs.nama_barang, "-") as barang_temuan'),
+                DB::raw('COALESCE(barangs.foto_barang, laporan_barang_hilangs.foto_barang, "") as foto_barang'),
                 DB::raw('COALESCE(barangs.lokasi_ditemukan, "-") as lokasi'),
                 DB::raw('COALESCE(barangs.status_barang, "-") as status_barang_temuan'),
                 DB::raw('COALESCE(admins.nama, "-") as admin_nama'),
@@ -268,18 +269,24 @@ class ClaimVerificationController extends Controller
 
     private function resolveItemImageUrl(string $fotoPath): string
     {
-        $cleanPath = trim($fotoPath, '/');
+        $cleanPath = str_replace('\\', '/', trim($fotoPath, '/'));
         if ($cleanPath === '') {
-            return route('media.image', ['folder' => 'barang-temuan', 'path' => 'hp.webp'], false);
+            return asset('img/login-image.png');
         }
 
         if (Str::startsWith($cleanPath, ['http://', 'https://'])) {
             return $cleanPath;
         }
 
+        if (Str::startsWith($cleanPath, 'storage/')) {
+            $cleanPath = substr($cleanPath, 8);
+        } elseif (Str::startsWith($cleanPath, 'public/')) {
+            $cleanPath = substr($cleanPath, 7);
+        }
+
         [$folder, $subPath] = array_pad(explode('/', $cleanPath, 2), 2, '');
         if (in_array($folder, ['barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== '') {
-            return route('media.image', ['folder' => $folder, 'path' => $subPath], false);
+            return route('media.image', ['folder' => $folder, 'path' => $subPath]);
         }
 
         return asset('storage/' . $cleanPath);

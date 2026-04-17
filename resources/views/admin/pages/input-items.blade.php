@@ -16,50 +16,7 @@
             <h1>Input Laporan Baru</h1>
             <p>Masukkan detail barang yang ditemukan atau hilang ke dalam sistem.</p>
         </section>
-
-        @if(session('status'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:check-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Berhasil</strong>
-                    <span>{{ session('status') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Gagal</strong>
-                    <span>{{ session('error') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        @if($errors->any())
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup error" data-autoclose="3600" style="--autoclose-ms: 3600ms;" role="alert" aria-live="assertive">
-                <span class="feedback-alert-icon" aria-hidden="true"><iconify-icon icon="mdi:alert-circle"></iconify-icon></span>
-                <div class="feedback-alert-body">
-                    <strong>Gagal</strong>
-                    <span>{{ $errors->first() }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        <section class="input-card">
+<section class="input-card">
             <form method="POST" action="{{ route('admin.input-items.store') }}" enctype="multipart/form-data" class="input-form">
                 @csrf
 
@@ -105,7 +62,7 @@
                 <div class="form-group form-col-12">
                     <label class="form-label" for="nama_pelapor">Nama Pelapor/Penemu <span>*</span></label>
                     <input id="nama_pelapor" type="text" name="nama_pelapor" class="form-input" value="{{ old('nama_pelapor') }}" placeholder="Masukkan nama pelapor atau penemu" required>
-                    <small class="form-note">Untuk laporan barang hilang, isikan nama/email akun pengguna yang sudah terdaftar.</small>
+                    <small class="form-note">Jika nama pelapor belum terdaftar sebagai user, sistem akan membuat akun pelapor otomatis.</small>
                 </div>
 
                 <div class="form-group form-col-12">

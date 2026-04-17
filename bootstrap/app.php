@@ -35,6 +35,14 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('admin.dashboard');
         }
 
+        if (Auth::guard('super_admin')->check()) {
+            return route('super.admin-verifications.index');
+        }
+
+        if (Auth::guard('web')->check()) {
+            return route('user.dashboard');
+        }
+
         return route('home');
     });
 })
@@ -52,8 +60,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 $request->session()->regenerateToken();
             }
 
+            $loginRoute = match (true) {
+                $request->is('admin') || $request->is('admin/*') => 'admin.login',
+                $request->is('super') || $request->is('super/*') => 'super.login',
+                default => 'login',
+            };
+
             return redirect()
-                ->route('login')
+                ->route($loginRoute)
                 ->with('status', 'Sesi login sudah kedaluwarsa. Silakan coba login kembali.');
         });
     })->create();

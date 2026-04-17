@@ -110,7 +110,6 @@ class DashboardController extends Controller
                 'deskripsi' => ['nullable', 'string', 'max:2000'],
                 'lokasi_ditemukan' => ['required', 'string', 'max:255'],
                 'tanggal_ditemukan' => ['required', 'date'],
-                'status_barang' => ['required', 'in:tersedia,dalam_proses_klaim,sudah_diklaim,sudah_dikembalikan'],
                 'lokasi_pengambilan' => ['nullable', 'string', 'max:255'],
                 'alamat_pengambilan' => ['nullable', 'string', 'max:255'],
                 'penanggung_jawab_pengambilan' => ['nullable', 'string', 'max:255'],
@@ -128,7 +127,6 @@ class DashboardController extends Controller
                     : ((string) ($report->deskripsi ?? '')),
                 'lokasi_ditemukan' => $validated['lokasi_ditemukan'],
                 'tanggal_ditemukan' => $validated['tanggal_ditemukan'],
-                'status_barang' => $validated['status_barang'],
                 'lokasi_pengambilan' => isset($validated['lokasi_pengambilan']) && trim((string) $validated['lokasi_pengambilan']) !== ''
                     ? trim((string) $validated['lokasi_pengambilan'])
                     : null,

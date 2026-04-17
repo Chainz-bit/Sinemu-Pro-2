@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FoundItemController extends Controller
@@ -113,7 +114,7 @@ class FoundItemController extends Controller
         /** @var \App\Models\Admin $admin */
         $admin = Auth::guard('admin')->user();
         $kategoriOptions = Kategori::query()
-            ->orderBy('nama_kategori')
+            ->forForm()
             ->get(['id', 'nama_kategori']);
 
         return view('admin.pages.found-item-edit', compact('barang', 'admin', 'kategoriOptions'));
@@ -135,7 +136,6 @@ class FoundItemController extends Controller
             'detail_lokasi_ditemukan' => ['nullable', 'string', 'max:2000'],
             'tanggal_ditemukan' => ['required', 'date'],
             'waktu_ditemukan' => ['nullable', 'date_format:H:i'],
-            'status_barang' => ['required', 'in:tersedia,dalam_proses_klaim,sudah_diklaim,sudah_dikembalikan'],
             'lokasi_pengambilan' => ['nullable', 'string', 'max:255'],
             'alamat_pengambilan' => ['nullable', 'string', 'max:255'],
             'penanggung_jawab_pengambilan' => ['nullable', 'string', 'max:255'],
@@ -169,7 +169,6 @@ class FoundItemController extends Controller
                 : null,
             'tanggal_ditemukan' => $validated['tanggal_ditemukan'],
             'waktu_ditemukan' => $validated['waktu_ditemukan'] ?? null,
-            'status_barang' => $validated['status_barang'],
             'lokasi_pengambilan' => isset($validated['lokasi_pengambilan']) && trim((string) $validated['lokasi_pengambilan']) !== ''
                 ? trim((string) $validated['lokasi_pengambilan'])
                 : null,

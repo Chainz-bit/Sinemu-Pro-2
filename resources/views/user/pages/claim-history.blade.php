@@ -9,19 +9,12 @@
 
 @section('page-content')
     <div class="dashboard-page-content">
-        @if(session('status'))
-            <div class="feedback-alert success">{{ session('status') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="feedback-alert error">{{ session('error') }}</div>
-        @endif
-
-        <section class="intro">
+<section class="intro">
             <h1>Riwayat Klaim Barang</h1>
             <p>Pantau status pengajuan klaim barang temuan Anda di sini.</p>
         </section>
 
-        <section class="report-card dashboard-report-card claim-history-card">
+        <section class="report-card report-card-scrollable dashboard-report-card claim-history-card">
             <header>
                 <div class="report-heading">
                     <h2>Daftar Riwayat Klaim</h2>

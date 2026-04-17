@@ -16,7 +16,7 @@
                     <h1>{{ $detail->title }}</h1>
                     <span class="report-detail-chip {{ $detail->status_class }}">{{ $detail->status_label }}</span>
                     <p class="report-detail-subtitle">
-                        Detail laporan barang {{ $detail->type === 'hilang' ? 'hilang' : 'temuan' }} untuk membantu pengguna memahami informasi sebelum tindak lanjut.
+                        {{ $detail->subtitle ?? ('Detail laporan barang ' . ($detail->type === 'hilang' ? 'hilang' : 'temuan') . ' untuk membantu pengguna memahami informasi sebelum tindak lanjut.') }}
                     </p>
 
                     <div class="report-detail-meta-grid">
@@ -56,19 +56,25 @@
                     </div>
 
                     <div class="report-detail-actions">
-                        <a href="{{ route('home') }}#hilang-temuan" class="btn btn-sinemu btn-sinemu-primary">
+                        <a href="{{ route('home') }}" class="btn btn-sinemu btn-sinemu-primary">
                             Lihat Laporan Lain
                         </a>
                         @if($detail->type === 'temuan')
-                            @auth
-                                <a href="{{ route('home') }}#hilang-temuan" class="btn btn-outline-primary">
-                                    Kembali untuk Klaim Barang
-                                </a>
+                            @if(($detail->is_claimable ?? false) === true)
+                                @auth
+                                    <a href="{{ route('home') }}" class="btn btn-outline-primary">
+                                        Kembali untuk Klaim Barang
+                                    </a>
+                                @else
+                                    <a href="{{ route('home') }}" class="btn btn-outline-primary">
+                                        Masuk untuk Klaim Barang
+                                    </a>
+                                @endauth
                             @else
-                                <a href="{{ route('home') }}" class="btn btn-outline-primary">
-                                    Masuk untuk Klaim Barang
+                                <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+                                    Kembali ke Daftar Temuan
                                 </a>
-                            @endauth
+                            @endif
                         @endif
                     </div>
                 </div>

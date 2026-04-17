@@ -14,7 +14,7 @@ class FoundReportController extends Controller
         $categories = collect();
         if (Schema::hasTable('kategoris')) {
             $categories = Kategori::query()
-                ->orderBy('nama_kategori')
+                ->forForm()
                 ->get(['id', 'nama_kategori']);
         }
 

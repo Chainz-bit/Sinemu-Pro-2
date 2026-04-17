@@ -161,6 +161,7 @@ class UserItemActionController extends Controller
 
         $payload = [
             'admin_id' => (int) $admin->id,
+            'user_id' => (int) Auth::id(),
             'kategori_id' => (int) $kategoriId,
             'nama_barang' => $validated['nama_barang'],
             'warna_barang' => $validated['warna_barang'] ?? null,
@@ -190,26 +191,31 @@ class UserItemActionController extends Controller
     public function storeClaim(Request $request): RedirectResponse
     {
         $user = Auth::user();
-        if (!$user || is_null($user->email_verified_at)) {
-            return back()->with('error', 'Klaim hanya bisa diajukan setelah email Anda terverifikasi.');
+        if (!$user) {
+            return back()->with('error', 'Anda harus login sebelum mengajukan klaim.');
         }
 
+        $claimWithoutReport = $request->boolean('claim_without_report');
         $validated = $request->validate([
             'barang_id' => ['required', 'integer', 'exists:barangs,id'],
-            'nama_barang_hilang' => ['required', 'string', 'max:255'],
-            'lokasi_hilang' => ['required', 'string', 'max:255'],
-            'detail_lokasi_hilang' => ['required', 'string', 'max:2000'],
-            'tanggal_hilang' => ['required', 'date'],
-            'warna_barang' => ['nullable', 'string', 'max:100'],
-            'merek_barang' => ['nullable', 'string', 'max:120'],
-            'nomor_seri' => ['nullable', 'string', 'max:150'],
-            'keterangan' => ['required', 'string', 'max:2000'],
-            'ciri_khusus' => ['required', 'string', 'max:2000'],
+            'claim_without_report' => ['nullable', 'boolean'],
+            'laporan_hilang_id' => [$claimWithoutReport ? 'nullable' : 'required', 'integer', 'exists:laporan_barang_hilangs,id'],
             'kontak_pelapor' => ['required', 'string', 'max:50'],
             'bukti_kepemilikan' => ['required', 'string', 'max:2000'],
             'bukti_foto' => ['required', 'array', 'min:1', 'max:3'],
             'bukti_foto.*' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'catatan' => ['nullable', 'string'],
+            'persetujuan_klaim' => ['accepted'],
+            'lost_nama_barang' => [$claimWithoutReport ? 'required' : 'nullable', 'string', 'max:255'],
+            'lost_kategori_barang' => ['nullable', 'string', 'max:100'],
+            'lost_warna_barang' => ['nullable', 'string', 'max:100'],
+            'lost_merek_barang' => ['nullable', 'string', 'max:120'],
+            'lost_nomor_seri' => ['nullable', 'string', 'max:150'],
+            'lost_lokasi_hilang' => [$claimWithoutReport ? 'required' : 'nullable', 'string', 'max:255'],
+            'lost_detail_lokasi_hilang' => ['nullable', 'string', 'max:2000'],
+            'lost_tanggal_hilang' => [$claimWithoutReport ? 'required' : 'nullable', 'date'],
+            'lost_keterangan' => [$claimWithoutReport ? 'required' : 'nullable', 'string'],
+            'lost_ciri_khusus' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $barang = Barang::query()->select('id', 'admin_id', 'status_barang')->find($validated['barang_id']);
@@ -226,65 +232,56 @@ class UserItemActionController extends Controller
             return back()->with('error', 'Anda sudah pernah mengajukan klaim aktif untuk barang ini.');
         }
 
-        $laporan = LaporanBarangHilang::query()
-            ->where('user_id', (int) Auth::id())
-            ->where('nama_barang', $validated['nama_barang_hilang'])
-            ->where('lokasi_hilang', $validated['lokasi_hilang'])
-            ->whereDate('tanggal_hilang', $validated['tanggal_hilang'])
-            ->first();
-
-        if (!$laporan) {
-            $payload = [
+        if ($claimWithoutReport) {
+            $laporanPayload = [
                 'user_id' => (int) Auth::id(),
-                'nama_barang' => $validated['nama_barang_hilang'],
-                'warna_barang' => $validated['warna_barang'] ?? null,
-                'merek_barang' => $validated['merek_barang'] ?? null,
-                'nomor_seri' => $validated['nomor_seri'] ?? null,
-                'lokasi_hilang' => $validated['lokasi_hilang'],
-                'detail_lokasi_hilang' => $validated['detail_lokasi_hilang'],
-                'tanggal_hilang' => $validated['tanggal_hilang'],
-                'keterangan' => $validated['keterangan'],
-                'ciri_khusus' => $validated['ciri_khusus'],
+                'nama_barang' => $validated['lost_nama_barang'],
+                'kategori_barang' => $validated['lost_kategori_barang'] ?? null,
+                'warna_barang' => $validated['lost_warna_barang'] ?? null,
+                'merek_barang' => $validated['lost_merek_barang'] ?? null,
+                'nomor_seri' => $validated['lost_nomor_seri'] ?? null,
+                'lokasi_hilang' => $validated['lost_lokasi_hilang'],
+                'detail_lokasi_hilang' => $validated['lost_detail_lokasi_hilang'] ?? null,
+                'tanggal_hilang' => $validated['lost_tanggal_hilang'],
+                'keterangan' => $validated['lost_keterangan'],
+                'ciri_khusus' => $validated['lost_ciri_khusus'] ?? null,
                 'kontak_pelapor' => $validated['kontak_pelapor'],
                 'bukti_kepemilikan' => $validated['bukti_kepemilikan'],
             ];
 
             if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
-                $payload['sumber_laporan'] = 'klaim';
+                $laporanPayload['sumber_laporan'] = 'lapor_hilang';
             }
 
-            $laporan = LaporanBarangHilang::create($payload);
+            $laporan = LaporanBarangHilang::create($laporanPayload);
         } else {
-            $laporanUpdatePayload = [];
+            $laporan = LaporanBarangHilang::query()
+                ->where('id', (int) $validated['laporan_hilang_id'])
+                ->where('user_id', (int) Auth::id())
+                ->first();
 
-            if (empty($laporan->warna_barang) && !empty($validated['warna_barang'])) {
-                $laporanUpdatePayload['warna_barang'] = $validated['warna_barang'];
+            if (!$laporan) {
+                return back()->with('error', 'Pilih laporan barang hilang milik Anda yang valid sebelum mengajukan klaim.');
             }
-            if (empty($laporan->merek_barang) && !empty($validated['merek_barang'])) {
-                $laporanUpdatePayload['merek_barang'] = $validated['merek_barang'];
-            }
-            if (empty($laporan->nomor_seri) && !empty($validated['nomor_seri'])) {
-                $laporanUpdatePayload['nomor_seri'] = $validated['nomor_seri'];
-            }
-            if (empty($laporan->detail_lokasi_hilang) && !empty($validated['detail_lokasi_hilang'])) {
-                $laporanUpdatePayload['detail_lokasi_hilang'] = $validated['detail_lokasi_hilang'];
-            }
-            if (empty($laporan->keterangan) && !empty($validated['keterangan'])) {
-                $laporanUpdatePayload['keterangan'] = $validated['keterangan'];
-            }
-            if (empty($laporan->ciri_khusus) && !empty($validated['ciri_khusus'])) {
-                $laporanUpdatePayload['ciri_khusus'] = $validated['ciri_khusus'];
-            }
-            if (empty($laporan->kontak_pelapor) && !empty($validated['kontak_pelapor'])) {
-                $laporanUpdatePayload['kontak_pelapor'] = $validated['kontak_pelapor'];
-            }
-            if (empty($laporan->bukti_kepemilikan) && !empty($validated['bukti_kepemilikan'])) {
-                $laporanUpdatePayload['bukti_kepemilikan'] = $validated['bukti_kepemilikan'];
-            }
+        }
 
-            if ($laporanUpdatePayload !== []) {
-                $laporan->update($laporanUpdatePayload);
-            }
+        $hasBlockingClaimForReport = Klaim::query()
+            ->where('laporan_hilang_id', (int) $laporan->id)
+            ->whereIn('status_klaim', ['pending', 'disetujui'])
+            ->exists();
+        if ($hasBlockingClaimForReport) {
+            return back()->with('error', 'Laporan ini masih punya klaim aktif. Tunggu proses klaim sebelumnya selesai.');
+        }
+
+        $laporanUpdatePayload = [];
+        if (empty($laporan->kontak_pelapor) && !empty($validated['kontak_pelapor'])) {
+            $laporanUpdatePayload['kontak_pelapor'] = $validated['kontak_pelapor'];
+        }
+        if (empty($laporan->bukti_kepemilikan) && !empty($validated['bukti_kepemilikan'])) {
+            $laporanUpdatePayload['bukti_kepemilikan'] = $validated['bukti_kepemilikan'];
+        }
+        if ($laporanUpdatePayload !== []) {
+            $laporan->update($laporanUpdatePayload);
         }
 
         $buktiFotoPaths = [];

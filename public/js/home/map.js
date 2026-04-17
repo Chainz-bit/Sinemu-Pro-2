@@ -18,6 +18,7 @@ function parsePickupLocations() {
             return {
                 id: Number(item.id || (index + 1)),
                 name: String(item.name || 'Lokasi Pengambilan SiNemu'),
+                managerLabel: String(item.manager_label || 'Admin Pengelola'),
                 address: String(item.address || ''),
                 kecamatan: String(item.kecamatan || ''),
                 phone: String(item.phone || DEFAULT_PHONE),
@@ -163,6 +164,7 @@ export function initMap() {
     const mapElement = document.getElementById('pickupMap');
     const listElement = document.getElementById('pickupLocationList');
     const selectedName = document.getElementById('selectedLocationName');
+    const selectedManager = document.getElementById('selectedLocationManager');
     const selectedAddress = document.getElementById('selectedLocationAddress');
     const selectedHours = document.getElementById('selectedLocationHours');
     const selectedDistance = document.getElementById('selectedLocationDistance');
@@ -233,6 +235,23 @@ export function initMap() {
         ].join('');
     }
 
+    function setLocateButtonState(isActive, isLoading) {
+        if (!locateMeButton) {
+            return;
+        }
+
+        if (isLoading) {
+            locateMeButton.disabled = true;
+            locateMeButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Mendeteksi lokasi...';
+            return;
+        }
+
+        locateMeButton.disabled = false;
+        locateMeButton.innerHTML = isActive
+            ? '<i class="fa-solid fa-circle-check me-2"></i>Lokasi Saya Aktif'
+            : '<i class="fa-solid fa-location-crosshairs me-2"></i>Lokasi Saya';
+    }
+
     function getSelectedLocation() {
         return locations.find(function (location) {
             return location.id === selectedLocationId;
@@ -264,6 +283,7 @@ export function initMap() {
         const location = getSelectedLocation();
 
         if (selectedName) selectedName.textContent = location.name;
+        if (selectedManager) selectedManager.textContent = location.managerLabel || 'Admin Pengelola';
         if (selectedAddress) selectedAddress.textContent = [location.address, location.kecamatan].filter(Boolean).join(', ');
         if (selectedHours) selectedHours.textContent = 'Jam Operasional: ' + location.hours;
         if (selectedDistance) selectedDistance.textContent = 'Jarak: ' + getDistanceText(location);
@@ -290,7 +310,10 @@ export function initMap() {
             return [
                 '<article class="lokasi-item' + (isActive ? ' is-active' : '') + '" data-location-id="' + location.id + '">',
                 '<div class="lokasi-item-top">',
+                '<div class="lokasi-item-heading">',
+                '<small class="lokasi-item-manager">' + escapeHtml(location.managerLabel || 'Admin Pengelola') + '</small>',
                 '<h4>' + escapeHtml(location.name) + '</h4>',
+                '</div>',
                 '<span class="lokasi-item-distance">' + escapeHtml(getDistanceText(location)) + '</span>',
                 '</div>',
                 '<p>' + escapeHtml(addressLabel) + '</p>',
@@ -388,10 +411,7 @@ export function initMap() {
             return;
         }
 
-        if (locateMeButton) {
-            locateMeButton.disabled = true;
-            locateMeButton.textContent = 'Mendeteksi lokasi...';
-        }
+        setLocateButtonState(false, true);
 
         navigator.geolocation.getCurrentPosition(
             function (position) {
@@ -423,17 +443,11 @@ export function initMap() {
                 updateSelectedInfo();
                 map.setView([userCoords.lat, userCoords.lng], 13, { animate: true, duration: 0.35 });
 
-                if (locateMeButton) {
-                    locateMeButton.disabled = false;
-                    locateMeButton.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i>Lokasi Saya';
-                }
+                setLocateButtonState(true, false);
             },
             function () {
                 if (selectedDistance) selectedDistance.textContent = 'Jarak: Izin lokasi ditolak. Gunakan tombol rute manual.';
-                if (locateMeButton) {
-                    locateMeButton.disabled = false;
-                    locateMeButton.innerHTML = '<i class="fa-solid fa-location-crosshairs me-2"></i>Lokasi Saya';
-                }
+                setLocateButtonState(false, false);
             },
             {
                 enableHighAccuracy: true,
@@ -538,6 +552,7 @@ export function initMap() {
     renderLocationList();
     initCarouselDrag();
     updateSelectedInfo();
+    setLocateButtonState(false, false);
     scrollSelectedCardIntoView();
 
     void initMarkers();

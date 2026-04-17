@@ -13,6 +13,7 @@ class Admin extends Authenticatable
         'super_admin_id',
         'nama',
         'email',
+        'nomor_telepon',
         'username',
         'password',
         'instansi',

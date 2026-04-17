@@ -113,12 +113,17 @@
 
 /* Bagian ini untuk kontrol pagination di bawah tabel. */
 .pagination {
-    display: flex;
+    display: none !important;
     justify-content: flex-end;
     gap: 6px;
     padding: 11px 14px;
     position: relative;
     z-index: 0;
+}
+
+.report-card-scrollable .pagination {
+    border-top: 1px solid #edf1f6;
+    background: #fff;
 }
 
 .pagination button {

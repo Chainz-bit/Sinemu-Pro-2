@@ -11,30 +11,13 @@
 
 @section('page-content')
     <div class="profile-page-content">
-        @if(session('status'))
-            <div class="feedback-alert feedback-alert-toast feedback-alert-popup success" data-autoclose="3200" style="--autoclose-ms: 3200ms;" role="status" aria-live="polite">
-                <span class="feedback-alert-icon" aria-hidden="true">
-                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                </span>
-                <div class="feedback-alert-body">
-                    <strong>Berhasil</strong>
-                    <span>{{ session('status') }}</span>
-                </div>
-                <button type="button" class="feedback-alert-close" data-alert-close aria-label="Tutup notifikasi">
-                    <iconify-icon icon="mdi:close"></iconify-icon>
-                </button>
-                <span class="feedback-alert-progress" aria-hidden="true"></span>
-            </div>
-        @endif
-
-        <section class="profile-account-card">
+<section class="profile-account-card">
             <div class="profile-account-top">
                 <div class="profile-account-main">
-                    <img src="{{ $profileAvatar }}" alt="Foto profil {{ $admin?->nama ?? 'Admin' }}" class="profile-account-avatar">
+                    <img src="{{ $profileAvatar }}" alt="Foto profil {{ $admin?->nama ?? 'Admin' }}" class="profile-account-avatar" onerror="this.onerror=null;this.src='{{ asset('img/profil.jpg') }}';">
                     <div class="profile-account-meta">
                         <div class="profile-account-name-wrap">
                             <h2>{{ $admin?->nama ?? 'Admin' }}</h2>
-                            <span class="profile-verify-chip {{ $verificationClass }}">{{ $verificationLabel }}</span>
                         </div>
                         <p class="profile-role">Admin SiNemu • Pengelola Operasional</p>
                         <div class="profile-account-contact">

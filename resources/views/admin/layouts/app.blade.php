@@ -10,9 +10,30 @@
     {{-- BAGIAN: Gaya Global --}}
     <link rel="stylesheet" href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}">
     <link rel="stylesheet" href="{{ asset('css/admin/app.css') }}?v={{ @filemtime(public_path('css/admin/app.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/flash-popup.css') }}?v={{ @filemtime(public_path('css/flash-popup.css')) }}">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
 </head>
 <body>
+    @php
+        $sinemuFlashMessages = [];
+        $statusMessage = session('status');
+        if (!empty($statusMessage)) {
+            $sinemuFlashMessages[] = [
+                'type' => 'success',
+                'message' => $statusMessage === 'verification-link-sent'
+                    ? 'Link verifikasi baru sudah dikirim ke email Anda.'
+                    : (string) $statusMessage,
+            ];
+        }
+        $errorMessage = session('error');
+        if (!empty($errorMessage)) {
+            $sinemuFlashMessages[] = ['type' => 'error', 'message' => (string) $errorMessage];
+        }
+        if ($errors->any()) {
+            $sinemuFlashMessages[] = ['type' => 'error', 'message' => (string) $errors->first()];
+        }
+    @endphp
+    <script>window.__SINEMU_FLASH_MESSAGES = @json($sinemuFlashMessages);</script>
     {{-- BAGIAN: Kerangka Admin --}}
     <div class="admin-shell {{ ($hideSidebar ?? false) ? 'admin-shell-no-sidebar' : '' }}">
         @if(!($hideSidebar ?? false))
@@ -37,8 +58,10 @@
                 'topbarBackLabel' => $topbarBackLabel ?? 'Kembali',
             ])
 
-            {{-- BAGIAN: Konten Halaman --}}
-            @yield('page-content')
+            <div class="main-content-scroll">
+                {{-- BAGIAN: Konten Halaman --}}
+                @yield('page-content')
+            </div>
         </main>
     </div>
 
@@ -56,6 +79,7 @@
 
     {{-- BAGIAN: Skrip Global --}}
     <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
+    <script src="{{ asset('js/flash-popup.js') }}?v={{ @filemtime(public_path('js/flash-popup.js')) }}" defer></script>
     <script type="module" src="{{ asset('js/admin/app.js') }}?v={{ @filemtime(public_path('js/admin/app.js')) }}"></script>
 </body>
 </html>

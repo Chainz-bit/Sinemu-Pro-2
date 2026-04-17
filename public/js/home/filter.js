@@ -1,21 +1,41 @@
-function normalizeCategory(value) {
-    const map = {
-        'semua kategori': '',
-        elektronik: 'GADGET',
-        hewan: 'HEWAN',
-        otomotif: 'OTOMOTIF',
-        dokumen: 'DOKUMEN',
-        aksesoris: 'AKSESORIS',
-        gadget: 'GADGET'
-    };
-    return map[value.toLowerCase()] || value.toUpperCase();
+function normalizeText(value) {
+    return String(value || '')
+        .trim()
+        .toLowerCase();
 }
 
-function formatDate(dateValue) {
-    const date = new Date(dateValue);
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const year = date.getFullYear();
+function normalizeCategory(value) {
+    const normalized = normalizeText(value);
+    if (!normalized || normalized === 'semua kategori') {
+        return '';
+    }
+
+    return normalized.toUpperCase();
+}
+
+function toItemDateString(dateValue) {
+    const raw = String(dateValue || '').trim();
+    if (!raw) {
+        return '';
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        const parts = raw.split('-');
+        return parts[1] + '/' + parts[2] + '/' + parts[0];
+    }
+
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+        return raw;
+    }
+
+    const parsed = new Date(raw);
+    if (Number.isNaN(parsed.getTime())) {
+        return '';
+    }
+
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const day = String(parsed.getDate()).padStart(2, '0');
+    const year = parsed.getFullYear();
     return month + '/' + day + '/' + year;
 }
 
@@ -88,14 +108,8 @@ function initFilterPanelToggle(filterWrap, filterForm) {
 export function initFilterAndCounts() {
     const keywordInput = document.getElementById('keywordInput');
     const categorySelect = document.getElementById('categorySelect');
-    const categoryDropdown = document.getElementById('categoryDropdown');
-    const categoryDropdownToggle = document.getElementById('categoryDropdownToggle');
-    const categoryDropdownMenu = document.getElementById('categoryDropdownMenu');
     const dateInput = document.getElementById('dateInput');
     const regionSelect = document.getElementById('regionSelect');
-    const regionDropdown = document.getElementById('regionDropdown');
-    const regionDropdownToggle = document.getElementById('regionDropdownToggle');
-    const regionDropdownMenu = document.getElementById('regionDropdownMenu');
     const filterForm = document.getElementById('filterForm');
     const filterWrap = document.querySelector('.filter-wrap');
 
@@ -103,7 +117,6 @@ export function initFilterAndCounts() {
         lost: Array.from(document.querySelectorAll('[data-list="lost"]')),
         found: Array.from(document.querySelectorAll('[data-list="found"]'))
     };
-    const dropdownRoots = Array.from(document.querySelectorAll('.filter-dropdown'));
 
     initModernDatepicker(dateInput);
     initFilterPanelToggle(filterWrap, filterForm);
@@ -111,23 +124,28 @@ export function initFilterAndCounts() {
     function applyFilters() {
         if (!keywordInput || !categorySelect || !dateInput || !regionSelect) return;
 
-        const keyword = keywordInput.value.trim().toLowerCase();
+        const keyword = normalizeText(keywordInput.value);
         const category = normalizeCategory(categorySelect.value);
-        const selectedDate = dateInput.value;
-        const selectedRegion = regionSelect.value.toLowerCase();
+        const selectedDate = toItemDateString(dateInput.value);
+        const selectedRegion = normalizeText(regionSelect.value);
 
         Object.entries(groups).forEach(function ([groupName, items]) {
             let visibleCount = 0;
 
             items.forEach(function (item) {
-                const itemName = item.dataset.name;
-                const itemCategory = item.dataset.category;
-                const itemRegion = item.dataset.region;
-                const itemDate = item.dataset.date;
+                const itemName = normalizeText(item.dataset.name);
+                const itemCategory = String(item.dataset.category || '').trim().toUpperCase();
+                const itemRegion = normalizeText(item.dataset.region);
+                const itemDate = toItemDateString(item.dataset.date);
 
-                const matchKeyword = !keyword || itemName.includes(keyword) || itemCategory.toLowerCase().includes(keyword);
-                const matchCategory = !category || itemCategory === category;
-                const matchDate = !selectedDate || itemDate === formatDate(selectedDate);
+                const keywordHaystack = [itemName, itemCategory.toLowerCase(), itemRegion].join(' ');
+                const matchKeyword = !keyword || keywordHaystack.includes(keyword);
+
+                // Untuk data lama barang hilang yang kategorinya masih "UMUM",
+                // jangan dipaksa strict supaya filter tetap terasa relevan.
+                const isGenericLostCategory = groupName === 'lost' && itemCategory === 'UMUM';
+                const matchCategory = !category || isGenericLostCategory || itemCategory === category;
+                const matchDate = !selectedDate || itemDate === selectedDate;
                 const matchRegion = selectedRegion === 'seluruh wilayah' || !selectedRegion || itemRegion.includes(selectedRegion);
                 const visible = matchKeyword && matchCategory && matchDate && matchRegion;
 
@@ -146,73 +164,6 @@ export function initFilterAndCounts() {
 
     // Filter dijalankan hanya ketika user submit form (klik tombol "Cari"),
     // bukan saat user mengetik atau mengubah pilihan dropdown.
-
-    function initCustomDropdown(dropdown, toggle, menu, select) {
-        if (!dropdown || !toggle || !menu || !select) return;
-
-        function closeAllDropdowns() {
-            dropdownRoots.forEach(function (dropdownRoot) {
-                dropdownRoot.classList.remove('open');
-                const dropdownToggle = dropdownRoot.querySelector('.filter-dropdown-toggle');
-                if (dropdownToggle) {
-                    dropdownToggle.setAttribute('aria-expanded', 'false');
-                }
-            });
-        }
-
-        function closeDropdown() {
-            dropdown.classList.remove('open');
-            toggle.setAttribute('aria-expanded', 'false');
-        }
-
-        function setActiveOption(value) {
-            const options = menu.querySelectorAll('.filter-option');
-            options.forEach(function (option) {
-                option.classList.toggle('is-active', option.dataset.value === value);
-            });
-        }
-
-        toggle.addEventListener('click', function () {
-            const willOpen = !dropdown.classList.contains('open');
-            closeAllDropdowns();
-            if (willOpen) {
-                dropdown.classList.add('open');
-                toggle.setAttribute('aria-expanded', 'true');
-                return;
-            }
-            toggle.setAttribute('aria-expanded', 'false');
-        });
-
-        menu.addEventListener('click', function (event) {
-            const optionButton = event.target.closest('.filter-option');
-            if (!optionButton) return;
-
-            const value = optionButton.dataset.value || '';
-            select.value = value;
-            toggle.textContent = value;
-            setActiveOption(value);
-            closeDropdown();
-        });
-
-        document.addEventListener('click', function (event) {
-            if (!dropdown.contains(event.target)) {
-                closeDropdown();
-            }
-        });
-
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape') {
-                closeDropdown();
-            }
-        });
-
-        const initialValue = select.value || toggle.textContent.trim();
-        toggle.textContent = initialValue;
-        setActiveOption(initialValue);
-    }
-
-    initCustomDropdown(categoryDropdown, categoryDropdownToggle, categoryDropdownMenu, categorySelect);
-    initCustomDropdown(regionDropdown, regionDropdownToggle, regionDropdownMenu, regionSelect);
 
     if (filterForm) {
         filterForm.addEventListener('submit', function (event) {

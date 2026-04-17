@@ -130,6 +130,16 @@
     border: 1px solid #e7e9ff;
 }
 
+.lokasi-manager-label {
+    display: inline-block;
+    margin-bottom: 0.18rem;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
 .lokasi-chip-icon {
     width: 30px;
     height: 30px;
@@ -329,6 +339,19 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 10px;
+}
+
+.lokasi-item-heading {
+    display: grid;
+    gap: 0.12rem;
+}
+
+.lokasi-item-manager {
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .lokasi-item h4 {

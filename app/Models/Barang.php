@@ -8,6 +8,7 @@ class Barang extends Model
 {
     protected $fillable = [
         'admin_id',
+        'user_id',
         'kategori_id',
         'nama_barang',
         'warna_barang',
@@ -35,6 +36,11 @@ class Barang extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function kategori()

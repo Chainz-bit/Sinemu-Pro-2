@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,11 +33,13 @@ class RegisteredUserController extends Controller
         $request->merge([
             'password' => $request->input('password') !== null ? (string) $request->input('password') : null,
             'password_confirmation' => $request->input('password_confirmation') !== null ? (string) $request->input('password_confirmation') : null,
+            'nomor_telepon' => $request->input('nomor_telepon') !== null ? trim((string) $request->input('nomor_telepon')) : null,
         ]);
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'nomor_telepon' => ['required', 'string', 'max:50'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -48,10 +49,10 @@ class RegisteredUserController extends Controller
             'name' => $validated['name'],
             'username' => $username,
             'email' => $validated['email'],
+            'nomor_telepon' => $validated['nomor_telepon'],
             'password' => Hash::make($validated['password']),
         ]);
-
-        event(new Registered($user));
+        $user->forceFill(['email_verified_at' => now()])->save();
 
         Auth::login($user);
 

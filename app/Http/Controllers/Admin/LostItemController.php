@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LostItemIndexRequest;
-use App\Models\Barang;
+use App\Models\Kategori;
 use App\Models\LaporanBarangHilang;
 use App\Services\Admin\LostItems\LostItemExportService;
 use App\Services\Admin\LostItems\LostItemQueryService;
@@ -71,7 +71,13 @@ class LostItemController extends Controller
         /** @var \App\Models\Admin $admin */
         $admin = Auth::guard('admin')->user();
 
-        return view('admin.pages.lost-item-edit', compact('laporanBarangHilang', 'admin'));
+        $lostCategoryOptions = Kategori::query()
+            ->forForm()
+            ->pluck('nama_kategori')
+            ->filter()
+            ->values();
+
+        return view('admin.pages.lost-item-edit', compact('laporanBarangHilang', 'admin', 'lostCategoryOptions'));
     }
 
     public function update(Request $request, LaporanBarangHilang $laporanBarangHilang): RedirectResponse
@@ -164,34 +170,21 @@ class LostItemController extends Controller
 
         $latestKlaim = $laporanBarangHilang->klaims()->latest('created_at')->first();
         if (!$latestKlaim) {
-            $candidateBarang = Barang::query()
-                ->where('status_barang', '!=', 'sudah_diklaim')
-                ->where(function ($query) use ($laporanBarangHilang) {
-                    $query
-                        ->where('nama_barang', 'like', '%'.$laporanBarangHilang->nama_barang.'%')
-                        ->orWhere('deskripsi', 'like', '%'.$laporanBarangHilang->nama_barang.'%');
-                })
-                ->orderByRaw("CASE WHEN status_barang = 'dalam_proses_klaim' THEN 0 WHEN status_barang = 'tersedia' THEN 1 ELSE 2 END")
-                ->latest('updated_at')
-                ->first();
-
-            if (!$candidateBarang) {
-                return back()->with('error', 'Belum ada barang temuan yang cocok untuk laporan ini. Tambahkan/tautkan barang temuan terlebih dahulu.');
-            }
-
             $latestKlaim = $laporanBarangHilang->klaims()->create([
-                'barang_id' => $candidateBarang->id,
+                'barang_id' => null,
                 'user_id' => (int) $laporanBarangHilang->user_id,
                 'admin_id' => (int) Auth::guard('admin')->id(),
                 'status_klaim' => $validated['status_klaim'],
                 'catatan' => $validated['catatan'] ?? null,
             ]);
         } else {
-            $latestKlaim->update([
+            $updatePayload = [
                 'status_klaim' => $validated['status_klaim'],
                 'catatan' => $validated['catatan'] ?? null,
                 'admin_id' => (int) Auth::guard('admin')->id(),
-            ]);
+            ];
+
+            $latestKlaim->update($updatePayload);
         }
 
         if ($latestKlaim->barang) {

@@ -16,19 +16,8 @@
     </section>
 
     {{-- BAGIAN: Notifikasi --}}
-    @if(session('status'))
-        <div class="report-card" style="margin-bottom:12px;">
-            <header><h2 style="font-size:14px;">{{ session('status') }}</h2></header>
-        </div>
-    @endif
-    @if(session('error'))
-        <div class="report-card" style="margin-bottom:12px;">
-            <header><h2 style="font-size:14px;color:#b91c1c;">{{ session('error') }}</h2></header>
-        </div>
-    @endif
-
-    {{-- BAGIAN: Toolbar + Tabel --}}
-    <section class="report-card">
+{{-- BAGIAN: Toolbar + Tabel --}}
+    <section class="report-card report-card-scrollable">
         <header>
             <form class="lost-toolbar" method="GET" action="{{ route('admin.claim-verifications') }}">
                 <div class="lost-toolbar-left">
@@ -76,7 +65,52 @@
                         <tr>
                             <td>
                                 <div class="item-cell">
-                                    <div class="item-avatar avatar-mint">{{ strtoupper(substr($claim->barang_temuan, 0, 1)) }}</div>
+                                    <div class="item-avatar avatar-mint">
+                                        <span class="item-avatar-fallback">{{ strtoupper(substr($claim->barang_temuan, 0, 1)) }}</span>
+                                        @php
+                                            $fotoUrlDefault = asset('img/login-image.png');
+                                            $fotoSrc = null;
+                                            $rawFotoPath = str_replace('\\', '/', trim((string) ($claim->foto_barang ?? '')));
+                                            $localFotoPath = null;
+
+                                            if ($rawFotoPath !== '') {
+                                                if (\Illuminate\Support\Str::startsWith($rawFotoPath, ['http://', 'https://'])) {
+                                                    $fotoSrc = $rawFotoPath;
+                                                } else {
+                                                    $fotoPath = ltrim($rawFotoPath, '/');
+                                                    if (\Illuminate\Support\Str::startsWith($fotoPath, 'storage/')) {
+                                                        $fotoPath = substr($fotoPath, 8);
+                                                    } elseif (\Illuminate\Support\Str::startsWith($fotoPath, 'public/')) {
+                                                        $fotoPath = substr($fotoPath, 7);
+                                                    }
+
+                                                    $localFotoPath = $fotoPath;
+                                                }
+                                            }
+
+                                            if (!empty($localFotoPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($localFotoPath)) {
+                                                $absolutePath = \Illuminate\Support\Facades\Storage::disk('public')->path($localFotoPath);
+                                                $mimeType = \Illuminate\Support\Facades\Storage::disk('public')->mimeType($localFotoPath) ?: 'image/jpeg';
+                                                $binary = @file_get_contents($absolutePath);
+                                                if ($binary !== false) {
+                                                    $fotoSrc = 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+                                                }
+                                            }
+
+                                            if (!$fotoSrc) {
+                                                $fotoSrc = $fotoUrlDefault;
+                                            }
+                                        @endphp
+                                        <img
+                                            src="{{ $fotoSrc }}"
+                                            alt="{{ $claim->barang_temuan }}"
+                                            loading="lazy"
+                                            decoding="async"
+                                            width="30"
+                                            height="30"
+                                            onerror="this.onerror=null;this.src='{{ $fotoUrlDefault }}';"
+                                        >
+                                    </div>
                                     <div>
                                         <strong>{{ $claim->barang_temuan }}</strong>
                                         <small>Klaim untuk: {{ $claim->barang_hilang }}</small>

@@ -10,6 +10,7 @@ use App\Support\Media\OptimizedImageUploader;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class InputItemService
 {
@@ -104,25 +105,59 @@ class InputItemService
 
     private function resolveReporter(string $reporterName): ?User
     {
+        $normalizedReporter = trim($reporterName);
+        if ($normalizedReporter === '') {
+            $normalizedReporter = 'Pelapor Admin';
+        }
+
         $hasNamaColumn = Schema::hasColumn('users', 'nama');
         $hasNameColumn = Schema::hasColumn('users', 'name');
 
-        return User::query()
-            ->where(function ($query) use ($reporterName, $hasNamaColumn, $hasNameColumn): void {
+        $existingUser = User::query()
+            ->where(function ($query) use ($normalizedReporter, $hasNamaColumn, $hasNameColumn): void {
                 if ($hasNamaColumn) {
-                    $query->where('nama', $reporterName);
+                    $query->where('nama', $normalizedReporter);
                 }
 
                 if ($hasNameColumn) {
                     if ($hasNamaColumn) {
-                        $query->orWhere('name', $reporterName);
+                        $query->orWhere('name', $normalizedReporter);
                     } else {
-                        $query->where('name', $reporterName);
+                        $query->where('name', $normalizedReporter);
                     }
                 }
 
-                $query->orWhere('email', $reporterName);
+                $query->orWhere('email', $normalizedReporter);
             })
             ->first();
+
+        if ($existingUser) {
+            return $existingUser;
+        }
+
+        $baseSlug = Str::slug($normalizedReporter);
+        if ($baseSlug === '') {
+            $baseSlug = 'pelapor-admin';
+        }
+
+        $username = $baseSlug;
+        $suffix = 1;
+        while (User::query()->where('username', $username)->exists()) {
+            $username = $baseSlug.'-'.$suffix;
+            $suffix++;
+        }
+
+        $email = $username.'@sinemu.local';
+        while (User::query()->where('email', $email)->exists()) {
+            $email = $username.'-'.Str::random(4).'@sinemu.local';
+        }
+
+        return User::query()->create([
+            'name' => $normalizedReporter,
+            'nama' => $normalizedReporter,
+            'username' => $username,
+            'email' => $email,
+            'password' => Str::random(24),
+        ]);
     }
 }

@@ -48,23 +48,6 @@ class LoginController extends Controller
                 ->withErrors(['login' => 'Email/username atau kata sandi tidak sesuai.']);
         }
 
-        if (($admin->status_verifikasi ?? 'pending') === 'pending') {
-            return back()
-                ->withInput($request->only('login'))
-                ->withErrors(['login' => 'Akun Anda belum diverifikasi oleh super admin.']);
-        }
-
-        if ($admin->status_verifikasi === 'rejected') {
-            $message = 'Akun Anda ditolak oleh super admin.';
-            if (!empty($admin->alasan_penolakan)) {
-                $message .= ' Alasan: '.$admin->alasan_penolakan;
-            }
-
-            return back()
-                ->withInput($request->only('login'))
-                ->withErrors(['login' => $message]);
-        }
-
         Auth::guard('admin')->login($admin, (bool) $request->boolean('remember'));
         $request->session()->regenerate();
 

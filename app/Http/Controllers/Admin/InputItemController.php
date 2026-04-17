@@ -21,7 +21,7 @@ class InputItemController extends Controller
         /** @var \App\Models\Admin $admin */
         $admin = Auth::guard('admin')->user();
         $kategoriOptions = Kategori::query()
-            ->orderBy('nama_kategori')
+            ->forForm()
             ->get(['id', 'nama_kategori']);
 
         return view('admin.pages.input-items', compact('admin', 'kategoriOptions'));

@@ -42,7 +42,7 @@ class LostReportController extends Controller
         return view('user.pages.lost-report', [
             'user' => Auth::user(),
             'lostCategoryOptions' => Kategori::query()
-                ->orderBy('nama_kategori')
+                ->forForm()
                 ->pluck('nama_kategori')
                 ->filter()
                 ->values(),

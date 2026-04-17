@@ -10,17 +10,7 @@
 
 @section('page-content')
     <div class="dashboard-page-content">
-        @if(session('status'))
-            <div class="feedback-alert success">{{ session('status') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="feedback-alert error">{{ session('error') }}</div>
-        @endif
-        @if($errors->any())
-            <div class="feedback-alert error">{{ $errors->first() }}</div>
-        @endif
-
-        {{-- BAGIAN: Header ringkasan --}}
+{{-- BAGIAN: Header ringkasan --}}
         <section class="intro">
             <h1>Ringkasan Dashboard User</h1>
             <p>Selamat datang, {{ $user?->nama ?? $user?->name ?? 'Pengguna' }}. Pantau laporan dan klaim Anda dari satu tempat.</p>
@@ -61,7 +51,7 @@
         </section>
 
         {{-- BAGIAN: Tabel aktivitas terbaru --}}
-        <section class="report-card dashboard-report-card">
+        <section class="report-card report-card-scrollable dashboard-report-card">
             <header>
                 <div class="report-heading">
                     <h2>Aktivitas Terbaru</h2>
@@ -116,6 +106,9 @@
                                 <td>
                                     <div class="item-cell">
                                         <div class="item-avatar {{ $activity->avatar_class ?? '' }}">
+                                            @if(!empty($activity->image_url))
+                                                <img src="{{ $activity->image_url }}" alt="{{ $activity->item_name ?? 'Gambar barang' }}" loading="lazy" decoding="async" onerror="this.remove()">
+                                            @endif
                                             <span class="item-avatar-fallback">{{ $activity->avatar ?? '?' }}</span>
                                         </div>
                                         <div>
@@ -150,7 +143,7 @@
                                     <div class="row-menu" id="user-menu-{{ $loop->index }}">
                                         <a href="{{ $activity->detail_url ?? '#' }}">{{ $activity->action_label ?? 'Lihat Detail' }}</a>
                                         @if(($activity->can_delete ?? false) && !empty($activity->delete_url))
-                                            <form method="POST" action="{{ $activity->delete_url }}" onsubmit="return confirm('Laporan yang dihapus tidak bisa dikembalikan. Lanjutkan?')">
+                                            <form method="POST" action="{{ $activity->delete_url }}" data-confirm-delete data-confirm-message="Laporan yang dihapus tidak bisa dikembalikan. Lanjutkan?">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="menu-submit danger">Hapus</button>

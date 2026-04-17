@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -124,20 +125,51 @@ class ProfileController extends Controller
 
     private function resolveAvatarUrl(User $user): string
     {
+        $defaultAvatar = asset('img/profil.jpg');
         $profilePath = trim((string) ($user->profil ?? ''));
         if ($profilePath === '') {
-            return asset('img/profil.jpg');
+            return $defaultAvatar;
         }
 
         if (str_starts_with($profilePath, 'http://') || str_starts_with($profilePath, 'https://')) {
             return $profilePath;
         }
 
-        if (str_starts_with($profilePath, '/')) {
-            return asset(ltrim($profilePath, '/'));
+        $normalized = str_replace('\\', '/', ltrim($profilePath, '/'));
+        if (str_starts_with($normalized, 'storage/')) {
+            $normalized = substr($normalized, 8);
+        } elseif (str_starts_with($normalized, 'public/')) {
+            $normalized = substr($normalized, 7);
         }
 
-        return asset('storage/' . ltrim($profilePath, '/'));
+        [$folder, $subPath] = array_pad(explode('/', $normalized, 2), 2, '');
+        if (in_array($folder, ['profil-admin', 'profil-user', 'barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== '') {
+            if (Storage::disk('public')->exists($normalized)) {
+                $absolutePath = Storage::disk('public')->path($normalized);
+                $mimeType = Storage::disk('public')->mimeType($normalized) ?: 'image/jpeg';
+                $binary = @file_get_contents($absolutePath);
+                if ($binary !== false) {
+                    return 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+                }
+
+                return route('media.image', ['folder' => $folder, 'path' => $subPath]);
+            }
+
+            return $defaultAvatar;
+        }
+
+        if (Storage::disk('public')->exists($normalized)) {
+            $absolutePath = Storage::disk('public')->path($normalized);
+            $mimeType = Storage::disk('public')->mimeType($normalized) ?: 'image/jpeg';
+            $binary = @file_get_contents($absolutePath);
+            if ($binary !== false) {
+                return 'data:' . $mimeType . ';base64,' . base64_encode($binary);
+            }
+
+            return asset('storage/' . $normalized);
+        }
+
+        return $defaultAvatar;
     }
 
     /**
@@ -171,6 +203,6 @@ class ProfileController extends Controller
             return route('home.lost-detail', $claim->laporan_hilang_id);
         }
 
-        return route('home') . '#hilang-temuan';
+        return route('home');
     }
 }

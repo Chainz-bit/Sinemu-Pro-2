@@ -11,11 +11,32 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link href="{{ asset('css/app.css') }}?v={{ @filemtime(public_path('css/app.css')) }}" rel="stylesheet">
     <link href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/flash-popup.css') }}?v={{ @filemtime(public_path('css/flash-popup.css')) }}">
 
     <!-- Bootstrap Icons (optional) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 <body>
+    @php
+        $sinemuFlashMessages = [];
+        $statusMessage = session('status');
+        if (!empty($statusMessage)) {
+            $sinemuFlashMessages[] = [
+                'type' => 'success',
+                'message' => $statusMessage === 'verification-link-sent'
+                    ? 'Link verifikasi baru sudah dikirim ke email Anda.'
+                    : (string) $statusMessage,
+            ];
+        }
+        $errorMessage = session('error');
+        if (!empty($errorMessage)) {
+            $sinemuFlashMessages[] = ['type' => 'error', 'message' => (string) $errorMessage];
+        }
+        if ($errors->any()) {
+            $sinemuFlashMessages[] = ['type' => 'error', 'message' => (string) $errors->first()];
+        }
+    @endphp
+    <script>window.__SINEMU_FLASH_MESSAGES = @json($sinemuFlashMessages);</script>
 
     <!-- Navbar Bootstrap -->
   <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm py-3 mb-4">
@@ -68,6 +89,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/app.js') }}?v={{ @filemtime(public_path('js/app.js')) }}" defer></script>
     <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
+    <script src="{{ asset('js/flash-popup.js') }}?v={{ @filemtime(public_path('js/flash-popup.js')) }}" defer></script>
 
 </body>
 </html>
