@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\LostItemIndexRequest;
 use App\Models\Kategori;
 use App\Models\LaporanBarangHilang;
+use App\Services\Admin\Matching\MatchingService;
 use App\Services\Admin\LostItems\LostItemExportService;
 use App\Services\Admin\LostItems\LostItemQueryService;
 use App\Services\ReportImageCleaner;
 use App\Services\UserNotificationService;
+use App\Support\WorkflowStatus;
 use App\Support\Media\OptimizedImageUploader;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
@@ -24,6 +26,7 @@ class LostItemController extends Controller
         private readonly LostItemQueryService $queryService,
         private readonly LostItemExportService $exportService,
         private readonly OptimizedImageUploader $imageUploader,
+        private readonly MatchingService $matchingService,
     ) {
     }
 
@@ -58,8 +61,12 @@ class LostItemController extends Controller
         }]);
 
         $latestKlaim = $laporanBarangHilang->klaims->first();
+        $matchingCandidates = collect();
+        if ((string) ($laporanBarangHilang->status_laporan ?? '') === WorkflowStatus::REPORT_APPROVED) {
+            $matchingCandidates = $this->matchingService->findCandidatesForLostReport($laporanBarangHilang);
+        }
 
-        return view('admin.pages.lost-item-detail', compact('laporanBarangHilang', 'latestKlaim', 'admin'));
+        return view('admin.pages.lost-item-detail', compact('laporanBarangHilang', 'latestKlaim', 'admin', 'matchingCandidates'));
     }
 
     public function edit(LaporanBarangHilang $laporanBarangHilang): View|RedirectResponse
@@ -163,55 +170,49 @@ class LostItemController extends Controller
 
     public function updateStatus(Request $request, LaporanBarangHilang $laporanBarangHilang): RedirectResponse
     {
+        $latestKlaim = $laporanBarangHilang->klaims()->latest('created_at')->first();
+        if (!$latestKlaim) {
+            return back()->with('error', 'Belum ada klaim aktif untuk laporan ini.');
+        }
+        return redirect()
+            ->route('admin.claim-verifications.show', $latestKlaim->id)
+            ->with('error', 'Perbarui status klaim dari halaman Verifikasi Klaim agar checklist keamanan tetap diterapkan.');
+    }
+
+    public function verify(Request $request, LaporanBarangHilang $laporanBarangHilang): RedirectResponse
+    {
         $validated = $request->validate([
-            'status_klaim' => ['required', 'in:pending,disetujui,ditolak'],
+            'status_laporan' => ['required', 'in:approved,rejected'],
             'catatan' => ['nullable', 'string', 'max:2000'],
         ]);
 
-        $latestKlaim = $laporanBarangHilang->klaims()->latest('created_at')->first();
-        if (!$latestKlaim) {
-            $latestKlaim = $laporanBarangHilang->klaims()->create([
-                'barang_id' => null,
-                'user_id' => (int) $laporanBarangHilang->user_id,
-                'admin_id' => (int) Auth::guard('admin')->id(),
-                'status_klaim' => $validated['status_klaim'],
-                'catatan' => $validated['catatan'] ?? null,
-            ]);
-        } else {
-            $updatePayload = [
-                'status_klaim' => $validated['status_klaim'],
-                'catatan' => $validated['catatan'] ?? null,
-                'admin_id' => (int) Auth::guard('admin')->id(),
-            ];
-
-            $latestKlaim->update($updatePayload);
+        if (!Schema::hasColumn('laporan_barang_hilangs', 'status_laporan')) {
+            return back()->with('error', 'Status verifikasi laporan belum tersedia di database.');
         }
 
-        if ($latestKlaim->barang) {
-            if ($validated['status_klaim'] === 'disetujui') {
-                $latestKlaim->barang->update(['status_barang' => 'sudah_diklaim']);
-            } elseif ($validated['status_klaim'] === 'ditolak' && $latestKlaim->barang->status_barang === 'dalam_proses_klaim') {
-                $latestKlaim->barang->update(['status_barang' => 'tersedia']);
-            }
-        }
+        $newStatus = $validated['status_laporan'] === 'approved'
+            ? WorkflowStatus::REPORT_APPROVED
+            : WorkflowStatus::REPORT_REJECTED;
+
+        $laporanBarangHilang->update([
+            'status_laporan' => $newStatus,
+            'verified_by_admin_id' => (int) Auth::guard('admin')->id(),
+            'verified_at' => now(),
+            'tampil_di_home' => $newStatus === WorkflowStatus::REPORT_APPROVED,
+        ]);
 
         if (!is_null($laporanBarangHilang->user_id)) {
-            $statusLabel = match ($validated['status_klaim']) {
-                'disetujui' => 'disetujui',
-                'ditolak' => 'ditolak',
-                default => 'diperbarui ke menunggu verifikasi',
-            };
-
+            $label = $newStatus === WorkflowStatus::REPORT_APPROVED ? 'disetujui' : 'ditolak';
             UserNotificationService::notifyUser(
                 userId: (int) $laporanBarangHilang->user_id,
-                type: 'status_laporan_hilang',
-                title: 'Status Laporan Diperbarui',
-                message: 'Admin memperbarui status laporan '.$laporanBarangHilang->nama_barang.' menjadi '.$statusLabel.'.',
+                type: 'verifikasi_laporan_hilang',
+                title: 'Verifikasi Laporan Hilang',
+                message: 'Laporan barang hilang "'.$laporanBarangHilang->nama_barang.'" '.$label.' admin.',
                 actionUrl: route('user.dashboard'),
                 meta: ['laporan_hilang_id' => $laporanBarangHilang->id]
             );
         }
 
-        return back()->with('status', 'Status barang hilang berhasil diperbarui.');
+        return back()->with('status', 'Verifikasi laporan barang hilang berhasil diperbarui.');
     }
 }

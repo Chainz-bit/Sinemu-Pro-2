@@ -27,9 +27,10 @@
                     </select>
                     <select name="status" class="filter-btn">
                         <option value="">Semua Status</option>
-                        <option value="pending" @selected(request('status') === 'pending')>Menunggu Verifikasi</option>
+                        <option value="menunggu" @selected(in_array(request('status'), ['menunggu','pending'], true))>Menunggu Verifikasi</option>
                         <option value="disetujui" @selected(request('status') === 'disetujui')>Disetujui</option>
                         <option value="ditolak" @selected(request('status') === 'ditolak')>Ditolak</option>
+                        <option value="selesai" @selected(request('status') === 'selesai')>Selesai</option>
                     </select>
                 </div>
                 <div class="lost-toolbar-right">
@@ -122,15 +123,13 @@
                             <td>{{ $claim->lokasi }}</td>
                             <td>
                                 @php
-                                    $statusMap = [
-                                        'pending' => ['MENUNGGU VERIFIKASI', 'status-dalam_peninjauan'],
-                                        'disetujui' => ['DISETUJUI', 'status-selesai'],
-                                        'ditolak' => ['DITOLAK', 'status-ditolak'],
-                                    ];
-                                    [$statusLabel, $statusClass] = $statusMap[$claim->status_klaim] ?? ['UNKNOWN', 'status-diproses'];
-                                    if ($claim->status_klaim === 'disetujui' && $claim->status_barang_temuan === 'sudah_dikembalikan') {
-                                        $statusLabel = 'SELESAI';
-                                    }
+                                    $statusKey = \App\Support\ClaimStatusPresenter::key(
+                                        (string) $claim->status_klaim,
+                                        (string) ($claim->status_verifikasi ?? ''),
+                                        (string) ($claim->status_barang_temuan ?? '')
+                                    );
+                                    $statusLabel = \App\Support\ClaimStatusPresenter::label($statusKey);
+                                    $statusClass = \App\Support\ClaimStatusPresenter::cssClass($statusKey);
                                 @endphp
                                 <span class="status-chip {{ $statusClass }}">{{ $statusLabel }}</span>
                             </td>
@@ -140,7 +139,7 @@
                                 </button>
                                 <div class="row-menu" id="menu-claim-{{ $index }}">
                                     <a href="{{ route('admin.claim-verifications.show', $claim->id) }}">
-                                        {{ $claim->status_klaim === 'pending' ? 'Tinjau Klaim' : 'Lihat Detail' }}
+                                        {{ $statusKey === 'menunggu' ? 'Tinjau Klaim' : 'Lihat Detail' }}
                                     </a>
                                     @php
                                         $isPublished = (bool) ($claim->barang_tampil_di_home ?? false) || (bool) ($claim->laporan_hilang_tampil_di_home ?? false);

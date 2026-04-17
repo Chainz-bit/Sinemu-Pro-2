@@ -14,16 +14,38 @@
     $hubungiHref = $hasPelaporEmail
         ? ('mailto:' . $pelaporEmail . '?subject=' . $contactSubject . '&body=' . $contactBody)
         : '#';
-    $ringkasanStatus = match ($klaim->status_klaim) {
-        'pending' => 'Klaim masih menunggu keputusan admin. Pastikan data pelapor dan kecocokan barang sudah tervalidasi.',
+    $ringkasanStatus = match ($statusKey ?? 'menunggu') {
+        'menunggu' => 'Klaim masih menunggu keputusan admin. Pastikan data pelapor dan kecocokan barang sudah tervalidasi.',
         'disetujui' => 'Klaim telah disetujui. Lanjutkan koordinasi penyerahan barang kepada pemilik.',
         'ditolak' => 'Klaim telah ditolak. Pastikan alasan penolakan terdokumentasi dengan jelas.',
+        'selesai' => 'Proses klaim sudah selesai. Barang telah diserahkan kepada pihak yang berhak.',
         default => 'Status klaim belum terdefinisi.',
     };
-    $catatanPengaju = trim((string) ($klaim->laporanHilang?->keterangan ?? ''));
-    $catatanAdmin = trim((string) ($klaim->catatan ?? ''));
-    $ciriKhususPengaju = trim((string) ($klaim->laporanHilang?->ciri_khusus ?? ''));
+    $langkahLanjutAdmin = match ($statusKey ?? 'menunggu') {
+        'menunggu' => 'Verifikasi checklist wajib, lalu pilih Setujui atau Tolak berdasarkan bukti.',
+        'disetujui' => 'Koordinasikan serah terima dan tandai selesai hanya setelah barang benar-benar diserahkan.',
+        'ditolak' => 'Arsipkan alasan penolakan agar dapat ditinjau jika user mengajukan klaim ulang.',
+        'selesai' => 'Simpan dokumentasi proses untuk audit operasional.',
+        default => 'Lanjutkan proses sesuai kebijakan verifikasi.',
+    };
+    $catatanPengaju = trim((string) ($klaim->catatan ?? ''));
+    $catatanLaporanHilang = trim((string) ($klaim->laporanHilang?->keterangan ?? ''));
+    $catatanVerifikasiAdmin = trim((string) ($klaim->catatan_verifikasi_admin ?? ''));
+    $alasanPenolakan = trim((string) ($klaim->alasan_penolakan ?? ''));
+    $ciriKhususPengaju = trim((string) ($klaim->bukti_ciri_khusus ?? $klaim->laporanHilang?->ciri_khusus ?? ''));
     $buktiKepemilikanPengaju = trim((string) ($klaim->laporanHilang?->bukti_kepemilikan ?? ''));
+    $detailIsiPengaju = trim((string) ($klaim->bukti_detail_isi ?? ''));
+    $lokasiSpesifikPengaju = trim((string) ($klaim->bukti_lokasi_spesifik ?? ''));
+    $waktuHilangPengaju = trim((string) ($klaim->bukti_waktu_hilang ?? ''));
+    $skorValiditas = is_numeric($klaim->skor_validitas ?? null) ? (int) $klaim->skor_validitas : null;
+    $hasilChecklist = (array) ($klaim->hasil_checklist ?? []);
+    $checklistLabels = [
+        'identitas_pelapor_valid' => 'Identitas pelapor valid',
+        'detail_barang_valid' => 'Detail barang sesuai',
+        'kronologi_valid' => 'Kronologi kejadian konsisten',
+        'bukti_visual_valid' => 'Bukti visual meyakinkan',
+        'kecocokan_data_laporan' => 'Data cocok dengan laporan hilang',
+    ];
     $buktiFotoUrls = collect((array) ($klaim->bukti_foto ?? []))
         ->filter(fn ($path) => is_string($path) && trim($path) !== '')
         ->map(function ($path) {
@@ -110,6 +132,27 @@
                             <h3>Ringkasan Verifikasi</h3>
                             <p>{{ $ringkasanStatus }}</p>
                         </article>
+                        <article class="claim-decision-guide">
+                            <h3>Panduan Keputusan Admin</h3>
+                            <div class="claim-decision-guide-grid">
+                                <div class="claim-decision-guide-item approve">
+                                    <strong>Setujui Klaim Jika:</strong>
+                                    <ul>
+                                        <li>Skor validitas minimal 75.</li>
+                                        <li>Poin kritikal (detail barang, kronologi, bukti visual) lolos.</li>
+                                        <li>Bukti kepemilikan konsisten dengan laporan hilang dan barang temuan.</li>
+                                    </ul>
+                                </div>
+                                <div class="claim-decision-guide-item reject">
+                                    <strong>Tolak Klaim Jika:</strong>
+                                    <ul>
+                                        <li>Data klaim bertentangan dengan laporan/barang temuan.</li>
+                                        <li>Bukti terlalu umum, lemah, atau tidak relevan.</li>
+                                        <li>Nomor seri/ciri unik tidak sesuai dengan barang terkait.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </article>
                     </div>
                 </div>
             </article>
@@ -125,6 +168,10 @@
                         <div class="claim-status-current">
                             <small>Status Barang Terkait</small>
                             <span class="status-chip {{ $statusBarangClass }}">{{ strtoupper($statusBarangLabel) }}</span>
+                        </div>
+                        <div class="claim-note-box claim-note-next-step">
+                            <small>Langkah Lanjut Admin</small>
+                            <p>{{ $langkahLanjutAdmin }}</p>
                         </div>
                         <ul class="claim-timeline">
                             <li>
@@ -142,14 +189,37 @@
                         </ul>
                         @if($catatanPengaju !== '')
                             <div class="claim-note-box claim-note-requester">
-                                <small>Catatan Pelapor</small>
+                                <small>Catatan Klaim Pengaju</small>
                                 <p>{{ $catatanPengaju }}</p>
+                            </div>
+                        @endif
+                        @if($catatanLaporanHilang !== '')
+                            <div class="claim-note-box claim-note-requester">
+                                <small>Catatan di Laporan Hilang</small>
+                                <p>{{ $catatanLaporanHilang }}</p>
                             </div>
                         @endif
                         @if($ciriKhususPengaju !== '')
                             <div class="claim-note-box claim-note-requester">
-                                <small>Ciri Unik Barang</small>
+                                <small>Ciri Unik Menurut Pengaju</small>
                                 <p>{{ $ciriKhususPengaju }}</p>
+                            </div>
+                        @endif
+                        @if($detailIsiPengaju !== '')
+                            <div class="claim-note-box claim-note-requester">
+                                <small>Detail Isi / Kondisi</small>
+                                <p>{{ $detailIsiPengaju }}</p>
+                            </div>
+                        @endif
+                        @if($lokasiSpesifikPengaju !== '' || $waktuHilangPengaju !== '')
+                            <div class="claim-note-box claim-note-requester">
+                                <small>Lokasi & Waktu Hilang Versi Pengaju</small>
+                                <p>
+                                    {{ $lokasiSpesifikPengaju !== '' ? $lokasiSpesifikPengaju : '-' }}
+                                    @if($waktuHilangPengaju !== '')
+                                        ({{ $waktuHilangPengaju }})
+                                    @endif
+                                </p>
                             </div>
                         @endif
                         @if($buktiKepemilikanPengaju !== '')
@@ -170,10 +240,32 @@
                                 </div>
                             </div>
                         @endif
-                        @if($catatanAdmin !== '')
+                        @if(!is_null($skorValiditas))
                             <div class="claim-note-box">
-                                <small>Catatan Klaim Tambahan</small>
-                                <p>{{ $catatanAdmin }}</p>
+                                <small>Skor Validitas Klaim</small>
+                                <p>{{ $skorValiditas }} / 100</p>
+                            </div>
+                        @endif
+                        @if($hasilChecklist !== [])
+                            <div class="claim-note-box">
+                                <small>Checklist Verifikasi Admin</small>
+                                <p>
+                                    @foreach($checklistLabels as $checklistKey => $checklistLabel)
+                                        {{ $checklistLabel }}: {{ (($hasilChecklist[$checklistKey] ?? false) ? 'Ya' : 'Tidak') }}@if(!$loop->last)<br>@endif
+                                    @endforeach
+                                </p>
+                            </div>
+                        @endif
+                        @if($catatanVerifikasiAdmin !== '')
+                            <div class="claim-note-box">
+                                <small>Catatan Verifikasi Admin</small>
+                                <p>{{ $catatanVerifikasiAdmin }}</p>
+                            </div>
+                        @endif
+                        @if($alasanPenolakan !== '')
+                            <div class="claim-note-box">
+                                <small>Alasan Penolakan</small>
+                                <p>{{ $alasanPenolakan }}</p>
                             </div>
                         @endif
                     </div>
@@ -193,25 +285,66 @@
             </aside>
         </section>
 
-        @if($klaim->status_klaim === 'pending')
-            <div class="claim-detail-bottom-actions">
-                <form method="POST" action="{{ route('admin.claim-verifications.reject', $klaim->id) }}"
-                    data-confirm-delete
-                    data-confirm-title="Konfirmasi Tolak Klaim"
-                    data-confirm-message="Tolak klaim ini? Pastikan alasan penolakan sudah sesuai."
-                    data-confirm-submit-label="Tolak Klaim"
-                    data-confirm-submit-variant="danger">
+        @if(($statusKey ?? 'menunggu') === 'menunggu')
+            <div class="claim-detail-bottom-actions claim-detail-bottom-actions-stack">
+                <form method="POST" action="{{ route('admin.claim-verifications.approve', $klaim->id) }}" class="claim-verification-form">
                     @csrf
-                    <button type="submit" class="claim-action-btn danger">Tolak Klaim</button>
+                    <div class="claim-verification-head">
+                        <h3>Form Verifikasi Klaim</h3>
+                        <p>Isi checklist dulu, lalu pilih aksi setujui atau tolak.</p>
+                    </div>
+                    <div class="claim-verification-rule">
+                        <strong>Aturan Otomatis Persetujuan</strong>
+                        <span>Klaim hanya bisa disetujui jika skor minimal 75 dan semua poin kritikal bernilai "Ya".</span>
+                    </div>
+                    <div class="claim-note-box claim-note-box-spacing">
+                        <small>Checklist Verifikasi (Wajib)</small>
+                        <div class="claim-verification-grid">
+                            @foreach($checklistLabels as $checklistKey => $checklistLabel)
+                                <label class="claim-verification-field">
+                                    <span>{{ $checklistLabel }}</span>
+                                    <select name="{{ $checklistKey }}" class="form-select" required>
+                                        <option value="">Pilih</option>
+                                        <option value="1" @selected(old($checklistKey) === '1')>Ya</option>
+                                        <option value="0" @selected(old($checklistKey) === '0')>Tidak</option>
+                                    </select>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="claim-note-box claim-note-box-spacing">
+                        <small>Catatan Verifikasi Admin</small>
+                        <textarea name="catatan_verifikasi_admin" class="form-control" rows="2" maxlength="2000" placeholder="Tambahkan catatan validasi jika diperlukan.">{{ old('catatan_verifikasi_admin') }}</textarea>
+                    </div>
+                    <div class="claim-note-box claim-note-box-spacing">
+                        <small>Alasan Penolakan (Wajib jika ditolak)</small>
+                        <textarea name="alasan_penolakan" class="form-control" rows="2" maxlength="2000" placeholder="Isi alasan jika Anda akan menolak klaim.">{{ old('alasan_penolakan') }}</textarea>
+                    </div>
+                    <div class="claim-verification-actions">
+                        <button type="submit"
+                            formaction="{{ route('admin.claim-verifications.reject', $klaim->id) }}"
+                            class="claim-action-btn danger">
+                            Tolak Klaim
+                        </button>
+                        <button type="submit"
+                            formaction="{{ route('admin.claim-verifications.approve', $klaim->id) }}"
+                            class="claim-action-btn success">
+                            Setujui Klaim
+                        </button>
+                    </div>
                 </form>
-                <form method="POST" action="{{ route('admin.claim-verifications.approve', $klaim->id) }}"
+            </div>
+        @endif
+        @if(($statusKey ?? 'menunggu') === 'disetujui')
+            <div class="claim-detail-bottom-actions">
+                <form method="POST" action="{{ route('admin.claim-verifications.complete', $klaim->id) }}"
                     data-confirm-delete
-                    data-confirm-title="Konfirmasi Setujui Klaim"
-                    data-confirm-message="Setujui klaim ini? Barang akan ditandai sesuai proses verifikasi."
-                    data-confirm-submit-label="Setujui Klaim"
+                    data-confirm-title="Tandai Klaim Selesai"
+                    data-confirm-message="Barang sudah diserahkan ke pemilik dan klaim akan ditutup sebagai selesai."
+                    data-confirm-submit-label="Tandai Selesai"
                     data-confirm-submit-variant="primary">
                     @csrf
-                    <button type="submit" class="claim-action-btn success">Setujui Klaim</button>
+                    <button type="submit" class="claim-action-btn success">Tandai Selesai</button>
                 </form>
             </div>
         @endif

@@ -7,6 +7,7 @@ use App\Models\Kategori;
 use App\Models\LaporanBarangHilang;
 use App\Models\User;
 use App\Support\Media\OptimizedImageUploader;
+use App\Support\WorkflowStatus;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
@@ -49,6 +50,10 @@ class InputItemService
         }
         if (Schema::hasColumn('laporan_barang_hilangs', 'tampil_di_home')) {
             $payload['tampil_di_home'] = true;
+        }
+        if (Schema::hasColumn('laporan_barang_hilangs', 'status_laporan')) {
+            $payload['status_laporan'] = WorkflowStatus::REPORT_APPROVED;
+            $payload['verified_at'] = now();
         }
 
         LaporanBarangHilang::create($payload);
@@ -98,6 +103,11 @@ class InputItemService
 
         if (Schema::hasColumn('barangs', 'tampil_di_home')) {
             $payload['tampil_di_home'] = true;
+        }
+        if (Schema::hasColumn('barangs', 'status_laporan')) {
+            $payload['status_laporan'] = WorkflowStatus::REPORT_APPROVED;
+            $payload['verified_by_admin_id'] = $adminId;
+            $payload['verified_at'] = now();
         }
 
         Barang::create($payload);

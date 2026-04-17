@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
+use App\Support\ClaimStatusPresenter;
+use App\Support\WorkflowStatus;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -21,20 +23,23 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
+        abort_unless(Auth::check(), 403);
         $user = Auth::user();
-        abort_unless($user, 403);
         $userId = (int) $user->id;
 
         $search = trim((string) $request->query('search', ''));
         $statusFilter = trim((string) $request->query('status', 'semua'));
         $hasSourceColumn = Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan');
         $hasFoundUserColumn = Schema::hasColumn('barangs', 'user_id');
+        $hasReportStatusColumn = Schema::hasColumn('laporan_barang_hilangs', 'status_laporan');
+        $hasFoundReportStatusColumn = Schema::hasColumn('barangs', 'status_laporan');
+        $hasClaimVerificationColumn = Schema::hasColumn('klaims', 'status_verifikasi');
 
         // BAGIAN: Statistik ringkas user.
         [$totalLaporHilang, $totalPengajuanKlaim, $menungguVerifikasi] = Cache::remember(
             $this->statsCacheKey($userId),
             now()->addSeconds(self::DASHBOARD_CACHE_TTL_SECONDS),
-            function () use ($userId, $hasSourceColumn) {
+            function () use ($userId, $hasSourceColumn, $hasClaimVerificationColumn) {
                 $lostReportsQuery = LaporanBarangHilang::query()->where('user_id', $userId);
                 if ($hasSourceColumn) {
                     $lostReportsQuery->where('sumber_laporan', 'lapor_hilang');
@@ -42,20 +47,30 @@ class DashboardController extends Controller
 
                 $totalLaporHilang = (clone $lostReportsQuery)->count();
                 $totalPengajuanKlaim = Klaim::query()->where('user_id', $userId)->count();
-                $menungguVerifikasi = Klaim::query()
-                    ->where('user_id', $userId)
-                    ->where('status_klaim', 'pending')
-                    ->count();
+                $menungguQuery = Klaim::query()->where('user_id', $userId);
+                if ($hasClaimVerificationColumn) {
+                    $menungguQuery->whereIn('status_verifikasi', [WorkflowStatus::CLAIM_SUBMITTED, WorkflowStatus::CLAIM_UNDER_REVIEW]);
+                } else {
+                    $menungguQuery->where('status_klaim', 'pending');
+                }
+                $menungguVerifikasi = $menungguQuery->count();
 
                 return [$totalLaporHilang, $totalPengajuanKlaim, $menungguVerifikasi];
             }
         );
 
         // BAGIAN: Aktivitas terbaru user (laporan hilang + klaim).
+        $columnFlags = (object) [
+            'hasSourceColumn' => $hasSourceColumn,
+            'hasFoundUserColumn' => $hasFoundUserColumn,
+            'hasReportStatusColumn' => $hasReportStatusColumn,
+            'hasFoundReportStatusColumn' => $hasFoundReportStatusColumn,
+            'hasClaimVerificationColumn' => $hasClaimVerificationColumn,
+        ];
         $latestActivities = Cache::remember(
             $this->activitiesCacheKey($userId),
             now()->addSeconds(self::DASHBOARD_CACHE_TTL_SECONDS),
-            fn () => $this->buildLatestActivities($userId, $hasSourceColumn, $hasFoundUserColumn)
+            fn () => $this->buildLatestActivities($userId, $columnFlags)
         );
         $latestActivities = $this->filterLatestActivities($latestActivities, $search, $statusFilter);
         $latestActivities = $this->paginateItems(
@@ -75,32 +90,47 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function buildLatestActivities(int $userId, bool $hasSourceColumn, bool $hasFoundUserColumn): Collection
+    private function buildLatestActivities(
+        int $userId,
+        object $columnFlags
+    ): Collection
     {
-        $lostReports = LaporanBarangHilang::query()
+        $lostReports = $this->buildLostReports($userId, $columnFlags);
+        $foundReports = $this->buildFoundReports($userId, $columnFlags);
+        $claims = $this->buildClaims($userId, $columnFlags);
+
+        return $lostReports
+            ->concat($foundReports)
+            ->concat($claims)
+            ->sortByDesc('activity_at')
+            ->values();
+    }
+
+    private function buildLostReports(int $userId, object $columnFlags): Collection
+    {
+        $lostReportsQuery = LaporanBarangHilang::query()
             ->where('user_id', $userId)
-            ->when($hasSourceColumn, function ($query) {
+            ->when($columnFlags->hasSourceColumn, function ($query) {
                 $query->where('sumber_laporan', 'lapor_hilang');
-            })
-            ->select(['id', 'nama_barang', 'lokasi_hilang', 'tanggal_hilang', 'foto_barang', 'created_at', 'updated_at'])
-            ->selectSub(
-                Klaim::query()
-                    ->whereColumn('laporan_hilang_id', 'laporan_barang_hilangs.id')
-                    ->where('user_id', $userId)
-                    ->latest('updated_at')
-                    ->limit(1)
-                    ->select('status_klaim'),
-                'latest_claim_status'
-            )
+            });
+
+        $lostSelectColumns = ['id', 'nama_barang', 'lokasi_hilang', 'tanggal_hilang', 'foto_barang', 'created_at', 'updated_at'];
+        if ($columnFlags->hasReportStatusColumn) {
+            $lostSelectColumns[] = 'status_laporan';
+        }
+
+        return $lostReportsQuery
+            ->select($lostSelectColumns)
             ->latest('updated_at')
             ->limit(16)
             ->get()
             ->map(function (LaporanBarangHilang $report) {
-                $statusPayload = match ((string) $report->latest_claim_status) {
-                    'pending' => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'MENUNGGU VERIFIKASI'],
-                    'disetujui' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'SELESAI'],
-                    'ditolak' => ['status' => 'ditolak', 'status_class' => 'status-ditolak', 'status_text' => 'DITOLAK'],
-                    default => ['status' => 'diproses', 'status_class' => 'status-diproses', 'status_text' => 'TERKIRIM'],
+                $statusPayload = match ((string) ($report->status_laporan ?? WorkflowStatus::REPORT_SUBMITTED)) {
+                    WorkflowStatus::REPORT_APPROVED => ['status' => 'terverifikasi', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'Terverifikasi'],
+                    WorkflowStatus::REPORT_REJECTED => ['status' => 'tidak_disetujui', 'status_class' => 'status-ditolak', 'status_text' => 'Tidak Disetujui'],
+                    WorkflowStatus::REPORT_MATCHED, WorkflowStatus::REPORT_CLAIMED => ['status' => 'sedang_diproses', 'status_class' => 'status-diproses', 'status_text' => 'Sedang Diproses'],
+                    WorkflowStatus::REPORT_COMPLETED => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'Selesai'],
+                    default => ['status' => 'menunggu_tinjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'Menunggu Tinjauan'],
                 };
 
                 $activityAt = strtotime((string) ($report->updated_at ?? $report->created_at));
@@ -125,62 +155,106 @@ class DashboardController extends Controller
                     'delete_url' => route('user.lost-reports.destroy', $report->id),
                 ];
             });
+    }
 
-        $foundReports = collect();
-        if ($hasFoundUserColumn) {
-            $foundReports = Barang::query()
-                ->where('user_id', $userId)
-                ->select(['id', 'nama_barang', 'lokasi_ditemukan', 'tanggal_ditemukan', 'status_barang', 'foto_barang', 'created_at', 'updated_at'])
-                ->latest('updated_at')
-                ->limit(16)
-                ->get()
-                ->map(function (Barang $item) {
-                    $statusPayload = match ((string) $item->status_barang) {
-                        'dalam_proses_klaim' => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'DALAM PROSES KLAIM'],
-                        'sudah_diklaim', 'sudah_dikembalikan' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'SELESAI'],
-                        default => ['status' => 'diproses', 'status_class' => 'status-diproses', 'status_text' => 'TERKIRIM'],
-                    };
-
-                    $activityAt = strtotime((string) ($item->updated_at ?? $item->created_at));
-
-                    return (object) [
-                        'type' => 'found_report',
-                        'report_id' => (int) $item->id,
-                        'item_name' => (string) $item->nama_barang,
-                        'item_detail' => 'Laporan Temuan - ' . (string) $item->lokasi_ditemukan,
-                        'incident_date' => (string) $item->tanggal_ditemukan,
-                        'created_at' => $item->created_at,
-                        'activity_at' => $activityAt,
-                        'status' => $statusPayload['status'],
-                        'status_class' => $statusPayload['status_class'],
-                        'status_text' => $statusPayload['status_text'],
-                        'avatar' => 'T',
-                        'avatar_class' => 'avatar-mint',
-                        'image_url' => $this->resolveItemImageUrl((string) ($item->foto_barang ?? ''), 'barang-temuan'),
-                        'detail_url' => route('home.found-detail', $item->id),
-                        'action_label' => 'Lihat Laporan',
-                        'can_delete' => false,
-                        'delete_url' => null,
-                    ];
-                });
+    private function buildFoundReports(int $userId, object $columnFlags): Collection
+    {
+        if (!$columnFlags->hasFoundUserColumn) {
+            return collect();
         }
 
-        $claims = Klaim::query()
+        $foundSelectColumns = ['id', 'nama_barang', 'lokasi_ditemukan', 'tanggal_ditemukan', 'status_barang', 'foto_barang', 'created_at', 'updated_at'];
+        if ($columnFlags->hasFoundReportStatusColumn) {
+            $foundSelectColumns[] = 'status_laporan';
+        }
+
+        return Barang::query()
+            ->where('user_id', $userId)
+            ->select($foundSelectColumns)
+            ->latest('updated_at')
+            ->limit(16)
+            ->get()
+            ->map(function (Barang $item) {
+                $reportStatus = (string) ($item->status_laporan ?? WorkflowStatus::REPORT_SUBMITTED);
+                $statusPayload = match (true) {
+                    $reportStatus === WorkflowStatus::REPORT_REJECTED => ['status' => 'tidak_disetujui', 'status_class' => 'status-ditolak', 'status_text' => 'Tidak Disetujui'],
+                    $reportStatus === WorkflowStatus::REPORT_SUBMITTED => ['status' => 'menunggu_tinjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'Menunggu Tinjauan'],
+                    (string) $item->status_barang === 'sudah_dikembalikan' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'Selesai'],
+                    in_array((string) $item->status_barang, ['dalam_proses_klaim', 'sudah_diklaim'], true) => ['status' => 'sedang_diproses', 'status_class' => 'status-diproses', 'status_text' => 'Sedang Diproses'],
+                    $reportStatus === WorkflowStatus::REPORT_APPROVED => ['status' => 'terverifikasi', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'Terverifikasi'],
+                    default => ['status' => 'sedang_diproses', 'status_class' => 'status-diproses', 'status_text' => 'Sedang Diproses'],
+                };
+
+                $activityAt = strtotime((string) ($item->updated_at ?? $item->created_at));
+
+                return (object) [
+                    'type' => 'found_report',
+                    'report_id' => (int) $item->id,
+                    'item_name' => (string) $item->nama_barang,
+                    'item_detail' => 'Laporan Temuan - ' . (string) $item->lokasi_ditemukan,
+                    'incident_date' => (string) $item->tanggal_ditemukan,
+                    'created_at' => $item->created_at,
+                    'activity_at' => $activityAt,
+                    'status' => $statusPayload['status'],
+                    'status_class' => $statusPayload['status_class'],
+                    'status_text' => $statusPayload['status_text'],
+                    'avatar' => 'T',
+                    'avatar_class' => 'avatar-mint',
+                    'image_url' => $this->resolveItemImageUrl((string) ($item->foto_barang ?? ''), 'barang-temuan'),
+                    'detail_url' => route('home.found-detail', $item->id),
+                    'action_label' => 'Lihat Laporan',
+                    'can_delete' => false,
+                    'delete_url' => null,
+                ];
+            });
+    }
+
+    private function buildClaims(int $userId, object $columnFlags): Collection
+    {
+        return Klaim::query()
             ->where('user_id', $userId)
             ->with([
                 'barang:id,nama_barang,lokasi_ditemukan,foto_barang',
                 'laporanHilang:id,nama_barang,lokasi_hilang,foto_barang',
             ])
-            ->select(['id', 'status_klaim', 'created_at', 'updated_at', 'barang_id', 'laporan_hilang_id'])
+            ->select(array_values(array_filter([
+                'id',
+                'status_klaim',
+                $columnFlags->hasClaimVerificationColumn ? 'status_verifikasi' : null,
+                'created_at',
+                'updated_at',
+                'barang_id',
+                'laporan_hilang_id',
+            ])))
             ->latest('updated_at')
             ->limit(16)
             ->get()
             ->map(function (Klaim $claim) {
-                $statusPayload = match ((string) $claim->status_klaim) {
-                    'disetujui' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'DISETUJUI'],
-                    'ditolak' => ['status' => 'ditolak', 'status_class' => 'status-ditolak', 'status_text' => 'DITOLAK'],
-                    default => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'MENUNGGU VERIFIKASI'],
-                };
+                $claimKey = ClaimStatusPresenter::key(
+                    statusKlaim: (string) $claim->status_klaim,
+                    statusVerifikasi: (string) ($claim->status_verifikasi ?? ''),
+                    statusBarang: (string) ($claim->barang?->status_barang ?? '')
+                );
+                $statusPayload = [
+                    'status' => match ($claimKey) {
+                        'menunggu' => 'menunggu_tinjauan',
+                        'disetujui' => 'sedang_diproses',
+                        'ditolak' => 'tidak_disetujui',
+                        default => 'selesai',
+                    },
+                    'status_class' => match ($claimKey) {
+                        'ditolak' => 'status-ditolak',
+                        'selesai' => 'status-selesai',
+                        'disetujui' => 'status-diproses',
+                        default => 'status-dalam_peninjauan',
+                    },
+                    'status_text' => match ($claimKey) {
+                        'ditolak' => 'Tidak Disetujui',
+                        'selesai' => 'Selesai',
+                        'disetujui' => 'Sedang Diproses',
+                        default => 'Menunggu Tinjauan',
+                    },
+                ];
 
                 $itemName = (string) ($claim->barang?->nama_barang ?? $claim->laporanHilang?->nama_barang ?? 'Klaim Barang');
                 $location = (string) ($claim->barang?->lokasi_ditemukan ?? $claim->laporanHilang?->lokasi_hilang ?? 'Lokasi tidak tersedia');
@@ -209,12 +283,6 @@ class DashboardController extends Controller
                     'delete_url' => null,
                 ];
             });
-
-        return $lostReports
-            ->merge($foundReports)
-            ->merge($claims)
-            ->sortByDesc('activity_at')
-            ->values();
     }
 
     private function filterLatestActivities(Collection $items, string $search, string $statusFilter): Collection
@@ -266,17 +334,18 @@ class DashboardController extends Controller
     {
         if ($type === 'claim') {
             return match ($status) {
-                'ditolak' => 'Lihat Detail',
+                'tidak_disetujui' => 'Lihat Detail',
                 'selesai' => 'Lihat Hasil',
-                'dalam_peninjauan' => 'Lihat Status',
+                'menunggu_tinjauan' => 'Lihat Status',
                 default => 'Lihat Detail',
             };
         }
 
         return match ($status) {
-            'diproses' => 'Edit Laporan',
-            'dalam_peninjauan' => 'Lihat Status',
-            'ditolak' => 'Perbaiki Data',
+            'menunggu_tinjauan' => 'Edit Laporan',
+            'terverifikasi' => 'Lihat Laporan',
+            'sedang_diproses' => 'Lihat Status',
+            'tidak_disetujui' => 'Perbaiki Data',
             'selesai' => 'Lihat Hasil',
             default => 'Lihat Detail',
         };
@@ -285,7 +354,7 @@ class DashboardController extends Controller
     private function resolveLostReportActionUrl(int $reportId, string $status): string
     {
         return match ($status) {
-            'diproses', 'ditolak' => route('user.lost-reports.create', ['edit' => $reportId]),
+            'menunggu_tinjauan', 'tidak_disetujui' => route('user.lost-reports.create', ['edit' => $reportId]),
             default => route('home.lost-detail', $reportId),
         };
     }
@@ -305,7 +374,7 @@ class DashboardController extends Controller
 
     private function canDeleteLostReport(string $status): bool
     {
-        return $status === 'diproses';
+        return $status === 'menunggu_tinjauan';
     }
 
     private function statsCacheKey(int $userId): string

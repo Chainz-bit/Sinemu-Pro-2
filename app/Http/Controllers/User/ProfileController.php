@@ -5,6 +5,9 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
+use App\Support\ClaimStatusPresenter;
+use App\Support\ReportStatusPresenter;
+use App\Support\WorkflowStatus;
 use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -26,14 +29,27 @@ class ProfileController extends Controller
         }
 
         $laporanDiajukan = (clone $laporanDiajukanQuery)->count();
-        $klaimMenunggu = Klaim::query()
-            ->where('user_id', (int) $user->id)
-            ->where('status_klaim', 'pending')
-            ->count();
-        $klaimSelesai = Klaim::query()
-            ->where('user_id', (int) $user->id)
-            ->whereIn('status_klaim', ['disetujui', 'ditolak'])
-            ->count();
+        $hasClaimVerification = Schema::hasColumn('klaims', 'status_verifikasi');
+
+        $klaimMenungguQuery = Klaim::query()->where('user_id', (int) $user->id);
+        if ($hasClaimVerification) {
+            $klaimMenungguQuery->whereIn('status_verifikasi', [WorkflowStatus::CLAIM_SUBMITTED, WorkflowStatus::CLAIM_UNDER_REVIEW]);
+        } else {
+            $klaimMenungguQuery->where('status_klaim', 'pending');
+        }
+        $klaimMenunggu = $klaimMenungguQuery->count();
+
+        $klaimSelesaiQuery = Klaim::query()->where('user_id', (int) $user->id);
+        if ($hasClaimVerification) {
+            $klaimSelesaiQuery->whereIn('status_verifikasi', [
+                WorkflowStatus::CLAIM_APPROVED,
+                WorkflowStatus::CLAIM_REJECTED,
+                WorkflowStatus::CLAIM_COMPLETED,
+            ]);
+        } else {
+            $klaimSelesaiQuery->whereIn('status_klaim', ['disetujui', 'ditolak']);
+        }
+        $klaimSelesai = $klaimSelesaiQuery->count();
 
         $recentActivities = $this->buildRecentActivities((int) $user->id);
         $profileAvatar = $this->resolveAvatarUrl($user);
@@ -58,25 +74,24 @@ class ProfileController extends Controller
             ->when(Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan'), function ($query) {
                 $query->where('sumber_laporan', 'lapor_hilang');
             })
-            ->select(['id', 'nama_barang', 'created_at', 'updated_at'])
-            ->selectSub(
-                Klaim::query()
-                    ->whereColumn('laporan_hilang_id', 'laporan_barang_hilangs.id')
-                    ->where('user_id', $userId)
-                    ->latest('updated_at')
-                    ->limit(1)
-                    ->select('status_klaim'),
-                'latest_claim_status'
-            )
+            ->select(array_values(array_filter([
+                'id',
+                'nama_barang',
+                Schema::hasColumn('laporan_barang_hilangs', 'status_laporan') ? 'status_laporan' : null,
+                'created_at',
+                'updated_at',
+            ])))
             ->latest('updated_at')
             ->limit(8)
             ->get()
             ->map(function (LaporanBarangHilang $report) {
-                [$statusClass, $statusLabel, $statusKey] = match ((string) $report->latest_claim_status) {
-                    'disetujui' => ['selesai', 'SELESAI', 'selesai'],
-                    'ditolak' => ['ditolak', 'DITOLAK', 'ditolak'],
-                    'pending' => ['dalam_peninjauan', 'MENUNGGU', 'dalam_peninjauan'],
-                    default => ['diproses', 'TERKIRIM', 'diproses'],
+                $reportStatus = ReportStatusPresenter::key($report->status_laporan ?? null);
+                [$statusKey, $statusClass, $statusLabel] = match ($reportStatus) {
+                    WorkflowStatus::REPORT_APPROVED => ['terverifikasi', 'dalam_peninjauan', 'Terverifikasi'],
+                    WorkflowStatus::REPORT_REJECTED => ['tidak_disetujui', 'ditolak', 'Tidak Disetujui'],
+                    WorkflowStatus::REPORT_MATCHED, WorkflowStatus::REPORT_CLAIMED => ['sedang_diproses', 'diproses', 'Sedang Diproses'],
+                    WorkflowStatus::REPORT_COMPLETED => ['selesai', 'selesai', 'Selesai'],
+                    default => ['menunggu_tinjauan', 'dalam_peninjauan', 'Menunggu Tinjauan'],
                 };
 
                 return (object) [
@@ -94,16 +109,36 @@ class ProfileController extends Controller
             ->with(['barang:id,nama_barang', 'laporanHilang:id,nama_barang'])
             ->latest('updated_at')
             ->limit(8)
-            ->get(['id', 'barang_id', 'laporan_hilang_id', 'status_klaim', 'created_at', 'updated_at'])
+            ->get(array_values(array_filter([
+                'id',
+                'barang_id',
+                'laporan_hilang_id',
+                'status_klaim',
+                Schema::hasColumn('klaims', 'status_verifikasi') ? 'status_verifikasi' : null,
+                'created_at',
+                'updated_at',
+            ])))
             ->map(function (Klaim $claim) {
                 $namaBarang = $claim->barang?->nama_barang
                     ?? $claim->laporanHilang?->nama_barang
                     ?? 'barang';
 
-                [$statusClass, $statusLabel, $kataKerja] = match ($claim->status_klaim) {
-                    'disetujui' => ['selesai', 'SELESAI', 'disetujui'],
-                    'ditolak' => ['ditolak', 'DITOLAK', 'ditolak'],
-                    default => ['dalam_peninjauan', 'MENUNGGU', 'menunggu verifikasi'],
+                $claimKey = ClaimStatusPresenter::key(
+                    statusKlaim: (string) $claim->status_klaim,
+                    statusVerifikasi: (string) ($claim->status_verifikasi ?? ''),
+                    statusBarang: null
+                );
+                [$statusClass, $statusLabel] = match ($claimKey) {
+                    'ditolak' => ['ditolak', 'Tidak Disetujui'],
+                    'disetujui' => ['diproses', 'Sedang Diproses'],
+                    'selesai' => ['selesai', 'Selesai'],
+                    default => ['dalam_peninjauan', 'Menunggu Tinjauan'],
+                };
+                $kataKerja = match ($claimKey) {
+                    'disetujui' => 'sedang diproses',
+                    'ditolak' => 'tidak disetujui',
+                    'selesai' => 'selesai',
+                    default => 'menunggu tinjauan',
                 };
 
                 return (object) [
@@ -186,7 +221,7 @@ class ProfileController extends Controller
 
     private function resolveLostReportDetailUrl(int $reportId, string $status): string
     {
-        if (in_array($status, ['diproses', 'ditolak'], true)) {
+        if (in_array($status, ['menunggu_tinjauan', 'tidak_disetujui'], true)) {
             return route('user.lost-reports.create', ['edit' => $reportId]);
         }
 

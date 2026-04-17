@@ -72,14 +72,14 @@
                 <small>Total laporan hilang oleh akun ini</small>
             </article>
             <article class="profile-stat-card">
-                <span>Klaim Menunggu</span>
+                <span>Klaim Menunggu Tinjauan</span>
                 <strong>{{ $klaimMenunggu }}</strong>
-                <small>Masih menunggu verifikasi admin</small>
+                <small>Masih menunggu tinjauan admin</small>
             </article>
             <article class="profile-stat-card">
                 <span>Klaim Diputuskan</span>
                 <strong>{{ $klaimSelesai }}</strong>
-                <small>Klaim sudah disetujui atau ditolak</small>
+                <small>Klaim sudah selesai atau tidak disetujui</small>
             </article>
         </section>
 

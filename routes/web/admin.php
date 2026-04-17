@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FoundItemController;
 use App\Http\Controllers\Admin\InputItemController;
 use App\Http\Controllers\Admin\LostItemController;
+use App\Http\Controllers\Admin\MatchingController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
 use Illuminate\Support\Facades\Route;
@@ -31,6 +32,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('barang-hilang/{laporanBarangHilang}/edit', [LostItemController::class, 'edit'])->name('lost-items.edit');
         Route::patch('barang-hilang/{laporanBarangHilang}', [LostItemController::class, 'update'])->name('lost-items.update');
         Route::patch('barang-hilang/{laporanBarangHilang}/status', [LostItemController::class, 'updateStatus'])->name('lost-items.update-status');
+        Route::patch('barang-hilang/{laporanBarangHilang}/verify', [LostItemController::class, 'verify'])->name('lost-items.verify');
         Route::delete('barang-hilang/{laporanBarangHilang}', [LostItemController::class, 'destroy'])->name('lost-items.destroy');
 
         Route::get('barang-temuan', [FoundItemController::class, 'index'])->name('found-items');
@@ -39,13 +41,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('barang-temuan/{barang}', [FoundItemController::class, 'update'])->name('found-items.update');
         Route::get('barang-temuan/{barang}/export', [FoundItemController::class, 'export'])->name('found-items.export');
         Route::patch('barang-temuan/{barang}/status', [FoundItemController::class, 'updateStatus'])->name('found-items.update-status');
+        Route::patch('barang-temuan/{barang}/verify', [FoundItemController::class, 'verify'])->name('found-items.verify');
         Route::delete('barang-temuan/{barang}', [FoundItemController::class, 'destroy'])->name('found-items.destroy');
+
+        Route::post('pencocokan', [MatchingController::class, 'store'])->name('matches.store');
+        Route::post('pencocokan/tidak-cocok', [MatchingController::class, 'dismiss'])->name('matches.dismiss');
 
         Route::get('verifikasi-klaim', [ClaimVerificationController::class, 'index'])->name('claim-verifications');
         Route::get('verifikasi-klaim/{klaim}', [ClaimVerificationController::class, 'show'])->name('claim-verifications.show');
         Route::delete('verifikasi-klaim/{klaim}', [ClaimVerificationController::class, 'destroy'])->name('claim-verifications.destroy');
         Route::post('verifikasi-klaim/{klaim}/approve', [ClaimVerificationController::class, 'approve'])->name('claim-verifications.approve');
         Route::post('verifikasi-klaim/{klaim}/reject', [ClaimVerificationController::class, 'reject'])->name('claim-verifications.reject');
+        Route::post('verifikasi-klaim/{klaim}/complete', [ClaimVerificationController::class, 'complete'])->name('claim-verifications.complete');
 
         Route::get('input-barang', [InputItemController::class, 'index'])->name('input-items');
         Route::post('input-barang', [InputItemController::class, 'store'])->name('input-items.store');

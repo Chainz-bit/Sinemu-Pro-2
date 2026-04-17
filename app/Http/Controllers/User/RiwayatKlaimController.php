@@ -4,9 +4,12 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Klaim;
+use App\Support\ClaimStatusPresenter;
+use App\Support\WorkflowStatus;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 class RiwayatKlaimController extends Controller
@@ -19,11 +22,12 @@ class RiwayatKlaimController extends Controller
         $search = trim((string) $request->query('search', ''));
         $status = trim((string) $request->query('status', 'semua'));
         $type = trim((string) $request->query('type', 'semua'));
+        $hasStatusVerifikasi = Schema::hasColumn('klaims', 'status_verifikasi');
 
         $claimsQuery = Klaim::query()
             ->where('user_id', (int) $user->id)
             ->with([
-                'barang:id,nama_barang,lokasi_ditemukan,foto_barang,status_barang,lokasi_pengambilan,alamat_pengambilan',
+                'barang:id,nama_barang,lokasi_ditemukan,foto_barang,status_barang,lokasi_pengambilan,alamat_pengambilan,penanggung_jawab_pengambilan,kontak_pengambilan,jam_layanan_pengambilan,catatan_pengambilan',
                 'laporanHilang:id,nama_barang,lokasi_hilang,foto_barang',
                 'admin:id,instansi,kecamatan,alamat_lengkap',
             ])
@@ -43,21 +47,37 @@ class RiwayatKlaimController extends Controller
             });
         }
 
-        if ($status === 'menunggu') {
-            $claimsQuery->where('status_klaim', 'pending');
-        } elseif ($status === 'ditolak') {
-            $claimsQuery->where('status_klaim', 'ditolak');
-        } elseif ($status === 'disetujui') {
-            $claimsQuery->where('status_klaim', 'disetujui')->where(function ($query) {
-                $query->whereDoesntHave('barang')
-                    ->orWhereHas('barang', function ($barangQuery) {
-                        $barangQuery->where('status_barang', '!=', 'sudah_dikembalikan');
-                    });
-            });
+        if ($status === 'menunggu_tinjauan') {
+            if ($hasStatusVerifikasi) {
+                $claimsQuery->whereIn('status_verifikasi', [WorkflowStatus::CLAIM_SUBMITTED, WorkflowStatus::CLAIM_UNDER_REVIEW]);
+            } else {
+                $claimsQuery->where('status_klaim', 'pending');
+            }
+        } elseif ($status === 'tidak_disetujui') {
+            if ($hasStatusVerifikasi) {
+                $claimsQuery->where('status_verifikasi', WorkflowStatus::CLAIM_REJECTED);
+            } else {
+                $claimsQuery->where('status_klaim', 'ditolak');
+            }
+        } elseif ($status === 'sedang_diproses') {
+            if ($hasStatusVerifikasi) {
+                $claimsQuery->where('status_verifikasi', WorkflowStatus::CLAIM_APPROVED);
+            } else {
+                $claimsQuery->where('status_klaim', 'disetujui')->where(function ($query) {
+                    $query->whereDoesntHave('barang')
+                        ->orWhereHas('barang', function ($barangQuery) {
+                            $barangQuery->where('status_barang', '!=', 'sudah_dikembalikan');
+                        });
+                });
+            }
         } elseif ($status === 'selesai') {
-            $claimsQuery->where('status_klaim', 'disetujui')->whereHas('barang', function ($barangQuery) {
-                $barangQuery->where('status_barang', 'sudah_dikembalikan');
-            });
+            if ($hasStatusVerifikasi) {
+                $claimsQuery->where('status_verifikasi', WorkflowStatus::CLAIM_COMPLETED);
+            } else {
+                $claimsQuery->where('status_klaim', 'disetujui')->whereHas('barang', function ($barangQuery) {
+                    $barangQuery->where('status_barang', 'sudah_dikembalikan');
+                });
+            }
         }
 
         if ($type === 'temuan') {
@@ -69,8 +89,9 @@ class RiwayatKlaimController extends Controller
         $claims = $claimsQuery->paginate(8)->withQueryString();
 
         $claims->setCollection(
-            $claims->getCollection()->map(function (Klaim $claim) {
-                [$statusText, $statusClass, $statusKey] = $this->resolveStatus($claim);
+            $claims->getCollection()->map(function (Klaim $claim) use ($hasStatusVerifikasi) {
+                [$statusText, $statusClass, $statusKey] = $this->resolveStatus($claim, $hasStatusVerifikasi);
+                $statusDetail = $this->resolveStatusDetail($claim, $statusKey);
 
                 $itemName = (string) ($claim->barang?->nama_barang ?? $claim->laporanHilang?->nama_barang ?? 'Klaim Barang');
                 $itemType = !is_null($claim->barang_id) ? 'Barang Temuan' : 'Laporan Hilang';
@@ -89,6 +110,7 @@ class RiwayatKlaimController extends Controller
                     'status_text' => $statusText,
                     'status_class' => $statusClass,
                     'status_key' => $statusKey,
+                    'status_detail' => $statusDetail,
                     'pickup_location' => $locationPickup,
                     'detail_url' => $this->resolveDetailUrl($claim),
                 ];
@@ -123,30 +145,29 @@ class RiwayatKlaimController extends Controller
             ->with('status', 'Riwayat klaim berhasil dihapus.');
     }
 
-    private function resolveStatus(Klaim $claim): array
+    private function resolveStatus(Klaim $claim, bool $hasStatusVerifikasi): array
     {
-        if ((string) $claim->status_klaim === 'pending') {
-            return ['MENUNGGU VERIFIKASI', 'status-dalam_peninjauan', 'menunggu'];
-        }
+        $key = ClaimStatusPresenter::key(
+            statusKlaim: (string) $claim->status_klaim,
+            statusVerifikasi: $hasStatusVerifikasi ? (string) ($claim->status_verifikasi ?? '') : null,
+            statusBarang: (string) ($claim->barang?->status_barang ?? '')
+        );
 
-        if ((string) $claim->status_klaim === 'ditolak') {
-            return ['DITOLAK', 'status-ditolak', 'ditolak'];
-        }
-
-        if ((string) ($claim->barang?->status_barang ?? '') === 'sudah_dikembalikan') {
-            return ['SELESAI', 'status-selesai', 'selesai'];
-        }
-
-        return ['DISETUJUI / BISA DIAMBIL', 'status-selesai', 'disetujui'];
+        return match ($key) {
+            'ditolak' => ['Tidak Disetujui', 'status-ditolak', 'tidak_disetujui'],
+            'disetujui' => ['Sedang Diproses', 'status-diproses', 'sedang_diproses'],
+            'selesai' => ['Selesai', 'status-selesai', 'selesai'],
+            default => ['Menunggu Tinjauan', 'status-dalam_peninjauan', 'menunggu_tinjauan'],
+        };
     }
 
     private function resolvePickupLocation(Klaim $claim, string $statusKey): string
     {
-        if ($statusKey === 'menunggu') {
-            return 'Menunggu Persetujuan';
+        if ($statusKey === 'menunggu_tinjauan') {
+            return 'Menunggu Tinjauan';
         }
 
-        if ($statusKey === 'ditolak') {
+        if ($statusKey === 'tidak_disetujui') {
             return '-';
         }
 
@@ -170,6 +191,37 @@ class RiwayatKlaimController extends Controller
         }
 
         return trim((string) ($claim->admin?->instansi ?? 'Hubungi Admin'));
+    }
+
+    private function resolveStatusDetail(Klaim $claim, string $statusKey): string
+    {
+        if ($statusKey === 'menunggu_tinjauan') {
+            return 'Klaim sedang diperiksa admin. Pastikan bukti kepemilikan sudah lengkap.';
+        }
+
+        if ($statusKey === 'tidak_disetujui') {
+            return 'Klaim ditolak. Periksa notifikasi dan lengkapi bukti untuk pengajuan berikutnya.';
+        }
+
+        if ($statusKey === 'selesai') {
+            return 'Barang sudah diserahkan dan proses klaim dinyatakan selesai.';
+        }
+
+        $petugas = trim((string) ($claim->barang?->penanggung_jawab_pengambilan ?? ''));
+        $kontak = trim((string) ($claim->barang?->kontak_pengambilan ?? ''));
+        $jamLayanan = trim((string) ($claim->barang?->jam_layanan_pengambilan ?? ''));
+
+        $pieces = array_values(array_filter([
+            $petugas !== '' ? ('Petugas: ' . $petugas) : null,
+            $kontak !== '' ? ('Kontak: ' . $kontak) : null,
+            $jamLayanan !== '' ? ('Jam: ' . $jamLayanan) : null,
+        ]));
+
+        if ($pieces === []) {
+            return 'Klaim disetujui. Lihat detail barang untuk informasi pengambilan.';
+        }
+
+        return 'Klaim disetujui. ' . implode(' | ', $pieces);
     }
 
     private function resolveDetailUrl(Klaim $claim): string

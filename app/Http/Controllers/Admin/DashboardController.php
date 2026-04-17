@@ -6,7 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
+use App\Support\ClaimStatusPresenter;
+use App\Support\ReportStatusPresenter;
 use App\Services\ReportImageCleaner;
+use App\Support\WorkflowStatus;
 use App\Support\Media\OptimizedImageUploader;
 use Illuminate\Support\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -36,7 +39,13 @@ class DashboardController extends Controller
 
         $totalTemuan = Barang::count();
 
-        $menungguVerifikasi = Klaim::where('status_klaim', 'pending')->count();
+        if (Schema::hasColumn('klaims', 'status_verifikasi')) {
+            $menungguVerifikasi = Klaim::query()
+                ->whereIn('status_verifikasi', [WorkflowStatus::CLAIM_SUBMITTED, WorkflowStatus::CLAIM_UNDER_REVIEW])
+                ->count();
+        } else {
+            $menungguVerifikasi = Klaim::where('status_klaim', 'pending')->count();
+        }
 
         $latestReportsCollection = $this->filterLatestReports(
             $this->buildLatestReports(),
@@ -205,6 +214,10 @@ class DashboardController extends Controller
             if (!Schema::hasColumn('laporan_barang_hilangs', 'tampil_di_home')) {
                 return back()->with('error', 'Kolom tampil_di_home belum tersedia pada laporan barang hilang.');
             }
+            if (Schema::hasColumn('laporan_barang_hilangs', 'status_laporan')
+                && (string) $report->status_laporan !== WorkflowStatus::REPORT_APPROVED) {
+                return back()->with('error', 'Laporan harus disetujui admin sebelum tampil di Home.');
+            }
 
             $report->update(['tampil_di_home' => true]);
 
@@ -215,6 +228,10 @@ class DashboardController extends Controller
             $report = Barang::query()->findOrFail($id);
             if (!Schema::hasColumn('barangs', 'tampil_di_home')) {
                 return back()->with('error', 'Kolom tampil_di_home belum tersedia pada barang temuan.');
+            }
+            if (Schema::hasColumn('barangs', 'status_laporan')
+                && (string) $report->status_laporan !== WorkflowStatus::REPORT_APPROVED) {
+                return back()->with('error', 'Laporan harus disetujui admin sebelum tampil di Home.');
             }
 
             $report->update(['tampil_di_home' => true]);
@@ -268,26 +285,34 @@ class DashboardController extends Controller
         if ($lostHasHomeFlag) {
             $lostSelectColumns[] = 'tampil_di_home';
         }
+        $hasLostStatusColumn = Schema::hasColumn('laporan_barang_hilangs', 'status_laporan');
+        if ($hasLostStatusColumn) {
+            $lostSelectColumns[] = 'status_laporan';
+        }
 
         $lostReportsQuery = LaporanBarangHilang::query()
             ->select($lostSelectColumns)
-            ->with('user:id,name,nama')
-            ->selectSub(
-                Klaim::query()
-                    ->whereColumn('laporan_hilang_id', 'laporan_barang_hilangs.id')
-                    ->orderByDesc('updated_at')
-                    ->limit(1)
-                    ->select('status_klaim'),
-                'latest_claim_status'
-            )
-            ->selectSub(
-                Klaim::query()
-                    ->whereColumn('laporan_hilang_id', 'laporan_barang_hilangs.id')
-                    ->orderByDesc('updated_at')
-                    ->limit(1)
-                    ->select('updated_at'),
-                'latest_claim_activity_at'
-            );
+            ->with('user:id,name,nama');
+
+        if (!$hasLostStatusColumn) {
+            $lostReportsQuery
+                ->selectSub(
+                    Klaim::query()
+                        ->whereColumn('laporan_hilang_id', 'laporan_barang_hilangs.id')
+                        ->orderByDesc('updated_at')
+                        ->limit(1)
+                        ->select('status_klaim'),
+                    'latest_claim_status'
+                )
+                ->selectSub(
+                    Klaim::query()
+                        ->whereColumn('laporan_hilang_id', 'laporan_barang_hilangs.id')
+                        ->orderByDesc('updated_at')
+                        ->limit(1)
+                        ->select('updated_at'),
+                    'latest_claim_activity_at'
+                );
+        }
 
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
             $lostReportsQuery->where('sumber_laporan', 'lapor_hilang');
@@ -298,12 +323,21 @@ class DashboardController extends Controller
             ->limit(10)
             ->get()
             ->map(function ($report) {
-                $statusPayload = match ($report->latest_claim_status) {
-                    'disetujui' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'DITEMUKAN'],
-                    'ditolak' => ['status' => 'ditolak', 'status_class' => 'status-ditolak', 'status_text' => 'DITOLAK'],
-                    'pending' => ['status' => 'diproses', 'status_class' => 'status-diproses', 'status_text' => 'DALAM PENINJAUAN'],
-                    default => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'BELUM DITEMUKAN'],
-                };
+                if (Schema::hasColumn('laporan_barang_hilangs', 'status_laporan')) {
+                    $reportStatus = ReportStatusPresenter::key($report->status_laporan ?? null);
+                    $statusPayload = [
+                        'status' => ReportStatusPresenter::dashboardStatus($reportStatus),
+                        'status_class' => ReportStatusPresenter::cssClass($reportStatus),
+                        'status_text' => ReportStatusPresenter::label($reportStatus),
+                    ];
+                } else {
+                    $statusPayload = match ($report->latest_claim_status) {
+                        'disetujui' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'DITEMUKAN'],
+                        'ditolak' => ['status' => 'ditolak', 'status_class' => 'status-ditolak', 'status_text' => 'DITOLAK'],
+                        'pending' => ['status' => 'diproses', 'status_class' => 'status-diproses', 'status_text' => 'DALAM PENINJAUAN'],
+                        default => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'BELUM DITEMUKAN'],
+                    };
+                }
 
                 $pelapor = $report->user?->nama ?? $report->user?->name ?? 'Pengguna';
 
@@ -439,16 +473,35 @@ class DashboardController extends Controller
                 },
                 'user:id,nama,name',
             ])
-            ->select('id', 'status_klaim', 'catatan', 'created_at', 'updated_at', 'barang_id', 'laporan_hilang_id')
+            ->select(array_values(array_filter([
+                'id',
+                'status_klaim',
+                Schema::hasColumn('klaims', 'status_verifikasi') ? 'status_verifikasi' : null,
+                'catatan',
+                'created_at',
+                'updated_at',
+                'barang_id',
+                'laporan_hilang_id',
+            ])))
             ->orderByDesc('updated_at')
             ->limit(10)
             ->get()
             ->map(function ($claim) {
-                $statusPayload = match ($claim->status_klaim) {
-                    'disetujui' => ['status' => 'selesai', 'status_class' => 'status-selesai', 'status_text' => 'DISETUJUI'],
-                    'ditolak' => ['status' => 'ditolak', 'status_class' => 'status-ditolak', 'status_text' => 'DITOLAK'],
-                    default => ['status' => 'dalam_peninjauan', 'status_class' => 'status-dalam_peninjauan', 'status_text' => 'MENUNGGU VERIFIKASI'],
-                };
+                $claimStatusKey = ClaimStatusPresenter::key(
+                    statusKlaim: (string) $claim->status_klaim,
+                    statusVerifikasi: (string) ($claim->status_verifikasi ?? ''),
+                    statusBarang: (string) ($claim->barang?->status_barang ?? '')
+                );
+                $statusPayload = [
+                    'status' => match ($claimStatusKey) {
+                        'disetujui' => 'diproses',
+                        'selesai' => 'selesai',
+                        'ditolak' => 'ditolak',
+                        default => 'dalam_peninjauan',
+                    },
+                    'status_class' => ClaimStatusPresenter::cssClass($claimStatusKey),
+                    'status_text' => ClaimStatusPresenter::label($claimStatusKey),
+                ];
 
                 $namaBarang = $claim->barang?->nama_barang
                     ?? $claim->laporanHilang?->nama_barang
@@ -501,7 +554,11 @@ class DashboardController extends Controller
                     'home_published' => $homePublished,
                     'target_url' => route('admin.claim-verifications', [
                         'search' => $namaBarang,
-                        'status' => $claim->status_klaim,
+                        'status' => match ($claimStatusKey) {
+                            'menunggu' => 'menunggu',
+                            'selesai' => 'selesai',
+                            default => $claimStatusKey,
+                        },
                     ]),
                     'target_label' => 'Buka Verifikasi Klaim',
                     'delete_url' => route('admin.claim-verifications.destroy', $claim->id),

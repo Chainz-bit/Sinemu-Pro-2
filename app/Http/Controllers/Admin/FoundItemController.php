@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\BarangStatusHistory;
 use App\Models\Kategori;
+use App\Services\Admin\Matching\MatchingService;
 use App\Services\ReportImageCleaner;
 use App\Services\UserNotificationService;
+use App\Support\WorkflowStatus;
 use App\Support\Media\OptimizedImageUploader;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
@@ -15,12 +17,16 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FoundItemController extends Controller
 {
-    public function __construct(private readonly OptimizedImageUploader $imageUploader)
+    public function __construct(
+        private readonly OptimizedImageUploader $imageUploader,
+        private readonly MatchingService $matchingService,
+    )
     {
     }
 
@@ -106,7 +112,12 @@ class FoundItemController extends Controller
             'statusHistories.admin:id,nama',
         ]);
 
-        return view('admin.pages.found-item-detail', compact('barang', 'admin'));
+        $matchingCandidates = collect();
+        if ((string) ($barang->status_laporan ?? '') === WorkflowStatus::REPORT_APPROVED) {
+            $matchingCandidates = $this->matchingService->findCandidatesForFoundItem($barang);
+        }
+
+        return view('admin.pages.found-item-detail', compact('barang', 'admin', 'matchingCandidates'));
     }
 
     public function edit(Barang $barang): View
@@ -219,6 +230,35 @@ class FoundItemController extends Controller
 
         $oldStatus = (string) $barang->status_barang;
         $newStatus = (string) $validated['status_barang'];
+        $latestClaim = $barang->klaims()->latest('updated_at')->first();
+        $latestClaimVerificationStatus = Schema::hasColumn('klaims', 'status_verifikasi')
+            ? (string) ($latestClaim?->status_verifikasi ?? '')
+            : '';
+        $latestClaimLegacyStatus = (string) ($latestClaim?->status_klaim ?? '');
+
+        if ($newStatus === 'sudah_diklaim') {
+            $canMarkClaimed = Schema::hasColumn('klaims', 'status_verifikasi')
+                ? in_array($latestClaimVerificationStatus, [WorkflowStatus::CLAIM_APPROVED, WorkflowStatus::CLAIM_COMPLETED], true)
+                : $latestClaimLegacyStatus === 'disetujui';
+
+            if (!$canMarkClaimed) {
+                return redirect()
+                    ->route('admin.found-items.show', $barang->id)
+                    ->with('error', 'Status "Sudah Diklaim" hanya bisa dipilih setelah klaim disetujui.');
+            }
+        }
+
+        if ($newStatus === 'sudah_dikembalikan') {
+            $canMarkCompleted = Schema::hasColumn('klaims', 'status_verifikasi')
+                ? $latestClaimVerificationStatus === WorkflowStatus::CLAIM_COMPLETED
+                : ($latestClaimLegacyStatus === 'disetujui' && $oldStatus === 'sudah_diklaim');
+
+            if (!$canMarkCompleted) {
+                return redirect()
+                    ->route('admin.found-items.show', $barang->id)
+                    ->with('error', 'Status "Selesai" hanya bisa dipilih setelah klaim ditandai selesai pada Verifikasi Klaim.');
+            }
+        }
 
         if ($oldStatus !== $newStatus) {
             $barang->update(['status_barang' => $newStatus]);
@@ -263,6 +303,38 @@ class FoundItemController extends Controller
         return redirect()
             ->route('admin.found-items.show', $barang->id)
             ->with('status', 'Tidak ada perubahan status yang disimpan.');
+    }
+
+    public function verify(Request $request, Barang $barang): RedirectResponse
+    {
+        $validated = $request->validate([
+            'status_laporan' => ['required', 'in:approved,rejected'],
+        ]);
+
+        $newStatus = $validated['status_laporan'] === 'approved'
+            ? WorkflowStatus::REPORT_APPROVED
+            : WorkflowStatus::REPORT_REJECTED;
+
+        $barang->update([
+            'status_laporan' => $newStatus,
+            'verified_by_admin_id' => (int) Auth::guard('admin')->id(),
+            'verified_at' => now(),
+            'tampil_di_home' => $newStatus === WorkflowStatus::REPORT_APPROVED,
+        ]);
+
+        if (!is_null($barang->user_id)) {
+            $label = $newStatus === WorkflowStatus::REPORT_APPROVED ? 'disetujui' : 'ditolak';
+            UserNotificationService::notifyUser(
+                userId: (int) $barang->user_id,
+                type: 'verifikasi_laporan_temuan',
+                title: 'Verifikasi Laporan Temuan',
+                message: 'Laporan barang temuan "'.$barang->nama_barang.'" '.$label.' admin.',
+                actionUrl: route('user.dashboard'),
+                meta: ['barang_id' => $barang->id]
+            );
+        }
+
+        return back()->with('status', 'Verifikasi laporan barang temuan berhasil diperbarui.');
     }
 
     public function export(Barang $barang): Response

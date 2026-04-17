@@ -27,9 +27,12 @@
                     </select>
                     <select name="status" class="filter-btn">
                         <option value="">Semua Status</option>
-                        <option value="pending" @selected(request('status') === 'pending')>Dalam Peninjauan</option>
-                        <option value="disetujui" @selected(request('status') === 'disetujui')>Ditemukan</option>
-                        <option value="ditolak" @selected(request('status') === 'ditolak')>Ditolak</option>
+                        <option value="submitted" @selected(request('status') === 'submitted')>Menunggu Verifikasi</option>
+                        <option value="approved" @selected(request('status') === 'approved')>Disetujui Admin</option>
+                        <option value="matched" @selected(request('status') === 'matched')>Sudah Dicocokkan</option>
+                        <option value="claimed" @selected(request('status') === 'claimed')>Klaim Diproses</option>
+                        <option value="completed" @selected(request('status') === 'completed')>Selesai</option>
+                        <option value="rejected" @selected(request('status') === 'rejected')>Ditolak Admin</option>
                     </select>
                 </div>
                 <div class="lost-toolbar-right">
@@ -136,13 +139,9 @@
                             <td>{{ $item->lokasi_hilang }}</td>
                             <td>
                                 @php
-                                    $statusMap = [
-                                        null => ['BELUM DITEMUKAN', 'status-dalam_peninjauan'],
-                                        'pending' => ['DALAM PENINJAUAN', 'status-diproses'],
-                                        'disetujui' => ['DITEMUKAN', 'status-selesai'],
-                                        'ditolak' => ['DITOLAK', 'status-ditolak'],
-                                    ];
-                                    [$statusLabel, $statusClass] = $statusMap[$item->latest_claim_status] ?? ['UNKNOWN', 'status-diproses'];
+                                    $reportStatus = \App\Support\ReportStatusPresenter::key($item->status_laporan ?? null);
+                                    $statusLabel = \App\Support\ReportStatusPresenter::label($reportStatus);
+                                    $statusClass = \App\Support\ReportStatusPresenter::cssClass($reportStatus);
                                 @endphp
                                 <span class="status-chip {{ $statusClass }}">{{ $statusLabel }}</span>
                             </td>

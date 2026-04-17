@@ -333,6 +333,40 @@
     gap: 8px;
 }
 
+.lost-verify-box {
+    border: 1px dashed #d8e3f1;
+    background: #f8fbff;
+    border-radius: 10px;
+    padding: 10px;
+    display: grid;
+    gap: 8px;
+}
+
+.lost-verify-box > small {
+    color: #4d6483;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+.lost-verify-box > p {
+    margin: 0;
+    font-size: 12px;
+    color: #637894;
+    line-height: 1.45;
+}
+
+.lost-verify-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lost-verify-actions form {
+    margin: 0;
+}
+
 .lost-status-form-label {
     font-size: 12px;
     color: #5f7087;
@@ -406,6 +440,60 @@
     margin-top: 2px;
     color: #7b8ba1;
     font-size: 11px;
+}
+
+.lost-matching-card > header {
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.lost-matching-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.lost-matching-header-copy {
+    display: grid;
+    gap: 4px;
+}
+
+.lost-matching-score {
+    display: grid;
+    gap: 4px;
+}
+
+.lost-matching-score small {
+    color: #73849a;
+    font-size: 11px;
+}
+
+.lost-matching-metrics {
+    display: grid;
+    gap: 4px;
+}
+
+.lost-matching-metrics small {
+    display: block;
+    color: #5d6f85;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.lost-matching-actions {
+    display: grid;
+    gap: 8px;
+    min-width: 168px;
+}
+
+.lost-matching-actions form {
+    margin: 0;
+}
+
+.lost-matching-btn {
+    width: 100%;
+    justify-content: center;
 }
 
 .lost-person-row {
@@ -529,8 +617,29 @@
         padding-top: 6px;
     }
 
+    .lost-matching-header {
+        flex-direction: column;
+    }
+
+    .lost-matching-header .filter-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     .lost-status-edit-form select.lost-status-form-input {
         width: 100%;
+    }
+
+    .lost-verify-actions {
+        flex-direction: column;
+    }
+
+    .lost-verify-actions .lost-action-btn {
+        width: 100%;
+    }
+
+    .lost-matching-actions {
+        min-width: 0;
     }
 
     .lost-detail-body h2 {

@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Barang;
 use App\Models\Klaim;
+use App\Support\ClaimStatusPresenter;
+use App\Support\WorkflowStatus;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,15 +28,27 @@ class ProfileController extends Controller
             ->where('admin_id', $admin->id)
             ->count();
 
-        $klaimMenunggu = Klaim::query()
-            ->where('admin_id', $admin->id)
-            ->where('status_klaim', 'pending')
-            ->count();
+        $hasClaimVerification = Schema::hasColumn('klaims', 'status_verifikasi');
 
-        $selesaiDitangani = Klaim::query()
-            ->where('admin_id', $admin->id)
-            ->whereIn('status_klaim', ['disetujui', 'ditolak'])
-            ->count();
+        $klaimMenungguQuery = Klaim::query()->where('admin_id', $admin->id);
+        if ($hasClaimVerification) {
+            $klaimMenungguQuery->whereIn('status_verifikasi', [WorkflowStatus::CLAIM_SUBMITTED, WorkflowStatus::CLAIM_UNDER_REVIEW]);
+        } else {
+            $klaimMenungguQuery->where('status_klaim', 'pending');
+        }
+        $klaimMenunggu = $klaimMenungguQuery->count();
+
+        $selesaiDitanganiQuery = Klaim::query()->where('admin_id', $admin->id);
+        if ($hasClaimVerification) {
+            $selesaiDitanganiQuery->whereIn('status_verifikasi', [
+                WorkflowStatus::CLAIM_APPROVED,
+                WorkflowStatus::CLAIM_REJECTED,
+                WorkflowStatus::CLAIM_COMPLETED,
+            ]);
+        } else {
+            $selesaiDitanganiQuery->whereIn('status_klaim', ['disetujui', 'ditolak']);
+        }
+        $selesaiDitangani = $selesaiDitanganiQuery->count();
 
         $recentActivities = $this->buildRecentActivities((int) $admin->id);
         $profileAvatar = $this->resolveAvatarUrl($admin);
@@ -104,6 +119,8 @@ class ProfileController extends Controller
 
     private function buildRecentActivities(int $adminId): Collection
     {
+        $hasStatusVerifikasi = Schema::hasColumn('klaims', 'status_verifikasi');
+
         $inputActivities = Barang::query()
             ->where('admin_id', $adminId)
             ->latest('updated_at')
@@ -124,7 +141,7 @@ class ProfileController extends Controller
 
                 $statusLabel = match ($barang->status_barang) {
                     'sudah_diklaim', 'sudah_dikembalikan' => 'SELESAI',
-                    'dalam_proses_klaim' => 'DALAM PENINJAUAN',
+                    'dalam_proses_klaim' => 'SEDANG DIKLAIM',
                     default => 'DIPROSES',
                 };
 
@@ -146,23 +163,37 @@ class ProfileController extends Controller
             ])
             ->latest('updated_at')
             ->limit(8)
-            ->get([
+            ->get(array_values(array_filter([
                 'id',
                 'barang_id',
                 'laporan_hilang_id',
                 'status_klaim',
+                $hasStatusVerifikasi ? 'status_verifikasi' : null,
                 'created_at',
                 'updated_at',
-            ])
+            ])))
             ->map(function (Klaim $klaim) {
                 $namaBarang = $klaim->barang?->nama_barang
                     ?? $klaim->laporanHilang?->nama_barang
                     ?? 'barang';
 
-                [$statusClass, $statusLabel, $kataKerja] = match ($klaim->status_klaim) {
-                    'disetujui' => ['selesai', 'SELESAI', 'disetujui'],
-                    'ditolak' => ['ditolak', 'DITOLAK', 'ditolak'],
-                    default => ['dalam_peninjauan', 'MENUNGGU', 'menunggu verifikasi'],
+                $claimKey = ClaimStatusPresenter::key(
+                    statusKlaim: (string) $klaim->status_klaim,
+                    statusVerifikasi: (string) ($klaim->status_verifikasi ?? ''),
+                    statusBarang: null
+                );
+                $statusClass = match ($claimKey) {
+                    'selesai' => 'selesai',
+                    'ditolak' => 'ditolak',
+                    'disetujui' => 'diproses',
+                    default => 'dalam_peninjauan',
+                };
+                $statusLabel = ClaimStatusPresenter::label($claimKey);
+                $kataKerja = match ($claimKey) {
+                    'disetujui' => 'disetujui',
+                    'ditolak' => 'ditolak',
+                    'selesai' => 'diselesaikan',
+                    default => 'menunggu verifikasi',
                 };
 
                 return (object) [

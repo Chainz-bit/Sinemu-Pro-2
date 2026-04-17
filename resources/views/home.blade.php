@@ -680,6 +680,10 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body claim-modal-body">
+                            <div class="claim-modal-note claim-modal-note-warning">
+                                <strong>Klaim Bukan Konfirmasi Otomatis Pemilik</strong>
+                                <span>Isi bukti kepemilikan dengan detail. Admin akan memverifikasi sebelum barang dapat diserahkan.</span>
+                            </div>
                             <div class="claim-modal-highlight">
                                 <span class="claim-modal-highlight-label">Barang Temuan</span>
                                 <input type="text" id="claimBarangName" class="form-control claim-modal-input is-readonly" readonly>
@@ -690,15 +694,9 @@
                             </div>
 
                             <div class="claim-modal-form-grid">
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="claim-modal-check">
-                                        <input type="checkbox" name="claim_without_report" id="claimWithoutReport" value="1" @checked(old('claim_without_report'))>
-                                        <span>Saya belum pernah membuat laporan barang hilang, isi data klaim langsung di sini.</span>
-                                    </label>
-                                </div>
                                 <div class="claim-modal-field claim-modal-field-full" id="claimReportSelectorWrap">
                                     <label class="form-label claim-modal-label">Pilih Laporan Barang Hilang Anda <span>*</span></label>
-                                    <select name="laporan_hilang_id" id="claimLostReportId" class="form-select claim-modal-input" @required(!old('claim_without_report'))>
+                                    <select name="laporan_hilang_id" id="claimLostReportId" class="form-select claim-modal-input" required>
                                         <option value="">Pilih laporan Anda</option>
                                         @foreach(($claimableLostReports ?? collect()) as $report)
                                             <option
@@ -708,13 +706,16 @@
                                                 data-report-date="{{ !empty($report->tanggal_hilang) ? \Carbon\Carbon::parse((string) $report->tanggal_hilang)->format('d/m/Y') : '-' }}"
                                                 data-report-contact="{{ $report->kontak_pelapor ?? '' }}"
                                                 data-report-ownership="{{ $report->bukti_kepemilikan ?? '' }}"
+                                                data-report-ciri="{{ $report->ciri_khusus ?? '' }}"
+                                                data-report-detail-location="{{ $report->detail_lokasi_hilang ?? '' }}"
+                                                data-report-time="{{ $report->waktu_hilang ?? '' }}"
                                                 @selected((string) old('laporan_hilang_id') === (string) $report->id)
                                             >
                                                 {{ $report->nama_barang }} - {{ $report->lokasi_hilang }} ({{ !empty($report->tanggal_hilang) ? \Carbon\Carbon::parse((string) $report->tanggal_hilang)->format('d/m/Y') : '-' }})
                                             </option>
                                         @endforeach
                                     </select>
-                                    <small class="claim-modal-file-hint">Pilih laporan yang sudah ada, atau centang opsi di atas jika belum pernah membuat laporan.</small>
+                                    <small class="claim-modal-file-hint">Klaim hanya dapat diajukan untuk laporan hilang yang sudah Anda buat.</small>
                                 </div>
                                 <div class="claim-modal-field claim-modal-field-full">
                                     <div class="claim-modal-summary" id="claimLostReportSummary" hidden>
@@ -724,54 +725,6 @@
                                         <div class="claim-modal-summary-row"><span>Tanggal</span><strong id="claimSummaryDate">-</strong></div>
                                     </div>
                                 </div>
-                                <div class="claim-modal-field claim-modal-field-full" id="claimManualFields" @if(!old('claim_without_report')) hidden @endif>
-                                    <div class="claim-modal-summary">
-                                        <div class="claim-modal-summary-title">Data Barang Hilang Anda</div>
-                                        <div class="claim-modal-form-grid">
-                                            <div class="claim-modal-field claim-modal-field-full">
-                                                <label class="form-label claim-modal-label">Nama Barang Hilang <span>*</span></label>
-                                                <input type="text" name="lost_nama_barang" id="claimLostNamaBarang" class="form-control claim-modal-input" value="{{ old('lost_nama_barang') }}" placeholder="Contoh: Tas ransel hitam" @required(old('claim_without_report'))>
-                                                <small class="claim-modal-file-hint">Otomatis terisi dari nama barang temuan, silakan koreksi jika berbeda.</small>
-                                            </div>
-                                            <div class="claim-modal-field">
-                                                <label class="form-label claim-modal-label">Kategori</label>
-                                                <input type="text" name="lost_kategori_barang" class="form-control claim-modal-input" value="{{ old('lost_kategori_barang') }}" placeholder="Contoh: Tas, Dompet, Dokumen">
-                                            </div>
-                                            <div class="claim-modal-field">
-                                                <label class="form-label claim-modal-label">Warna Dominan</label>
-                                                <input type="text" name="lost_warna_barang" class="form-control claim-modal-input" value="{{ old('lost_warna_barang') }}" placeholder="Contoh: Hitam">
-                                            </div>
-                                            <div class="claim-modal-field">
-                                                <label class="form-label claim-modal-label">Merek / Brand</label>
-                                                <input type="text" name="lost_merek_barang" class="form-control claim-modal-input" value="{{ old('lost_merek_barang') }}" placeholder="Contoh: Eiger, Samsung">
-                                            </div>
-                                            <div class="claim-modal-field">
-                                                <label class="form-label claim-modal-label">Nomor Seri / Kode Unik</label>
-                                                <input type="text" name="lost_nomor_seri" class="form-control claim-modal-input" value="{{ old('lost_nomor_seri') }}" placeholder="Contoh: IMEI, nomor seri">
-                                            </div>
-                                            <div class="claim-modal-field">
-                                                <label class="form-label claim-modal-label">Lokasi Hilang <span>*</span></label>
-                                                <input type="text" name="lost_lokasi_hilang" id="claimLostLokasiHilang" class="form-control claim-modal-input" value="{{ old('lost_lokasi_hilang') }}" placeholder="Contoh: Terminal Sindang" @required(old('claim_without_report'))>
-                                            </div>
-                                            <div class="claim-modal-field">
-                                                <label class="form-label claim-modal-label">Tanggal Hilang <span>*</span></label>
-                                                <input type="date" name="lost_tanggal_hilang" id="claimLostTanggalHilang" class="form-control claim-modal-input" value="{{ old('lost_tanggal_hilang') }}" @required(old('claim_without_report'))>
-                                            </div>
-                                            <div class="claim-modal-field claim-modal-field-full">
-                                                <label class="form-label claim-modal-label">Detail Lokasi Hilang</label>
-                                                <textarea name="lost_detail_lokasi_hilang" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Contoh: Jatuh dekat parkiran sebelah ATM.">{{ old('lost_detail_lokasi_hilang') }}</textarea>
-                                            </div>
-                                            <div class="claim-modal-field claim-modal-field-full">
-                                                <label class="form-label claim-modal-label">Deskripsi dan Kronologi Singkat <span>*</span></label>
-                                                <textarea name="lost_keterangan" id="claimLostKeterangan" class="form-control claim-modal-textarea" rows="3" placeholder="Jelaskan barang, kapan terakhir terlihat, dan kronologi singkatnya." @required(old('claim_without_report'))>{{ old('lost_keterangan') }}</textarea>
-                                            </div>
-                                            <div class="claim-modal-field claim-modal-field-full">
-                                                <label class="form-label claim-modal-label">Ciri Unik Barang</label>
-                                                <textarea name="lost_ciri_khusus" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Contoh: Ada stiker, goresan, isi dompet tertentu.">{{ old('lost_ciri_khusus') }}</textarea>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="claim-modal-field">
                                     <label class="form-label claim-modal-label">No. WA yang Bisa Dihubungi <span>*</span></label>
                                     <input type="text" name="kontak_pelapor" id="claimKontakPelapor" class="form-control claim-modal-input" value="{{ old('kontak_pelapor', auth()->user()?->nomor_telepon) }}" placeholder="Contoh: 081234567890" required>
@@ -779,6 +732,22 @@
                                 <div class="claim-modal-field claim-modal-field-full">
                                     <label class="form-label claim-modal-label">Bukti Kepemilikan <span>*</span></label>
                                     <textarea name="bukti_kepemilikan" id="claimBuktiKepemilikan" class="form-control claim-modal-textarea" rows="3" placeholder="Tuliskan bukti yang hanya pemilik asli tahu: isi barang, foto saat dipakai, nomor seri, nota, atau detail lain." required>{{ old('bukti_kepemilikan') }}</textarea>
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Ciri Unik Barang yang Anda Ketahui <span>*</span></label>
+                                    <textarea name="bukti_ciri_khusus" id="claimBuktiCiriKhusus" class="form-control claim-modal-textarea" rows="2" placeholder="Contoh: ada stiker, goresan, ukiran nama, aksesoris khusus." required>{{ old('bukti_ciri_khusus') }}</textarea>
+                                </div>
+                                <div class="claim-modal-field claim-modal-field-full">
+                                    <label class="form-label claim-modal-label">Detail Isi / Kondisi Saat Hilang</label>
+                                    <textarea name="bukti_detail_isi" id="claimBuktiDetailIsi" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Contoh: isi tas, casing, wallpaper, atau detail kondisi terakhir.">{{ old('bukti_detail_isi') }}</textarea>
+                                </div>
+                                <div class="claim-modal-field">
+                                    <label class="form-label claim-modal-label">Lokasi Spesifik Hilang <span>*</span></label>
+                                    <input type="text" name="bukti_lokasi_spesifik" id="claimBuktiLokasiSpesifik" class="form-control claim-modal-input" value="{{ old('bukti_lokasi_spesifik') }}" placeholder="Contoh: meja pojok kanan perpustakaan" required>
+                                </div>
+                                <div class="claim-modal-field">
+                                    <label class="form-label claim-modal-label">Perkiraan Waktu Hilang <span>*</span></label>
+                                    <input type="time" name="bukti_waktu_hilang" id="claimBuktiWaktuHilang" class="form-control claim-modal-input" value="{{ old('bukti_waktu_hilang') }}" required>
                                 </div>
                                 <div class="claim-modal-field claim-modal-field-full">
                                     <label class="form-label claim-modal-label">Foto Bukti Kepemilikan <span>*</span></label>
@@ -793,7 +762,7 @@
                                 <div class="claim-modal-field claim-modal-field-full">
                                     <label class="claim-modal-check">
                                         <input type="checkbox" id="claimPersetujuanKlaim" name="persetujuan_klaim" value="1" @checked(old('persetujuan_klaim')) required>
-                                        <span>Saya menyatakan data klaim ini benar dan siap diverifikasi oleh admin.</span>
+                                        <span>Saya menyatakan data klaim ini benar dan siap diverifikasi oleh admin. Saya akan memantau hasilnya di Riwayat Klaim.</span>
                                     </label>
                                 </div>
                             </div>

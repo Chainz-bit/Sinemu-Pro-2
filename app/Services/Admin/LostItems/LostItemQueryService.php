@@ -5,6 +5,7 @@ namespace App\Services\Admin\LostItems;
 use App\Http\Requests\Admin\LostItemIndexRequest;
 use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
+use App\Support\WorkflowStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
 
@@ -25,6 +26,9 @@ class LostItemQueryService
         ];
         if (Schema::hasColumn('laporan_barang_hilangs', 'tampil_di_home')) {
             $selectColumns[] = 'laporan_barang_hilangs.tampil_di_home';
+        }
+        if (Schema::hasColumn('laporan_barang_hilangs', 'status_laporan')) {
+            $selectColumns[] = 'laporan_barang_hilangs.status_laporan';
         }
 
         $query = LaporanBarangHilang::query()
@@ -90,11 +94,38 @@ class LostItemQueryService
             return;
         }
 
-        $query->whereExists(function ($claimQuery) use ($status): void {
+        if (Schema::hasColumn('laporan_barang_hilangs', 'status_laporan')) {
+            $allowedStatuses = [
+                WorkflowStatus::REPORT_SUBMITTED,
+                WorkflowStatus::REPORT_APPROVED,
+                WorkflowStatus::REPORT_REJECTED,
+                WorkflowStatus::REPORT_MATCHED,
+                WorkflowStatus::REPORT_CLAIMED,
+                WorkflowStatus::REPORT_COMPLETED,
+            ];
+
+            if (in_array($status, $allowedStatuses, true)) {
+                $query->where('laporan_barang_hilangs.status_laporan', $status);
+            }
+
+            return;
+        }
+
+        $legacyStatusMap = [
+            WorkflowStatus::REPORT_SUBMITTED => 'pending',
+            WorkflowStatus::REPORT_REJECTED => 'ditolak',
+            WorkflowStatus::REPORT_COMPLETED => 'disetujui',
+        ];
+        $claimStatus = $legacyStatusMap[$status] ?? null;
+        if ($claimStatus === null) {
+            return;
+        }
+
+        $query->whereExists(function ($claimQuery) use ($claimStatus): void {
             $claimQuery->selectRaw('1')
                 ->from('klaims')
                 ->whereColumn('klaims.laporan_hilang_id', 'laporan_barang_hilangs.id')
-                ->where('klaims.status_klaim', $status);
+                ->where('klaims.status_klaim', $claimStatus);
         });
     }
 

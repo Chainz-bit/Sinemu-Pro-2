@@ -61,6 +61,9 @@
         'sudah_diklaim' => 'Sudah Diklaim',
         'sudah_dikembalikan' => 'Sudah Dikembalikan',
     ];
+    $reportStatus = \App\Support\ReportStatusPresenter::key($barang->status_laporan ?? null);
+    $reportStatusLabel = \App\Support\ReportStatusPresenter::label($reportStatus);
+    $reportStatusClass = \App\Support\ReportStatusPresenter::cssClass($reportStatus);
     [$statusLabel, $statusClass] = $statusMap[$barang->status_barang] ?? ['UNKNOWN', 'status-diproses'];
     $petugasName = $barang->admin?->nama ?? 'Admin';
     $petugasEmail = $barang->admin?->email ?? 'Email tidak tersedia';
@@ -198,6 +201,27 @@
                         <h2>Status Saat Ini</h2>
                     </header>
                     <div class="found-detail-panel-body">
+                        <span class="status-chip {{ $reportStatusClass }}">{{ $reportStatusLabel }}</span>
+
+                        <div class="found-verify-box">
+                            <small>Verifikasi Laporan</small>
+                            <p>Tentukan apakah laporan ini layak ditampilkan di halaman publik.</p>
+                            <div class="found-verify-actions">
+                                <form method="POST" action="{{ route('admin.found-items.verify', $barang->id) }}" data-confirm-delete data-confirm-title="Setujui Laporan" data-confirm-message="Setujui laporan ini? Laporan akan bisa dipublikasikan ke Home." data-confirm-submit-label="Setujui" data-confirm-submit-variant="primary">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status_laporan" value="approved">
+                                    <button type="submit" class="filter-btn found-action-btn found-action-btn-primary">Setujui Laporan</button>
+                                </form>
+                                <form method="POST" action="{{ route('admin.found-items.verify', $barang->id) }}" data-confirm-delete data-confirm-title="Tolak Laporan" data-confirm-message="Tolak laporan ini? Laporan tidak akan tampil di Home." data-confirm-submit-label="Tolak" data-confirm-submit-variant="danger">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status_laporan" value="rejected">
+                                    <button type="submit" class="filter-btn found-action-btn found-action-btn-ghost">Tolak Laporan</button>
+                                </form>
+                            </div>
+                        </div>
+
                         <span class="status-chip {{ $statusClass }}">{{ $statusLabel }}</span>
 
                         <form method="POST" action="{{ route('admin.found-items.update-status', $barang->id) }}" class="status-edit-form" id="status-update-form" data-confirm-delete data-confirm-title="Konfirmasi Perbarui Status" data-confirm-submit-label="Perbarui" data-confirm-submit-variant="primary" data-confirm-message="Perbarui status barang temuan ini? Pastikan data sudah sesuai sebelum menyimpan.">
@@ -284,6 +308,102 @@
                 </article>
             </div>
         </div>
+
+        <article class="report-card mt-3 found-matching-card" id="kandidat-pencocokan">
+            <header class="mb-3 found-matching-header">
+                <div class="found-matching-header-copy">
+                    <h2 class="mb-1">Kandidat Laporan Barang Hilang</h2>
+                    <p class="mb-0">Sistem menilai kandidat berdasarkan kategori, nama barang, warna, merek, nomor seri, lokasi, tanggal, deskripsi, dan ciri khusus.</p>
+                </div>
+                <a href="{{ route('admin.found-items.show', $barang->id) }}#kandidat-pencocokan" class="filter-btn">Muat Ulang Kandidat</a>
+            </header>
+
+            @if((string) ($barang->status_laporan ?? '') !== \App\Support\WorkflowStatus::REPORT_APPROVED)
+                <p class="mb-0">Kandidat baru tersedia setelah laporan barang temuan disetujui admin.</p>
+            @elseif(($matchingCandidates ?? collect())->isEmpty())
+                <p class="mb-0">Belum ada kandidat dengan skor kecocokan yang cukup atau semua kandidat sudah ditinjau.</p>
+            @else
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Laporan Hilang</th>
+                                <th>Skor</th>
+                                <th>Ringkasan</th>
+                                <th>Parameter Skor</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($matchingCandidates as $candidate)
+                                @php
+                                    $laporan = $candidate->laporan;
+                                    $reasons = collect($candidate->reasons ?? [])->take(3)->values();
+                                    $meta = collect($candidate->meta ?? []);
+                                    $scoreClass = $candidate->score >= 75 ? 'status-selesai' : ($candidate->score >= 55 ? 'status-diproses' : 'status-dalam_peninjauan');
+                                    $scoreSummary = $candidate->score >= 75 ? 'Tinggi' : ($candidate->score >= 55 ? 'Sedang' : 'Rendah');
+                                    $catatanSkor = 'Skor otomatis: ' . $candidate->score . '/100';
+                                    if ($reasons->isNotEmpty()) {
+                                        $catatanSkor .= ' | ' . $reasons->implode(', ');
+                                    }
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ $laporan->nama_barang }}</strong>
+                                            <small style="display:block;">{{ $laporan->lokasi_hilang }} - {{ \Illuminate\Support\Carbon::parse($laporan->tanggal_hilang)->format('d M Y') }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="found-matching-score">
+                                            <span class="status-chip {{ $scoreClass }}">{{ $candidate->score }} / 100</span>
+                                            <small>{{ $scoreSummary }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($reasons->isNotEmpty())
+                                            <div>{{ $reasons->implode(', ') }}</div>
+                                        @else
+                                            <span>-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="found-matching-metrics">
+                                            <small>Nama: {{ (int) ($meta->get('nama_barang', 0)) }}</small>
+                                            <small>Kategori: {{ (int) ($meta->get('kategori', 0)) }}</small>
+                                            <small>Warna: {{ (int) ($meta->get('warna', 0)) }}</small>
+                                            <small>Merek: {{ (int) ($meta->get('merek', 0)) }}</small>
+                                            <small>No. Seri: {{ (int) ($meta->get('nomor_seri', 0)) }}</small>
+                                            <small>Lokasi: {{ (int) ($meta->get('lokasi', 0)) }}</small>
+                                            <small>Tanggal: {{ (int) ($meta->get('tanggal', 0)) }}</small>
+                                            <small>Deskripsi/Ciri: {{ (int) ($meta->get('deskripsi', 0)) }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="found-matching-actions">
+                                            <form method="POST" action="{{ route('admin.matches.store') }}">
+                                                @csrf
+                                                <input type="hidden" name="laporan_hilang_id" value="{{ $laporan->id }}">
+                                                <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+                                                <input type="hidden" name="catatan" value="{{ $catatanSkor }}">
+                                                <button type="submit" class="filter-btn found-matching-btn">Tandai Diduga Cocok</button>
+                                            </form>
+                                            <form method="POST" action="{{ route('admin.matches.dismiss') }}">
+                                                @csrf
+                                                <input type="hidden" name="laporan_hilang_id" value="{{ $laporan->id }}">
+                                                <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+                                                <input type="hidden" name="catatan" value="{{ 'Skor otomatis: '.$candidate->score.'/100 | Ditandai tidak cocok oleh admin.' }}">
+                                                <button type="submit" class="filter-btn found-action-btn found-action-btn-ghost found-matching-btn">Tidak Cocok</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </article>
 
         <div class="found-detail-bottom-actions">
             <button type="submit" form="status-update-form" class="filter-btn found-action-btn found-action-btn-primary" disabled>Perbarui Status</button>

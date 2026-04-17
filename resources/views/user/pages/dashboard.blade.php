@@ -40,13 +40,13 @@
             </article>
             <article class="stat-card stat-card-claim">
                 <div class="stat-card-head">
-                    <span>Menunggu Verifikasi</span>
+                    <span>Menunggu Tinjauan</span>
                     <div class="stat-card-icon">
                         <iconify-icon icon="mdi:clock-alert-outline"></iconify-icon>
                     </div>
                 </div>
                 <strong>{{ $menungguVerifikasi }}</strong>
-                <small>Klaim aktif yang masih menunggu proses admin.</small>
+                <small>Laporan/klaim aktif yang masih ditinjau.</small>
             </article>
         </section>
 
@@ -64,10 +64,11 @@
                         @endif
                         <select name="status" class="filter-btn dashboard-filter-select" onchange="this.form.submit()">
                             <option value="semua" @selected($statusFilter === 'semua')>Semua Status</option>
-                            <option value="diproses" @selected($statusFilter === 'diproses')>Diproses</option>
-                            <option value="dalam_peninjauan" @selected($statusFilter === 'dalam_peninjauan')>Dalam Peninjauan</option>
+                            <option value="menunggu_tinjauan" @selected($statusFilter === 'menunggu_tinjauan')>Menunggu Tinjauan</option>
+                            <option value="terverifikasi" @selected($statusFilter === 'terverifikasi')>Terverifikasi</option>
+                            <option value="sedang_diproses" @selected($statusFilter === 'sedang_diproses')>Sedang Diproses</option>
                             <option value="selesai" @selected($statusFilter === 'selesai')>Selesai</option>
-                            <option value="ditolak" @selected($statusFilter === 'ditolak')>Ditolak</option>
+                            <option value="tidak_disetujui" @selected($statusFilter === 'tidak_disetujui')>Tidak Disetujui</option>
                         </select>
                     </form>
                 </div>
@@ -76,10 +77,11 @@
             <div class="dashboard-table-toolbar">
                 <div class="dashboard-quick-filters">
                     <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'semua'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'semua' ? 'is-active' : '' }}">Semua</a>
-                    <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'dalam_peninjauan'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'dalam_peninjauan' ? 'is-active' : '' }}">Menunggu</a>
-                    <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'diproses'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'diproses' ? 'is-active' : '' }}">Diproses</a>
+                    <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'menunggu_tinjauan'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'menunggu_tinjauan' ? 'is-active' : '' }}">Menunggu</a>
+                    <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'terverifikasi'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'terverifikasi' ? 'is-active' : '' }}">Terverifikasi</a>
+                    <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'sedang_diproses'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'sedang_diproses' ? 'is-active' : '' }}">Diproses</a>
                     <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'selesai'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'selesai' ? 'is-active' : '' }}">Selesai</a>
-                    <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'ditolak'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'ditolak' ? 'is-active' : '' }}">Ditolak</a>
+                    <a href="{{ route('user.dashboard', array_filter(['search' => $search, 'status' => 'tidak_disetujui'])) }}" class="dashboard-filter-chip {{ $statusFilter === 'tidak_disetujui' ? 'is-active' : '' }}">Tidak Disetujui</a>
                 </div>
                 <div class="dashboard-toolbar-note">
                     @if($search !== '')

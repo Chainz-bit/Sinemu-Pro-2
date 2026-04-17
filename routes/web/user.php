@@ -1,13 +1,13 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\User\ClaimController;
 use App\Http\Controllers\User\DashboardController;
 use App\Http\Controllers\User\FoundReportController;
 use App\Http\Controllers\User\LostReportController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
 use App\Http\Controllers\User\RiwayatKlaimController;
 use App\Http\Controllers\User\UserNotificationController;
-use App\Http\Controllers\UserItemActionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
@@ -34,8 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::post('/laporan/hilang', [UserItemActionController::class, 'storeLostReport'])->name('user.lost-reports.store');
-    Route::delete('/laporan/hilang/{laporanBarangHilang}', [UserItemActionController::class, 'destroyLostReport'])->name('user.lost-reports.destroy');
-    Route::post('/laporan/temuan', [UserItemActionController::class, 'storeFoundReport'])->name('user.found-reports.store');
-    Route::post('/klaim', [UserItemActionController::class, 'storeClaim'])->name('user.claims.store');
+    Route::post('/laporan/hilang', [LostReportController::class, 'store'])->name('user.lost-reports.store');
+    Route::delete('/laporan/hilang/{laporanBarangHilang}', [LostReportController::class, 'destroy'])->name('user.lost-reports.destroy');
+    Route::post('/laporan/temuan', [FoundReportController::class, 'store'])->name('user.found-reports.store');
+    Route::post('/klaim', [ClaimController::class, 'store'])->name('user.claims.store');
 });

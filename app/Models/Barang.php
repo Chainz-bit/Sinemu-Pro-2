@@ -4,6 +4,44 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property int $id
+ * @property int|null $admin_id
+ * @property int|null $user_id
+ * @property int|null $kategori_id
+ * @property string $nama_barang
+ * @property string|null $warna_barang
+ * @property string|null $merek_barang
+ * @property string|null $nomor_seri
+ * @property string|null $deskripsi
+ * @property string|null $ciri_khusus
+ * @property string|null $nama_penemu
+ * @property string|null $kontak_penemu
+ * @property string $lokasi_ditemukan
+ * @property string|null $detail_lokasi_ditemukan
+ * @property string $tanggal_ditemukan
+ * @property string|null $waktu_ditemukan
+ * @property string|null $status_barang
+ * @property string|null $foto_barang
+ * @property bool $tampil_di_home
+ * @property string|null $status_laporan
+ * @property int|null $verified_by_admin_id
+ * @property string|null $verified_at
+ * @property string|null $lokasi_pengambilan
+ * @property string|null $alamat_pengambilan
+ * @property string|null $penanggung_jawab_pengambilan
+ * @property string|null $kontak_pengambilan
+ * @property string|null $jam_layanan_pengambilan
+ * @property string|null $catatan_pengambilan
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property-read Admin|null $admin
+ * @property-read User|null $user
+ * @property-read Kategori|null $kategori
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Klaim> $klaims
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, BarangStatusHistory> $statusHistories
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Pencocokan> $pencocokans
+ */
 class Barang extends Model
 {
     protected $fillable = [
@@ -25,6 +63,9 @@ class Barang extends Model
         'status_barang',
         'foto_barang',
         'tampil_di_home',
+        'status_laporan',
+        'verified_by_admin_id',
+        'verified_at',
         'lokasi_pengambilan',
         'alamat_pengambilan',
         'penanggung_jawab_pengambilan',
@@ -56,5 +97,10 @@ class Barang extends Model
     public function statusHistories()
     {
         return $this->hasMany(BarangStatusHistory::class)->latest();
+    }
+
+    public function pencocokans()
+    {
+        return $this->hasMany(Pencocokan::class);
     }
 }

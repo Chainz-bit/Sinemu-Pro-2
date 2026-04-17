@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Admin;
 use App\Models\Barang;
 use App\Models\Kategori;
-use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
 use App\Models\Wilayah;
+use App\Support\ReportStatusPresenter;
+use App\Support\WorkflowStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -44,16 +45,9 @@ class HomeController extends Controller
                         'lokasi_hilang',
                         'tanggal_hilang',
                         'foto_barang',
+                        'status_laporan',
                         'updated_at',
                     ])
-                    ->selectSub(
-                        Klaim::query()
-                            ->whereColumn('laporan_hilang_id', 'laporan_barang_hilangs.id')
-                            ->orderByDesc('updated_at')
-                            ->limit(1)
-                            ->select('status_klaim'),
-                        'latest_claim_status'
-                    )
                     ->latest('updated_at');
 
                 $lostItemsQuery->limit(self::HOME_ITEMS_LIMIT);
@@ -62,12 +56,14 @@ class HomeController extends Controller
                     ->get()
                     ->map(function ($item) {
                         $categoryLabel = trim((string) ($item->kategori_barang ?? ''));
-                        $latestClaimStatus = (string) ($item->latest_claim_status ?? '');
-                        [$lostStatusLabel, $lostStatusClass] = match ($latestClaimStatus) {
-                            'pending' => ['Dalam Peninjauan', 'item-status-warning'],
-                            'disetujui' => ['Ditemukan', 'item-status-success'],
-                            'ditolak' => ['Ditolak', 'item-status-muted'],
-                            default => ['Belum Ditemukan', 'item-status-danger'],
+                        $reportStatus = ReportStatusPresenter::key((string) ($item->status_laporan ?? WorkflowStatus::REPORT_SUBMITTED));
+                        [$lostStatusLabel, $lostStatusClass] = match ($reportStatus) {
+                            WorkflowStatus::REPORT_APPROVED => ['Terverifikasi', 'item-status-info'],
+                            WorkflowStatus::REPORT_MATCHED => ['Sudah Dicocokkan', 'item-status-success'],
+                            WorkflowStatus::REPORT_CLAIMED => ['Sedang Diklaim', 'item-status-warning'],
+                            WorkflowStatus::REPORT_COMPLETED => ['Selesai', 'item-status-success'],
+                            WorkflowStatus::REPORT_REJECTED => ['Ditolak', 'item-status-muted'],
+                            default => ['Menunggu Verifikasi', 'item-status-warning'],
                         };
 
                         return [
@@ -328,6 +324,13 @@ class HomeController extends Controller
                 if ($this->hasDatabaseColumn('laporan_barang_hilangs', 'sumber_laporan')) {
                     $query->where('sumber_laporan', 'lapor_hilang');
                 }
+                if ($this->hasDatabaseColumn('laporan_barang_hilangs', 'status_laporan')) {
+                    $query->whereIn('status_laporan', [
+                        WorkflowStatus::REPORT_APPROVED,
+                        WorkflowStatus::REPORT_MATCHED,
+                        WorkflowStatus::REPORT_CLAIMED,
+                    ]);
+                }
 
                 return $query
                     ->orderByDesc('tanggal_hilang')
@@ -361,16 +364,13 @@ class HomeController extends Controller
         );
         abort_unless($isVisible, 404);
 
-        $latestKlaim = $laporanBarangHilang->klaims()
-            ->select(['id', 'status_klaim', 'updated_at', 'created_at'])
-            ->orderByDesc('updated_at')
-            ->first();
-
-        [$lostStatusLabel, $lostStatusClass] = match ((string) ($latestKlaim?->status_klaim ?? '')) {
-            'pending' => ['Dalam Peninjauan', 'is-in-progress'],
-            'disetujui' => ['Ditemukan', 'is-found'],
-            'ditolak' => ['Ditolak', 'is-returned'],
-            default => ['Belum Ditemukan', 'is-lost'],
+        [$lostStatusLabel, $lostStatusClass] = match ((string) ($laporanBarangHilang->status_laporan ?? WorkflowStatus::REPORT_SUBMITTED)) {
+            WorkflowStatus::REPORT_APPROVED => ['Terverifikasi', 'is-in-progress'],
+            WorkflowStatus::REPORT_MATCHED => ['Sudah Dicocokkan', 'is-found'],
+            WorkflowStatus::REPORT_CLAIMED => ['Sedang Diproses Klaim', 'is-in-progress'],
+            WorkflowStatus::REPORT_COMPLETED => ['Selesai', 'is-returned'],
+            WorkflowStatus::REPORT_REJECTED => ['Ditolak Admin', 'is-returned'],
+            default => ['Menunggu Verifikasi', 'is-in-progress'],
         };
 
         $pelapor = $laporanBarangHilang->user?->nama ?? $laporanBarangHilang->user?->name ?? 'Pengguna';
@@ -433,8 +433,22 @@ class HomeController extends Controller
             ],
         };
 
+        $claimActionUrl = route('home') . '#hilang-temuan';
+        $claimActionLabel = Auth::check() ? 'Buka Beranda untuk Ajukan Klaim' : 'Masuk untuk Ajukan Klaim';
+        if ($statusBarang === 'dalam_proses_klaim') {
+            $claimActionUrl = route('user.claim-history');
+            $claimActionLabel = 'Lihat Status Klaim';
+        } elseif ($statusBarang === 'sudah_diklaim') {
+            $claimActionUrl = route('user.claim-history');
+            $claimActionLabel = 'Lihat Instruksi Pengambilan';
+        } elseif ($statusBarang === 'sudah_dikembalikan') {
+            $claimActionUrl = route('user.claim-history');
+            $claimActionLabel = 'Lihat Riwayat Klaim';
+        }
+
         $penanggungJawab = $barang->admin?->instansi ?? $barang->admin?->nama ?? 'Admin';
         $detail = (object) [
+            'id' => (int) $barang->id,
             'type' => 'temuan',
             'title' => (string) $barang->nama_barang,
             'category' => ucwords(strtolower((string) ($barang->kategori?->nama_kategori ?? 'Umum'))),
@@ -451,6 +465,9 @@ class HomeController extends Controller
             'image_url' => $this->resolveItemImageUrl((string) ($barang->foto_barang ?? ''), 'barang-temuan'),
             'subtitle' => $statusMeta['subtitle'],
             'is_claimable' => $statusMeta['claimable'],
+            'claim_action_url' => $claimActionUrl,
+            'claim_action_label' => $claimActionLabel,
+            'preclaim_note' => 'Kecocokan barang tidak otomatis membuktikan kepemilikan. Anda wajib mengajukan klaim dengan bukti kepemilikan untuk diverifikasi admin.',
         ];
 
         return view('home.detail', [
@@ -654,14 +671,40 @@ class HomeController extends Controller
 
     private function resolveHomeScopeQuery($baseQuery, string $tableName)
     {
-        // Home menampilkan seluruh data upload admin/user yang ada,
-        // tidak dibatasi flag tampil_di_home.
+        if ($tableName === 'laporan_barang_hilangs' && $this->hasDatabaseColumn('laporan_barang_hilangs', 'status_laporan')) {
+            $baseQuery->whereIn('status_laporan', [
+                WorkflowStatus::REPORT_APPROVED,
+                WorkflowStatus::REPORT_MATCHED,
+                WorkflowStatus::REPORT_CLAIMED,
+            ]);
+        }
+
+        if ($tableName === 'barangs' && $this->hasDatabaseColumn('barangs', 'status_laporan')) {
+            $baseQuery->whereIn('status_laporan', [
+                WorkflowStatus::REPORT_APPROVED,
+                WorkflowStatus::REPORT_MATCHED,
+                WorkflowStatus::REPORT_CLAIMED,
+            ]);
+        }
+
+        if ($tableName === 'barangs' && $this->hasDatabaseColumn('barangs', 'status_barang')) {
+            $baseQuery->where('status_barang', '!=', 'sudah_dikembalikan');
+        }
+
         return $baseQuery;
     }
 
     private function canAccessPublicDetail(bool $isPublished, string $tableName): bool
     {
-        return true;
+        if ($tableName === 'laporan_barang_hilangs' && $this->hasDatabaseColumn('laporan_barang_hilangs', 'status_laporan')) {
+            return $isPublished;
+        }
+
+        if ($tableName === 'barangs' && $this->hasDatabaseColumn('barangs', 'status_laporan')) {
+            return $isPublished;
+        }
+
+        return $isPublished;
     }
 
     private function publishedItemsCount(string $tableName): int

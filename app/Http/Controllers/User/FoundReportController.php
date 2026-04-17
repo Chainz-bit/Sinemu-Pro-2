@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
+use App\Models\Barang;
 use App\Models\Kategori;
+use App\Support\WorkflowStatus;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
@@ -22,5 +27,69 @@ class FoundReportController extends Controller
             'user' => Auth::user(),
             'categories' => $categories,
         ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'nama_barang' => ['required', 'string', 'max:255'],
+            'kategori_id' => ['nullable', 'integer', 'exists:kategoris,id'],
+            'warna_barang' => ['nullable', 'string', 'max:100'],
+            'merek_barang' => ['nullable', 'string', 'max:120'],
+            'nomor_seri' => ['nullable', 'string', 'max:150'],
+            'deskripsi' => ['required', 'string'],
+            'ciri_khusus' => ['nullable', 'string', 'max:2000'],
+            'nama_penemu' => ['nullable', 'string', 'max:150'],
+            'kontak_penemu' => ['required', 'string', 'max:50'],
+            'lokasi_ditemukan' => ['required', 'string', 'max:255'],
+            'detail_lokasi_ditemukan' => ['nullable', 'string', 'max:2000'],
+            'tanggal_ditemukan' => ['required', 'date'],
+            'waktu_ditemukan' => ['nullable', 'date_format:H:i'],
+            'foto_barang' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
+        ]);
+
+        $admin = Admin::query()->select('id')->orderBy('id')->first();
+        if (!$admin) {
+            return back()->with('error', 'Belum ada admin aktif untuk menerima laporan temuan.');
+        }
+
+        $kategoriId = $validated['kategori_id'] ?? Kategori::query()->value('id');
+        if (!$kategoriId) {
+            $kategoriId = Kategori::query()->create(['nama_kategori' => 'Umum'])->id;
+        }
+
+        $payload = [
+            'admin_id' => (int) $admin->id,
+            'user_id' => (int) Auth::id(),
+            'kategori_id' => (int) $kategoriId,
+            'nama_barang' => $validated['nama_barang'],
+            'warna_barang' => $validated['warna_barang'] ?? null,
+            'merek_barang' => $validated['merek_barang'] ?? null,
+            'nomor_seri' => $validated['nomor_seri'] ?? null,
+            'deskripsi' => $validated['deskripsi'],
+            'ciri_khusus' => $validated['ciri_khusus'] ?? null,
+            'nama_penemu' => $validated['nama_penemu'] ?? (Auth::user()?->nama ?? Auth::user()?->name ?? null),
+            'kontak_penemu' => $validated['kontak_penemu'],
+            'lokasi_ditemukan' => $validated['lokasi_ditemukan'],
+            'detail_lokasi_ditemukan' => $validated['detail_lokasi_ditemukan'] ?? null,
+            'tanggal_ditemukan' => $validated['tanggal_ditemukan'],
+            'waktu_ditemukan' => $validated['waktu_ditemukan'] ?? null,
+            'status_barang' => 'tersedia',
+        ];
+        if (Schema::hasColumn('barangs', 'status_laporan')) {
+            $payload['status_laporan'] = WorkflowStatus::REPORT_SUBMITTED;
+        }
+        if (Schema::hasColumn('barangs', 'tampil_di_home')) {
+            $payload['tampil_di_home'] = false;
+        }
+
+        $photo = $request->file('foto_barang');
+        if ($photo) {
+            $payload['foto_barang'] = $photo->store('barang-temuan/' . now()->format('Y/m'), 'public');
+        }
+
+        Barang::create($payload);
+
+        return back()->with('status', 'Laporan barang temuan berhasil dikirim.');
     }
 }

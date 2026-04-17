@@ -50,21 +50,17 @@
         $fotoSrc = $fotoUrl;
     }
 
-    $statusMap = [
-        null => ['BELUM DITEMUKAN', 'status-dalam_peninjauan'],
-        'pending' => ['DALAM PENINJAUAN', 'status-diproses'],
-        'disetujui' => ['DITEMUKAN', 'status-selesai'],
-        'ditolak' => ['DITOLAK', 'status-ditolak'],
-    ];
-    [$statusLabel, $statusClass] = $statusMap[$latestKlaim->status_klaim ?? null] ?? ['BELUM DITEMUKAN', 'status-dalam_peninjauan'];
+    $reportStatus = \App\Support\ReportStatusPresenter::key($laporanBarangHilang->status_laporan ?? null);
+    $statusLabel = \App\Support\ReportStatusPresenter::label($reportStatus);
+    $statusClass = \App\Support\ReportStatusPresenter::cssClass($reportStatus);
 
     $pelaporName = $laporanBarangHilang->user?->nama ?? $laporanBarangHilang->user?->name ?? 'Pengguna';
-    $statusOptionLabels = [
-        'pending' => 'Dalam Peninjauan',
-        'disetujui' => 'Ditemukan',
+    $claimStatusHistoryLabel = match ($latestKlaim->status_klaim ?? null) {
+        'disetujui' => 'Disetujui',
         'ditolak' => 'Ditolak',
-    ];
-    $statusValue = $latestKlaim->status_klaim ?? 'pending';
+        'pending' => 'Menunggu Verifikasi',
+        default => 'Belum Ada Klaim',
+    };
     $pelaporEmail = $laporanBarangHilang->user?->email ?? 'Email tidak tersedia';
     $hasPelaporEmail = filter_var($pelaporEmail, FILTER_VALIDATE_EMAIL) !== false;
     $emailContactHref = $hasPelaporEmail
@@ -196,33 +192,37 @@
 
             <div class="lost-detail-side">
                 <article class="report-card lost-detail-panel lost-panel-status">
-                    <header><h2>Status Saat Ini</h2></header>
+                    <header><h2>Status Laporan</h2></header>
                     <div class="lost-detail-panel-body">
                         <span class="status-chip {{ $statusClass }}">{{ $statusLabel }}</span>
 
-                        <form method="POST" action="{{ route('admin.lost-items.update-status', $laporanBarangHilang->id) }}" id="lost-status-update-form" class="lost-status-edit-form">
-                            @csrf
-                            @method('PATCH')
-
-                            <div class="lost-form-group">
-                                <label class="lost-status-form-label" for="status_klaim">Status Baru</label>
-                                <select id="status_klaim" name="status_klaim" class="form-input lost-status-form-input">
-                                    @foreach($statusOptionLabels as $optionValue => $optionLabel)
-                                        <option value="{{ $optionValue }}" @selected(old('status_klaim', $statusValue) === $optionValue)>{{ $optionLabel }}</option>
-                                    @endforeach
-                                </select>
+                        <div class="lost-verify-box">
+                            <small>Verifikasi Laporan</small>
+                            <p>Tentukan apakah laporan ini layak ditampilkan di halaman publik.</p>
+                            <div class="lost-verify-actions">
+                                <form method="POST" action="{{ route('admin.lost-items.verify', $laporanBarangHilang->id) }}" data-confirm-delete data-confirm-title="Setujui Laporan" data-confirm-message="Setujui laporan ini? Laporan akan bisa dipublikasikan ke Home." data-confirm-submit-label="Setujui" data-confirm-submit-variant="primary">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status_laporan" value="approved">
+                                    <button type="submit" class="filter-btn lost-action-btn lost-action-btn-primary">Setujui Laporan</button>
+                                </form>
+                                <form method="POST" action="{{ route('admin.lost-items.verify', $laporanBarangHilang->id) }}" data-confirm-delete data-confirm-title="Tolak Laporan" data-confirm-message="Tolak laporan ini? Laporan tidak akan tampil di Home." data-confirm-submit-label="Tolak" data-confirm-submit-variant="danger">
+                                    @csrf
+                                    @method('PATCH')
+                                    <input type="hidden" name="status_laporan" value="rejected">
+                                    <button type="submit" class="filter-btn lost-action-btn lost-action-btn-ghost">Tolak Laporan</button>
+                                </form>
                             </div>
+                        </div>
 
-                            <div class="lost-form-group">
-                                <label class="lost-status-form-label" for="catatan">Catatan (Opsional)</label>
-                                <textarea
-                                    id="catatan"
-                                    name="catatan"
-                                    class="form-input form-textarea-sm lost-status-form-input"
-                                    placeholder="{{ $latestKlaim?->catatan ?: 'Contoh: Bukti kepemilikan valid dan sudah diverifikasi admin.' }}"
-                                >{{ old('catatan') }}</textarea>
-                            </div>
-                        </form>
+                        @if(!$latestKlaim)
+                            <p>Belum ada klaim aktif untuk laporan ini.</p>
+                        @else
+                            <p>Perubahan status klaim dilakukan dari halaman Verifikasi Klaim agar checklist keamanan tetap konsisten.</p>
+                            <a href="{{ route('admin.claim-verifications.show', $latestKlaim->id) }}" class="filter-btn lost-action-btn lost-action-btn-primary">
+                                Buka Verifikasi Klaim
+                            </a>
+                        @endif
                     </div>
                 </article>
 
@@ -279,7 +279,7 @@
                         @if($latestKlaim)
                             <div class="lost-activity-item">
                                 <p><strong>Status Klaim Terakhir</strong></p>
-                                <small>{{ $statusLabel }} - {{ \Illuminate\Support\Carbon::parse($latestKlaim->created_at)->format('d M Y, H:i') }} WIB</small>
+                                <small>{{ $claimStatusHistoryLabel }} - {{ \Illuminate\Support\Carbon::parse($latestKlaim->created_at)->format('d M Y, H:i') }} WIB</small>
                             </div>
                         @endif
                     </div>
@@ -287,45 +287,106 @@
             </div>
         </div>
 
-        <div class="lost-detail-bottom-actions">
-            <button type="submit" form="lost-status-update-form" class="filter-btn lost-action-btn lost-action-btn-primary">Perbarui Status</button>
-        </div>
+        <article class="report-card mt-3 lost-matching-card" id="kandidat-pencocokan">
+            <header class="mb-3 lost-matching-header">
+                <div class="lost-matching-header-copy">
+                    <h2 class="mb-1">Kandidat Pencocokan Barang Temuan</h2>
+                    <p class="mb-0">Sistem menilai kandidat berdasarkan kategori, nama barang, warna, merek, nomor seri, lokasi, tanggal, deskripsi, dan ciri khusus.</p>
+                </div>
+                <a href="{{ route('admin.lost-items.show', $laporanBarangHilang->id) }}#kandidat-pencocokan" class="filter-btn">Muat Ulang Kandidat</a>
+            </header>
+
+            @if((string) ($laporanBarangHilang->status_laporan ?? '') !== \App\Support\WorkflowStatus::REPORT_APPROVED)
+                <p class="mb-0">Kandidat baru tersedia setelah laporan barang hilang disetujui admin.</p>
+            @elseif(($matchingCandidates ?? collect())->isEmpty())
+                <p class="mb-0">Belum ada kandidat dengan skor kecocokan yang cukup atau semua kandidat sudah ditinjau.</p>
+            @else
+                <div class="report-table-wrap">
+                    <table class="report-table">
+                        <thead>
+                            <tr>
+                                <th>Barang Temuan</th>
+                                <th>Skor</th>
+                                <th>Ringkasan</th>
+                                <th>Parameter Skor</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($matchingCandidates as $candidate)
+                                @php
+                                    $barang = $candidate->barang;
+                                    $reasons = collect($candidate->reasons ?? [])->take(3)->values();
+                                    $meta = collect($candidate->meta ?? []);
+                                    $scoreClass = $candidate->score >= 75 ? 'status-selesai' : ($candidate->score >= 55 ? 'status-diproses' : 'status-dalam_peninjauan');
+                                    $scoreSummary = $candidate->score >= 75 ? 'Tinggi' : ($candidate->score >= 55 ? 'Sedang' : 'Rendah');
+                                    $catatanSkor = 'Skor otomatis: ' . $candidate->score . '/100';
+                                    if ($reasons->isNotEmpty()) {
+                                        $catatanSkor .= ' | ' . $reasons->implode(', ');
+                                    }
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <div>
+                                            <strong>{{ $barang->nama_barang }}</strong>
+                                            <small style="display:block;">{{ $barang->lokasi_ditemukan }} - {{ \Illuminate\Support\Carbon::parse($barang->tanggal_ditemukan)->format('d M Y') }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="lost-matching-score">
+                                            <span class="status-chip {{ $scoreClass }}">{{ $candidate->score }} / 100</span>
+                                            <small>{{ $scoreSummary }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($reasons->isNotEmpty())
+                                            <div>{{ $reasons->implode(', ') }}</div>
+                                        @else
+                                            <span>-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="lost-matching-metrics">
+                                            <small>Nama: {{ (int) ($meta->get('nama_barang', 0)) }}</small>
+                                            <small>Kategori: {{ (int) ($meta->get('kategori', 0)) }}</small>
+                                            <small>Warna: {{ (int) ($meta->get('warna', 0)) }}</small>
+                                            <small>Merek: {{ (int) ($meta->get('merek', 0)) }}</small>
+                                            <small>No. Seri: {{ (int) ($meta->get('nomor_seri', 0)) }}</small>
+                                            <small>Lokasi: {{ (int) ($meta->get('lokasi', 0)) }}</small>
+                                            <small>Tanggal: {{ (int) ($meta->get('tanggal', 0)) }}</small>
+                                            <small>Deskripsi/Ciri: {{ (int) ($meta->get('deskripsi', 0)) }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="lost-matching-actions">
+                                            <form method="POST" action="{{ route('admin.matches.store') }}">
+                                                @csrf
+                                                <input type="hidden" name="laporan_hilang_id" value="{{ $laporanBarangHilang->id }}">
+                                                <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+                                                <input type="hidden" name="catatan" value="{{ $catatanSkor }}">
+                                                <button type="submit" class="filter-btn lost-matching-btn">Tandai Diduga Cocok</button>
+                                            </form>
+                                            <form method="POST" action="{{ route('admin.matches.dismiss') }}">
+                                                @csrf
+                                                <input type="hidden" name="laporan_hilang_id" value="{{ $laporanBarangHilang->id }}">
+                                                <input type="hidden" name="barang_id" value="{{ $barang->id }}">
+                                                <input type="hidden" name="catatan" value="{{ 'Skor otomatis: '.$candidate->score.'/100 | Ditandai tidak cocok oleh admin.' }}">
+                                                <button type="submit" class="filter-btn lost-action-btn lost-action-btn-ghost lost-matching-btn">Tidak Cocok</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </article>
     </section>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             document.body.classList.add('lost-detail-page-mode');
-
-            const form = document.getElementById('lost-status-update-form');
-            if (!form) return;
-
-            const submitButton = document.querySelector('button[form="lost-status-update-form"][type="submit"]');
-            if (!submitButton) return;
-
-            const statusInput = form.querySelector('#status_klaim');
-            const noteInput = form.querySelector('#catatan');
-
-            if (!statusInput || !noteInput || statusInput.disabled || noteInput.disabled) return;
-
-            const initialStatus = statusInput.value;
-            const initialNote = noteInput.value;
-            const initialText = submitButton.textContent.trim();
-
-            const syncSubmitState = function () {
-                const hasChanged = statusInput.value !== initialStatus || noteInput.value !== initialNote;
-                submitButton.disabled = !hasChanged;
-            };
-
-            statusInput.addEventListener('change', syncSubmitState);
-            noteInput.addEventListener('input', syncSubmitState);
-
-            form.addEventListener('submit', function () {
-                submitButton.disabled = true;
-                submitButton.textContent = 'Menyimpan...';
-                submitButton.dataset.originalText = initialText;
-            });
-
-            syncSubmitState();
         });
     </script>
 @endsection

@@ -55,6 +55,13 @@
                         <p>{{ $detail->description }}</p>
                     </div>
 
+                    @if($detail->type === 'temuan')
+                        <div class="report-detail-preclaim-note" role="note" aria-label="Informasi klaim">
+                            <strong>Verifikasi Kepemilikan Wajib</strong>
+                            <p>{{ $detail->preclaim_note ?? 'User tidak langsung dianggap pemilik. Ajukan klaim dan lengkapi bukti kepemilikan agar dapat diverifikasi admin.' }}</p>
+                        </div>
+                    @endif
+
                     <div class="report-detail-actions">
                         <a href="{{ route('home') }}" class="btn btn-sinemu btn-sinemu-primary">
                             Lihat Laporan Lain
@@ -62,17 +69,20 @@
                         @if($detail->type === 'temuan')
                             @if(($detail->is_claimable ?? false) === true)
                                 @auth
-                                    <a href="{{ route('home') }}" class="btn btn-outline-primary">
-                                        Kembali untuk Klaim Barang
+                                    <a href="{{ $detail->claim_action_url ?? route('home') }}" class="btn btn-outline-primary">
+                                        {{ $detail->claim_action_label ?? 'Buka Beranda untuk Ajukan Klaim' }}
+                                    </a>
+                                    <a href="{{ route('user.claim-history') }}" class="btn btn-outline-secondary">
+                                        Pantau Status Klaim
                                     </a>
                                 @else
-                                    <a href="{{ route('home') }}" class="btn btn-outline-primary">
+                                    <a href="{{ $detail->claim_action_url ?? route('home') }}" class="btn btn-outline-primary">
                                         Masuk untuk Klaim Barang
                                     </a>
                                 @endauth
                             @else
-                                <a href="{{ route('home') }}" class="btn btn-outline-secondary">
-                                    Kembali ke Daftar Temuan
+                                <a href="{{ $detail->claim_action_url ?? route('home') }}" class="btn btn-outline-secondary">
+                                    {{ $detail->claim_action_label ?? 'Kembali ke Daftar Temuan' }}
                                 </a>
                             @endif
                         @endif

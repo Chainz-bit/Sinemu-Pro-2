@@ -14,6 +14,21 @@
             <p>Pantau status pengajuan klaim barang temuan Anda di sini.</p>
         </section>
 
+        <section class="report-card claim-status-guide">
+            <header>
+                <div class="report-heading">
+                    <h2>Arti Status Klaim</h2>
+                    <p>Gunakan panduan ini untuk mengetahui langkah Anda berikutnya.</p>
+                </div>
+            </header>
+            <div class="claim-status-guide-body">
+                <span class="status-chip status-dalam_peninjauan">Menunggu Tinjauan</span>
+                <span class="status-chip status-diproses">Sedang Diproses</span>
+                <span class="status-chip status-ditolak">Tidak Disetujui</span>
+                <span class="status-chip status-selesai">Selesai</span>
+            </div>
+        </section>
+
         <section class="report-card report-card-scrollable dashboard-report-card claim-history-card">
             <header>
                 <div class="report-heading">
@@ -30,9 +45,9 @@
                         @endif
                         <select name="status" class="filter-btn dashboard-filter-select" onchange="this.form.submit()">
                             <option value="semua" @selected($statusFilter === 'semua')>Semua Status</option>
-                            <option value="menunggu" @selected($statusFilter === 'menunggu')>Menunggu Verifikasi</option>
-                            <option value="disetujui" @selected($statusFilter === 'disetujui')>Disetujui</option>
-                            <option value="ditolak" @selected($statusFilter === 'ditolak')>Ditolak</option>
+                            <option value="menunggu_tinjauan" @selected($statusFilter === 'menunggu_tinjauan')>Menunggu Tinjauan</option>
+                            <option value="sedang_diproses" @selected($statusFilter === 'sedang_diproses')>Sedang Diproses</option>
+                            <option value="tidak_disetujui" @selected($statusFilter === 'tidak_disetujui')>Tidak Disetujui</option>
                             <option value="selesai" @selected($statusFilter === 'selesai')>Selesai</option>
                         </select>
                     </form>
@@ -94,6 +109,7 @@
                                     <span class="status-chip {{ $claim->status_class }}">
                                         {{ $claim->status_text }}
                                     </span>
+                                    <small class="claim-status-detail">{{ $claim->status_detail }}</small>
                                 </td>
                                 <td>{{ $claim->pickup_location }}</td>
                                 <td class="menu-cell">

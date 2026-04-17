@@ -75,6 +75,17 @@
     color: #fff;
 }
 
+.found-action-btn-ghost {
+    border: 1px solid #d6dfec;
+    background: #ffffff;
+    color: #4f647f;
+}
+
+.found-action-btn-ghost:hover {
+    background: #f8fbff;
+    border-color: #c8d5e7;
+}
+
 .found-action-btn-primary:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -290,6 +301,40 @@
     gap: 8px;
 }
 
+.found-verify-box {
+    border: 1px dashed #d8e3f1;
+    background: #f8fbff;
+    border-radius: 10px;
+    padding: 10px;
+    display: grid;
+    gap: 8px;
+}
+
+.found-verify-box > small {
+    color: #4d6483;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+.found-verify-box > p {
+    margin: 0;
+    font-size: 12px;
+    color: #637894;
+    line-height: 1.45;
+}
+
+.found-verify-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.found-verify-actions form {
+    margin: 0;
+}
+
 .status-form-label {
     font-size: 12px;
     color: #5f7087;
@@ -372,6 +417,60 @@
     margin-top: 2px;
     color: #7b8ba1;
     font-size: 11px;
+}
+
+.found-matching-card > header {
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.found-matching-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.found-matching-header-copy {
+    display: grid;
+    gap: 4px;
+}
+
+.found-matching-score {
+    display: grid;
+    gap: 4px;
+}
+
+.found-matching-score small {
+    color: #73849a;
+    font-size: 11px;
+}
+
+.found-matching-metrics {
+    display: grid;
+    gap: 4px;
+}
+
+.found-matching-metrics small {
+    display: block;
+    color: #5d6f85;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.found-matching-actions {
+    display: grid;
+    gap: 8px;
+    min-width: 168px;
+}
+
+.found-matching-actions form {
+    margin: 0;
+}
+
+.found-matching-btn {
+    width: 100%;
+    justify-content: center;
 }
 
 .found-person-row {
@@ -462,6 +561,15 @@
         padding-top: 6px;
     }
 
+    .found-matching-header {
+        flex-direction: column;
+    }
+
+    .found-matching-header .filter-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     .found-detail-body h2 {
         font-size: 26px;
     }
@@ -476,6 +584,18 @@
 
     .status-edit-form select.status-form-input {
         width: 100%;
+    }
+
+    .found-verify-actions {
+        flex-direction: column;
+    }
+
+    .found-verify-actions .found-action-btn {
+        width: 100%;
+    }
+
+    .found-matching-actions {
+        min-width: 0;
     }
 }
 
