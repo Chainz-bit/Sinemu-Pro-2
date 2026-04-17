@@ -103,49 +103,49 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-    # ─── JOB 3: DEPLOY KE VPS ────────────────────────────────
-deploy:
-  name: Deploy ke VPS
-  runs-on: ubuntu-latest
-  needs: build-and-push
+  # ─── JOB 3: DEPLOY KE VPS ────────────────────────────────
+  deploy:
+    name: Deploy ke VPS
+    runs-on: ubuntu-latest
+    needs: build-and-push
 
-  steps:
-    - name: Deploy via SSH
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SSH_PORT }}
-        script: |
-          set -e
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
 
-          echo "🚀 Mulai deployment..."
+            echo "🚀 Mulai deployment..."
 
-          # Login ke GHCR
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Login ke GHCR
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-          # Masuk ke folder project di VPS
-          cd /home/${{ secrets.SERVER_USER }}/RPL2D-kelompok-2
+            # Masuk ke folder project di VPS
+            cd /home/${{ secrets.SERVER_USER }}/RPL2D-kelompok-2
 
-          # Pull image terbaru
-          docker pull ghcr.io/chainz-bit/sinemu-pro-2:latest
+            # Pull image terbaru
+            docker pull ghcr.io/chainz-bit/sinemu-pro-2:latest
 
-          # Jalankan / update container
-          docker compose up -d --remove-orphans
+            # Jalankan / update container
+            docker compose up -d --remove-orphans
 
-          # Tunggu database siap
-          echo "⏳ Menunggu database ready..."
-          until docker compose exec -T db mysqladmin ping -h "localhost" --silent; do
-            sleep 2
-          done
+            # Tunggu database siap
+            echo "⏳ Menunggu database ready..."
+            until docker compose exec -T db mysqladmin ping -h "localhost" --silent; do
+              sleep 2
+            done
 
-          # Jalankan migrasi
-          docker compose exec -T app php artisan migrate --force --no-interaction
+            # Jalankan migrasi
+            docker compose exec -T app php artisan migrate --force --no-interaction
 
-          # Optional: cache ulang konfigurasi Laravel
-          docker compose exec -T app php artisan config:cache
-          docker compose exec -T app php artisan route:cache
-          docker compose exec -T app php artisan view:cache
+            # Optional: cache ulang konfigurasi Laravel
+            docker compose exec -T app php artisan config:cache
+            docker compose exec -T app php artisan route:cache
+            docker compose exec -T app php artisan view:cache
 
-          echo "✅ Deployment selesai!"
+            echo "✅ Deployment selesai!"

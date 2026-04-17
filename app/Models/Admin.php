@@ -3,8 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * @property int $id
+ * @property int|null $super_admin_id
+ * @property string $nama
+ * @property string $email
+ * @property string|null $nomor_telepon
+ * @property string $username
+ * @property string $password
+ * @property string|null $instansi
+ * @property string|null $kecamatan
+ * @property string|null $alamat_lengkap
+ * @property string|null $status_verifikasi
+ * @property string|null $alasan_penolakan
+ * @property string|null $verified_at
+ * @property float|null $lat
+ * @property float|null $lng
+ * @property string|null $profil
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ * @property-read SuperAdmin|null $superAdmin
+ * @property-read Collection<int, Barang> $barangs
+ * @property-read Collection<int, Klaim> $klaims
+ * @property-read Collection<int, AdminNotification> $notifications
+ */
 class Admin extends Authenticatable
 {
     use HasFactory;

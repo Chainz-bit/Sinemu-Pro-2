@@ -352,7 +352,7 @@ class FoundItemController extends Controller
         $photoDataUri = null;
         if (!empty($barang->foto_barang) && Storage::disk('public')->exists($barang->foto_barang)) {
             $absolutePath = Storage::disk('public')->path($barang->foto_barang);
-            $mimeType = Storage::disk('public')->mimeType($barang->foto_barang) ?: 'image/jpeg';
+            $mimeType = mime_content_type($absolutePath) ?: 'image/jpeg';
             $photoDataUri = 'data:' . $mimeType . ';base64,' . base64_encode((string) file_get_contents($absolutePath));
         }
 

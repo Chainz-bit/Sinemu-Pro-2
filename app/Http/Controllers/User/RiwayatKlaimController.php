@@ -16,8 +16,8 @@ class RiwayatKlaimController extends Controller
 {
     public function index(Request $request)
     {
+        abort_unless(Auth::check(), 403);
         $user = Auth::user();
-        abort_unless($user, 403);
 
         $search = trim((string) $request->query('search', ''));
         $status = trim((string) $request->query('status', 'semua'));
@@ -128,8 +128,8 @@ class RiwayatKlaimController extends Controller
 
     public function destroy(Klaim $klaim)
     {
+        abort_unless(Auth::check(), 403);
         $user = Auth::user();
-        abort_unless($user, 403);
         abort_unless((int) $klaim->user_id === (int) $user->id, 403);
 
         foreach ((array) ($klaim->bukti_foto ?? []) as $path) {

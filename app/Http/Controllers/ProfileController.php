@@ -18,8 +18,8 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        abort_unless($request->user() !== null, 403);
         $user = $request->user();
-        abort_unless($user, 403);
 
         $defaultAvatar = asset('img/profil.jpg');
         $profilePath = trim((string) ($user->profil ?? ''));
@@ -40,7 +40,7 @@ class ProfileController extends Controller
                 ? (Storage::disk('public')->exists($normalized)
                     ? ((function () use ($normalized, $folder, $subPath) {
                         $absolutePath = Storage::disk('public')->path($normalized);
-                        $mimeType = Storage::disk('public')->mimeType($normalized) ?: 'image/jpeg';
+                        $mimeType = mime_content_type($absolutePath) ?: 'image/jpeg';
                         $binary = @file_get_contents($absolutePath);
                         if ($binary !== false) {
                             return 'data:' . $mimeType . ';base64,' . base64_encode($binary);
@@ -52,7 +52,7 @@ class ProfileController extends Controller
                 : (Storage::disk('public')->exists($normalized)
                     ? ((function () use ($normalized) {
                         $absolutePath = Storage::disk('public')->path($normalized);
-                        $mimeType = Storage::disk('public')->mimeType($normalized) ?: 'image/jpeg';
+                        $mimeType = mime_content_type($absolutePath) ?: 'image/jpeg';
                         $binary = @file_get_contents($absolutePath);
                         if ($binary !== false) {
                             return 'data:' . $mimeType . ';base64,' . base64_encode($binary);
@@ -79,8 +79,8 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        abort_unless($request->user() !== null, 403);
         $user = $request->user();
-        abort_unless($user, 403);
 
         $validated = $request->validated();
         unset($validated['profil']);

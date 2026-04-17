@@ -11,8 +11,8 @@ class UserNotificationController extends Controller
 {
     public function markAllAsRead(): RedirectResponse
     {
+        abort_unless(Auth::check(), 403);
         $user = Auth::user();
-        abort_unless($user, 403);
 
         $user->notifications()
             ->whereNull('read_at')
@@ -45,8 +45,8 @@ class UserNotificationController extends Controller
 
     public function destroyAll(): RedirectResponse
     {
+        abort_unless(Auth::check(), 403);
         $user = Auth::user();
-        abort_unless($user, 403);
 
         $user->notifications()->delete();
 

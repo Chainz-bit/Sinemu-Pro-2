@@ -16,7 +16,7 @@ class MediaController extends Controller
         abort_unless(Storage::disk('public')->exists($relativePath), 404);
 
         $absolutePath = Storage::disk('public')->path($relativePath);
-        $mimeType = Storage::disk('public')->mimeType($relativePath) ?: 'application/octet-stream';
+        $mimeType = mime_content_type($absolutePath) ?: 'application/octet-stream';
 
         // Pastikan tidak ada output liar (spasi/BOM) sebelum binary image.
         while (\ob_get_level() > 0) {

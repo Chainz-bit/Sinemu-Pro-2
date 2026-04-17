@@ -181,7 +181,7 @@ class ProfileController extends Controller
         if (in_array($folder, ['profil-admin', 'profil-user', 'barang-hilang', 'barang-temuan', 'verifikasi-klaim'], true) && $subPath !== '') {
             if (Storage::disk('public')->exists($normalized)) {
                 $absolutePath = Storage::disk('public')->path($normalized);
-                $mimeType = Storage::disk('public')->mimeType($normalized) ?: 'image/jpeg';
+                $mimeType = mime_content_type($absolutePath) ?: 'image/jpeg';
                 $binary = @file_get_contents($absolutePath);
                 if ($binary !== false) {
                     return 'data:' . $mimeType . ';base64,' . base64_encode($binary);
@@ -195,7 +195,7 @@ class ProfileController extends Controller
 
         if (Storage::disk('public')->exists($normalized)) {
             $absolutePath = Storage::disk('public')->path($normalized);
-            $mimeType = Storage::disk('public')->mimeType($normalized) ?: 'image/jpeg';
+            $mimeType = mime_content_type($absolutePath) ?: 'image/jpeg';
             $binary = @file_get_contents($absolutePath);
             if ($binary !== false) {
                 return 'data:' . $mimeType . ';base64,' . base64_encode($binary);

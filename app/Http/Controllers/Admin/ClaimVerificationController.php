@@ -19,7 +19,7 @@ use Illuminate\Support\Str;
 
 class ClaimVerificationController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): View|StreamedResponse
     {
         /** @var \App\Models\Admin $admin */
         $admin = Auth::guard('admin')->user();

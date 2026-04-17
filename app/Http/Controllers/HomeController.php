@@ -23,12 +23,42 @@ class HomeController extends Controller
     private bool $databaseFailureReported = false;
     private bool $databaseReachabilityChecked = false;
 
-    public function index()
+    public function index(): \Illuminate\View\View|\Illuminate\Http\RedirectResponse
     {
         if (Auth::guard('admin')->check()) {
             return redirect()->route('admin.dashboard');
         }
 
+        [$lostItems, $lostTotalCount] = $this->getLostItems();
+        [$foundItems, $foundTotalCount] = $this->getFoundItems();
+        [$categories, $kategoriOptions] = $this->getCategories($foundItems);
+        [$regions, $mapRegions] = $this->getRegions($lostItems, $foundItems);
+        $pickupLocations = $this->getPickupLocations();
+        $currentUser = Auth::user();
+        $userName = $this->resolveUserDisplayName($currentUser);
+        $userAvatar = $this->resolveUserAvatarUrl($currentUser?->profil ?? null);
+        $userLocation = $currentUser?->location ?? 'Lokasi Anda';
+        $claimableLostReports = Auth::check() ? $this->getClaimableLostReports() : collect();
+
+        return view('home', compact(
+            'lostItems',
+            'foundItems',
+            'lostTotalCount',
+            'foundTotalCount',
+            'categories',
+            'kategoriOptions',
+            'regions',
+            'mapRegions',
+            'pickupLocations',
+            'userName',
+            'userAvatar',
+            'userLocation',
+            'claimableLostReports'
+        ));
+    }
+
+    private function getLostItems(): array
+    {
         $lostItems = [];
         $lostTotalCount = 0;
         if ($this->hasDatabaseTable('laporan_barang_hilangs')) {
@@ -85,7 +115,11 @@ class HomeController extends Controller
                 return [$lostItems, $lostTotalCount];
             }, [[], 0]);
         }
+        return [$lostItems, $lostTotalCount];
+    }
 
+    private function getFoundItems(): array
+    {
         $foundItems = [];
         $foundTotalCount = 0;
         if ($this->hasDatabaseTable('barangs')) {
@@ -146,7 +180,11 @@ class HomeController extends Controller
                 return [$foundItems, $foundTotalCount];
             }, [[], 0]);
         }
+        return [$foundItems, $foundTotalCount];
+    }
 
+    private function getCategories(array $foundItems): array
+    {
         $categories = ['Semua Kategori'];
         $kategoriOptions = collect();
         if ($this->hasDatabaseTable('kategoris')) {
@@ -180,7 +218,11 @@ class HomeController extends Controller
         if (count($categoryLabels) > 0) {
             $categories = array_merge(['Semua Kategori'], $categoryLabels);
         }
+        return [$categories, $kategoriOptions];
+    }
 
+    private function getRegions(array $lostItems, array $foundItems): array
+    {
         $regions = ['Seluruh Wilayah'];
         $mapRegions = [];
         if ($this->hasDatabaseTable('wilayahs')) {
@@ -245,7 +287,11 @@ class HomeController extends Controller
                 $regions = array_merge(['Seluruh Wilayah'], $regionFromItems);
             }
         }
+        return [$regions, $mapRegions];
+    }
 
+    private function getPickupLocations(): array
+    {
         $pickupLocations = [];
         if ($this->hasDatabaseTable('admins')) {
             $pickupLocations = $this->safeDatabaseCall(function () {
@@ -301,15 +347,16 @@ class HomeController extends Controller
                     ->all();
             }, []);
         }
+        return $pickupLocations;
+    }
 
-        $currentUser = Auth::user();
-        $userName = $this->resolveUserDisplayName($currentUser);
-        $userAvatar = $this->resolveUserAvatarUrl($currentUser?->profil ?? null);
-        $userLocation = $currentUser?->location ?? 'Lokasi Anda';
-        $claimableLostReports = collect();
-
-        if (Auth::check() && $this->hasDatabaseTable('laporan_barang_hilangs')) {
-            $claimableLostReports = $this->safeDatabaseCall(function () {
+    private function getClaimableLostReports(): \Illuminate\Support\Collection
+    {
+        if (!$this->hasDatabaseTable('laporan_barang_hilangs')) {
+            return collect();
+        }
+        
+        return $this->safeDatabaseCall(function () {
                 $query = LaporanBarangHilang::query()
                     ->where('user_id', (int) Auth::id())
                     ->select([
@@ -337,23 +384,6 @@ class HomeController extends Controller
                     ->orderByDesc('updated_at')
                     ->get();
             }, collect());
-        }
-
-        return view('home', compact(
-            'lostItems',
-            'foundItems',
-            'lostTotalCount',
-            'foundTotalCount',
-            'categories',
-            'kategoriOptions',
-            'regions',
-            'mapRegions',
-            'pickupLocations',
-            'userName',
-            'userAvatar',
-            'userLocation',
-            'claimableLostReports'
-        ));
     }
 
     public function showLostDetail(LaporanBarangHilang $laporanBarangHilang)
@@ -550,7 +580,7 @@ class HomeController extends Controller
         }
 
         $absolutePath = Storage::disk('public')->path($relativePath);
-        $mimeType = Storage::disk('public')->mimeType($relativePath) ?: 'image/jpeg';
+        $mimeType = mime_content_type($absolutePath) ?: 'image/jpeg';
         if (!is_string($mimeType) || !str_starts_with($mimeType, 'image/')) {
             $extension = strtolower(pathinfo($relativePath, PATHINFO_EXTENSION));
             $mimeType = match ($extension) {
