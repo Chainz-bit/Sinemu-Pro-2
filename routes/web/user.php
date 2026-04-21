@@ -20,6 +20,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('user')->name('user.')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/profil', [UserProfileController::class, 'index'])->name('profile');
+        Route::get('/klaim', [ClaimController::class, 'create'])->name('claims.create');
         Route::get('/riwayat-klaim', [RiwayatKlaimController::class, 'index'])->name('claim-history');
         Route::delete('/riwayat-klaim/{klaim}', [RiwayatKlaimController::class, 'destroy'])->name('claim-history.destroy');
         Route::get('/lapor-barang-hilang', [LostReportController::class, 'create'])->name('lost-reports.create');

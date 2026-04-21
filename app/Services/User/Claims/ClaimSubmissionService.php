@@ -31,7 +31,7 @@ class ClaimSubmissionService
             'bukti_ciri_khusus' => ['required', 'string', 'max:2000'],
             'bukti_detail_isi' => ['nullable', 'string', 'max:2000'],
             'bukti_lokasi_spesifik' => ['required', 'string', 'max:255'],
-            'bukti_waktu_hilang' => ['required', 'date_format:H:i'],
+            'bukti_waktu_hilang' => ['required', 'regex:/^([01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/'],
             'bukti_foto' => ['required', 'array', 'min:1', 'max:3'],
             'bukti_foto.*' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'catatan' => ['nullable', 'string'],
@@ -124,7 +124,7 @@ class ClaimSubmissionService
             $claimPayload['bukti_lokasi_spesifik'] = $validated['bukti_lokasi_spesifik'];
         }
         if (Schema::hasColumn('klaims', 'bukti_waktu_hilang')) {
-            $claimPayload['bukti_waktu_hilang'] = $validated['bukti_waktu_hilang'];
+            $claimPayload['bukti_waktu_hilang'] = $this->normalizeClaimTime((string) $validated['bukti_waktu_hilang']);
         }
 
         Klaim::create($claimPayload);
@@ -138,5 +138,19 @@ class ClaimSubmissionService
         $pencocokan->update(['status_pencocokan' => WorkflowStatus::MATCH_CLAIM_IN_PROGRESS]);
 
         return ['ok' => true, 'message' => 'Pengajuan klaim berhasil dikirim. Pantau status verifikasi di Riwayat Klaim.'];
+    }
+
+    private function normalizeClaimTime(string $rawTime): string
+    {
+        $rawTime = trim($rawTime);
+        if ($rawTime === '') {
+            return $rawTime;
+        }
+
+        $segments = explode(':', $rawTime);
+        $hour = isset($segments[0]) ? (int) $segments[0] : 0;
+        $minute = isset($segments[1]) ? (int) $segments[1] : 0;
+
+        return sprintf('%02d:%02d', $hour, $minute);
     }
 }

@@ -1,0 +1,620 @@
+/* Bagian ini mengatur layout detail barang temuan agar sejalan dengan detail barang hilang. */
+.found-detail-page {
+    display: grid;
+    gap: 18px;
+    margin-top: 10px;
+    padding-bottom: 14px;
+    max-width: 1320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.found-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.found-detail-breadcrumb {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: #7b8797;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.found-detail-breadcrumb a {
+    color: #637894;
+    text-decoration: none;
+}
+
+.found-detail-header h1 {
+    margin: 0;
+    font-size: 36px;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+}
+
+.found-detail-header-meta {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.found-detail-header-meta span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid #dce6f3;
+    background: #f7faff;
+    color: #5d728f;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.found-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.found-action-btn-primary {
+    border-color: #2f8fe9;
+    background: #2f8fe9;
+    color: #fff;
+}
+
+.found-action-btn-ghost {
+    border: 1px solid #d6dfec;
+    background: #ffffff;
+    color: #4f647f;
+}
+
+.found-action-btn-ghost:hover {
+    background: #f8fbff;
+    border-color: #c8d5e7;
+}
+
+.found-action-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.found-detail-bottom-actions {
+    display: flex;
+    justify-content: flex-end;
+    position: sticky;
+    bottom: 0;
+    z-index: 6;
+    margin-top: 2px;
+    padding: 10px 0 8px;
+    background: linear-gradient(180deg, rgba(246, 249, 253, 0) 0%, rgba(246, 249, 253, 0.95) 60%);
+}
+
+.found-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    align-items: start;
+}
+
+.found-detail-main {
+    overflow: hidden;
+    border-radius: 14px;
+    border: 1px solid #e5ecf5;
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.04);
+}
+
+.found-detail-main-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+    padding: 18px;
+}
+
+.found-detail-image-wrap {
+    position: relative;
+    border: 1px solid #e7edf6;
+    background: linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
+    min-height: 320px;
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+    border-radius: 12px;
+}
+
+.found-detail-image-label {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 9px;
+    border-radius: 999px;
+    border: 1px solid #d5e2f2;
+    background: rgba(255, 255, 255, 0.9);
+    color: #4f6481;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.found-detail-image {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 285px;
+    display: block;
+    border-radius: 12px;
+}
+
+.found-detail-body {
+    padding: 2px 0;
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    max-width: 100%;
+}
+
+.found-detail-body h2 {
+    margin: 0;
+    font-size: clamp(1.85rem, 2.5vw, 2.45rem);
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    color: #162b49;
+}
+
+.found-detail-body p {
+    margin: 0;
+    color: #4c6079;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 75ch;
+}
+
+.found-detail-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #edf1f6;
+}
+
+.found-detail-meta span {
+    display: block;
+    color: #8091a8;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+}
+
+.found-detail-meta strong {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1f2d3d;
+}
+
+.found-detail-meta > div {
+    border: 1px solid #e5edf7;
+    background: linear-gradient(180deg, #fbfdff 0%, #f7faff 100%);
+    border-radius: 12px;
+    padding: 10px 12px;
+    min-height: 72px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.found-detail-meta > div:hover {
+    border-color: #cfddf0;
+    box-shadow: 0 6px 14px rgba(32, 59, 94, 0.06);
+}
+
+.found-detail-side {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    align-content: start;
+    position: static;
+}
+
+.found-panel-status,
+.found-panel-activity {
+    grid-column: 1 / -1;
+}
+
+.found-detail-panel {
+    border-radius: 14px;
+    border: 1px solid #e5ecf5;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.03);
+}
+
+.found-detail-panel > header {
+    padding: 13px 14px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    border-bottom: 1px solid #e7eef7;
+}
+
+.found-detail-panel > header h2 {
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #7a8ba3;
+}
+
+.found-detail-panel-body {
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+}
+
+.found-detail-panel-body p {
+    margin: 0;
+    font-size: 13px;
+    color: #4a607a;
+    line-height: 1.45;
+}
+
+.found-detail-panel-body p strong {
+    color: #223446;
+}
+
+.found-detail-page .status-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.found-detail-panel-body > .status-chip {
+    justify-self: start;
+    align-self: start;
+}
+
+.status-edit-form {
+    margin-top: 6px;
+    display: grid;
+    gap: 8px;
+}
+
+.found-verify-box {
+    border: 1px dashed #d8e3f1;
+    background: #f8fbff;
+    border-radius: 10px;
+    padding: 10px;
+    display: grid;
+    gap: 8px;
+}
+
+.found-verify-box > small {
+    color: #4d6483;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+.found-verify-box > p {
+    margin: 0;
+    font-size: 12px;
+    color: #637894;
+    line-height: 1.45;
+}
+
+.found-verify-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.found-verify-actions form {
+    margin: 0;
+}
+
+.status-form-label {
+    font-size: 12px;
+    color: #5f7087;
+    font-weight: 600;
+}
+
+.status-form-input {
+    height: 40px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #d8e3f1;
+    background: #fdfefe;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-form-input:focus {
+    border-color: #9fc0eb;
+    box-shadow: 0 0 0 3px rgba(47, 143, 233, 0.14);
+    outline: none;
+}
+
+.status-edit-form select.status-form-input {
+    height: 34px;
+    min-height: 34px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    line-height: 1.1;
+    width: 170px;
+    max-width: 100%;
+    justify-self: start;
+}
+
+.status-form-input:disabled {
+    background: #f3f6fb;
+    color: #66758c;
+    cursor: not-allowed;
+}
+
+.status-edit-form .form-textarea-sm.status-form-input {
+    height: auto;
+    min-height: 92px;
+}
+
+.found-contact-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.found-contact-actions .filter-btn {
+    text-decoration: none;
+    font-size: 11px;
+    padding: 6px 10px;
+    background: #f7f9fc;
+}
+
+.found-contact-actions .filter-btn.is-disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.activity-item {
+    position: relative;
+    padding-left: 14px;
+}
+
+.activity-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: #3b82f6;
+}
+
+.activity-item small {
+    display: block;
+    margin-top: 2px;
+    color: #7b8ba1;
+    font-size: 11px;
+}
+
+.found-matching-card > header {
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.found-matching-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.found-matching-header-copy {
+    display: grid;
+    gap: 4px;
+}
+
+.found-matching-score {
+    display: grid;
+    gap: 4px;
+}
+
+.found-matching-score small {
+    color: #73849a;
+    font-size: 11px;
+}
+
+.found-matching-metrics {
+    display: grid;
+    gap: 4px;
+}
+
+.found-matching-metrics small {
+    display: block;
+    color: #5d6f85;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.found-matching-actions {
+    display: grid;
+    gap: 8px;
+    min-width: 168px;
+}
+
+.found-matching-actions form {
+    margin: 0;
+}
+
+.found-matching-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.found-person-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.found-person-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    background: #e6f0ff;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.found-person-row small {
+    color: #74869f;
+    font-size: 11px;
+}
+
+.found-info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+}
+
+.found-info-icon {
+    width: 18px;
+    height: 18px;
+    color: #8aa0bd;
+    margin-top: 2px;
+}
+
+.found-info-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.found-info-item small {
+    color: #7b8ba1;
+    font-size: 11px;
+}
+
+@media (max-width: 1024px) {
+    .found-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .found-detail-header h1 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 900px) {
+    .found-detail-side {
+        grid-template-columns: 1fr;
+    }
+
+    .found-panel-status,
+    .found-panel-activity {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .found-detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .found-detail-header h1 {
+        font-size: 26px;
+    }
+
+    .found-detail-header-meta {
+        gap: 6px;
+    }
+
+    .found-detail-bottom-actions {
+        position: static;
+        background: transparent;
+        padding-top: 6px;
+    }
+
+    .found-matching-header {
+        flex-direction: column;
+    }
+
+    .found-matching-header .filter-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .found-detail-body h2 {
+        font-size: 26px;
+    }
+
+    .found-detail-image {
+        max-height: 220px;
+    }
+
+    .found-detail-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .status-edit-form select.status-form-input {
+        width: 100%;
+    }
+
+    .found-verify-actions {
+        flex-direction: column;
+    }
+
+    .found-verify-actions .found-action-btn {
+        width: 100%;
+    }
+
+    .found-matching-actions {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 520px) {
+    .found-detail-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .found-detail-body h2 {
+        font-size: 18px;
+    }
+
+    .found-detail-image {
+        max-height: 190px;
+    }
+
+    .found-detail-main-content {
+        padding: 10px;
+        gap: 10px;
+        grid-template-columns: 1fr;
+    }
+}

@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\View;
 
 class AppServiceProvider extends ServiceProvider
 {
+    private const TOPBAR_NOTIFICATIONS_LIMIT = 8;
+
     /**
      * Register any application services.
      */
@@ -56,8 +58,9 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $notifications = $admin->notifications()
+                ->select(['id', 'admin_id', 'title', 'message', 'action_url', 'read_at', 'created_at'])
                 ->latest('created_at')
-                ->limit(20)
+                ->limit(self::TOPBAR_NOTIFICATIONS_LIMIT)
                 ->get();
 
             $unreadCount = $admin->notifications()
@@ -86,8 +89,9 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $notifications = $user->notifications()
+                ->select(['id', 'user_id', 'title', 'message', 'action_url', 'read_at', 'created_at'])
                 ->latest('created_at')
-                ->limit(20)
+                ->limit(self::TOPBAR_NOTIFICATIONS_LIMIT)
                 ->get();
 
             $unreadCount = $user->notifications()

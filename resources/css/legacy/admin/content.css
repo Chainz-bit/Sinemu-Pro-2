@@ -1,0 +1,23 @@
+/*
+|--------------------------------------------------------------------------
+| Konten Admin (Aggregator)
+|--------------------------------------------------------------------------
+| File ini hanya mengatur urutan import style konten admin.
+| Setiap modul dipisah agar lebih mudah dikembangkan dan dirawat.
+*/
+
+@import url('./content/intro-stats.css');
+@import url('./content/report-table.css');
+@import url('./content/row-menu-pagination.css');
+@import url('./content/page-modes.css');
+@import url('./content/input-form.css');
+@import url('./content/modals.css');
+@import url('./content/found-detail.css');
+@import url('./content/found-detail-fixed.css');
+@import url('./content/lost-detail.css');
+@import url('./content/lost-detail-fixed.css');
+@import url('./content/edit-report-page.css');
+@import url('./content/claim-verification-detail.css');
+@import url('./content/profile.css');
+@import url('./content/settings.css');
+@import url('./content/settings-logs.css');

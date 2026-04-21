@@ -21,7 +21,7 @@ class HomeController extends Controller
 
         $viewData = $this->homePageService->buildHomeViewData(
             currentUser: Auth::user(),
-            includeClaimableReports: Auth::check()
+            includeClaimableReports: false
         );
 
         return view('home', $viewData);

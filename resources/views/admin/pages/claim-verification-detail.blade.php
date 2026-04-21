@@ -287,11 +287,15 @@
 
         @if(($statusKey ?? 'menunggu') === 'menunggu')
             <div class="claim-detail-bottom-actions claim-detail-bottom-actions-stack">
-                <form method="POST" action="{{ route('admin.claim-verifications.approve', $klaim->id) }}" class="claim-verification-form" data-confirm-delete>
+                <form method="POST" action="{{ route('admin.claim-verifications.approve', $klaim->id) }}" class="claim-verification-form" data-confirm-delete data-claim-verification-form>
                     @csrf
                     <div class="claim-verification-head">
                         <h3>Form Verifikasi Klaim</h3>
                         <p>Isi checklist dulu, lalu pilih aksi setujui atau tolak.</p>
+                        <div class="claim-verification-meta">
+                            <span>Checklist wajib: {{ count($checklistLabels) }} poin</span>
+                            <span>Keputusan akhir: Setujui atau Tolak</span>
+                        </div>
                     </div>
                     <div class="claim-verification-rule">
                         <strong>Aturan Otomatis Persetujuan</strong>
@@ -314,11 +318,11 @@
                     </div>
                     <div class="claim-note-box claim-note-box-spacing">
                         <small>Catatan Verifikasi Admin</small>
-                        <textarea name="catatan_verifikasi_admin" class="form-control" rows="2" maxlength="2000" placeholder="Tambahkan catatan validasi jika diperlukan.">{{ old('catatan_verifikasi_admin') }}</textarea>
+                        <textarea name="catatan_verifikasi_admin" class="form-control" rows="4" maxlength="2000" placeholder="Tambahkan catatan validasi jika diperlukan.">{{ old('catatan_verifikasi_admin') }}</textarea>
                     </div>
                     <div class="claim-note-box claim-note-box-spacing">
                         <small>Alasan Penolakan (Wajib jika ditolak)</small>
-                        <textarea name="alasan_penolakan" class="form-control" rows="2" maxlength="2000" placeholder="Isi alasan jika Anda akan menolak klaim.">{{ old('alasan_penolakan') }}</textarea>
+                        <textarea name="alasan_penolakan" class="form-control" rows="4" maxlength="2000" placeholder="Isi alasan jika Anda akan menolak klaim.">{{ old('alasan_penolakan') }}</textarea>
                     </div>
                     <div class="claim-verification-actions">
                         <button type="submit"
@@ -336,10 +340,12 @@
                             data-confirm-message="Setujui klaim ini? Status klaim akan berubah menjadi disetujui."
                             data-confirm-submit-label="Ya, Setujui"
                             data-confirm-submit-variant="primary"
-                            class="claim-action-btn success">
+                            class="claim-action-btn success"
+                            data-approve-btn>
                             Setujui Klaim
                         </button>
                     </div>
+                    <p class="claim-validation-hint" data-approve-hint aria-live="polite"></p>
                 </form>
             </div>
         @endif

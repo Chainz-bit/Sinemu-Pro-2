@@ -39,7 +39,7 @@
 
             <div class="notification-modal" id="notification-modal">
                 <div class="notification-head">
-                    <strong>Your notifications</strong>
+                    <strong>Notifikasi Admin</strong>
                     <div class="notification-head-actions">
                         <form method="POST" action="{{ route('admin.notifications.read-all') }}">
                             @csrf
@@ -62,9 +62,10 @@
                         <div class="notification-item {{ is_null($notification->read_at) ? 'is-unread' : 'is-read' }}">
                             <a href="{{ $notification->action_url ?: '#' }}" class="notification-main">
                                 <div class="notification-text">
-                                    <strong>{{ $notification->title }}: {{ $notification->message }}</strong>
-                                    <small>
-                                        {{ $notification->created_at?->diffForHumans() }}
+                                    <strong class="notification-title">{{ $notification->title }}</strong>
+                                    <p class="notification-message">{{ $notification->message }}</p>
+                                    <small class="notification-meta">
+                                        <span class="notification-time">{{ $notification->created_at?->diffForHumans() }}</span>
                                         @if(is_null($notification->read_at))
                                             <span class="notification-state unread">Belum dibaca</span>
                                         @else

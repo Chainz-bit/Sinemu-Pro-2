@@ -9,6 +9,7 @@ use App\Services\User\LostReports\LostReportCommandService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class LostReportController extends Controller
 {
@@ -24,11 +25,11 @@ class LostReportController extends Controller
 
         return view('user.pages.lost-report', [
             'user' => Auth::user(),
-            'lostCategoryOptions' => Kategori::query()
+            'lostCategoryOptions' => Cache::remember('lost-report:category-options', 600, static fn () => Kategori::query()
                 ->forForm()
                 ->pluck('nama_kategori')
                 ->filter()
-                ->values(),
+                ->values()),
             'editingReport' => $editingReport,
         ]);
     }

@@ -148,7 +148,7 @@ class HomePageViewService
             ],
         };
 
-        $claimActionUrl = route('home') . '#hilang-temuan';
+        $claimActionUrl = route('user.claims.create', ['barang_id' => $barang->id]);
         $claimActionLabel = 'Ajukan Klaim';
         if ($statusBarang === 'dalam_proses_klaim') {
             $claimActionUrl = route('user.claim-history');

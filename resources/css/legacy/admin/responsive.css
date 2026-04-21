@@ -1,0 +1,240 @@
+/* section: tablet */
+@media (max-width: 1024px) {
+    .admin-shell {
+        grid-template-columns: 1fr;
+        position: relative;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        max-width: calc(100vw - 40px);
+        height: 100vh;
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+        z-index: 40;
+        transform: translateX(-105%);
+        transition: transform 0.26s ease;
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
+    }
+
+    body.sidebar-open .sidebar {
+        transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+        display: block;
+        border: 0;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.24);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.22s ease, visibility 0.22s ease;
+        z-index: 30;
+    }
+
+    body.sidebar-open .sidebar-backdrop {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .sidebar-nav {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar-toggle {
+        display: inline-block;
+        flex: 0 0 auto;
+    }
+
+    .search-form {
+        width: min(420px, calc(100% - 52px));
+    }
+
+    .found-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .found-detail-main-content {
+        grid-template-columns: 1fr;
+    }
+
+    .found-detail-header h1 {
+        font-size: 28px;
+    }
+
+    .found-detail-side {
+        position: static;
+    }
+
+}
+
+/* section: mobile */
+@media (max-width: 699px) {
+    .stat-card {
+        grid-column: span 6;
+    }
+}
+
+@media (max-width: 640px) {
+    .topbar {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr) 32px 32px;
+        align-items: center;
+        gap: 8px;
+        height: auto;
+    }
+
+    .search-form {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .top-actions {
+        display: contents;
+    }
+
+    .notification-modal {
+        position: fixed;
+        top: 70px;
+        right: 10px;
+        left: 10px;
+        width: auto;
+    }
+
+    .top-actions > button {
+        width: 32px;
+        height: 32px;
+    }
+
+    .report-card > header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .report-actions {
+        width: 100%;
+        margin-left: 0;
+        justify-content: space-between;
+    }
+
+    .dashboard-table-toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dashboard-toolbar-note {
+        white-space: normal;
+    }
+
+    .lost-toolbar {
+        flex-wrap: wrap;
+    }
+
+    .lost-toolbar-right {
+        margin-left: auto;
+    }
+
+    .input-card {
+        padding: 14px;
+    }
+
+    .report-type-wrap {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .input-form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-col-6,
+    .form-col-12 {
+        grid-column: auto;
+    }
+
+    .form-actions {
+        justify-content: stretch;
+    }
+
+    .btn-secondary,
+    .btn-primary {
+        flex: 1 1 0;
+    }
+
+    .found-detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .found-detail-header h1 {
+        font-size: 26px;
+    }
+
+    .found-detail-actions {
+        width: 100%;
+    }
+
+    .found-action-btn {
+        flex: 1 1 0;
+        text-align: center;
+        padding: 8px 10px;
+    }
+
+    .found-detail-body h2 {
+        font-size: 26px;
+    }
+
+    .found-detail-image {
+        max-height: 220px;
+    }
+
+    .found-detail-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+/* section: small mobile */
+@media (max-width: 520px) {
+    .stat-card {
+        grid-column: span 12;
+    }
+
+    .topbar {
+        grid-template-columns: 36px minmax(0, 1fr) 30px 30px;
+        gap: 6px;
+        padding: 8px;
+    }
+
+    .top-actions > button {
+        width: 30px;
+        height: 30px;
+    }
+
+    .lost-toolbar-right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .found-detail-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .found-detail-body h2 {
+        font-size: 18px;
+    }
+
+    .found-detail-image {
+        max-height: 190px;
+    }
+
+    .found-detail-main-content {
+        padding: 10px;
+        gap: 10px;
+    }
+}

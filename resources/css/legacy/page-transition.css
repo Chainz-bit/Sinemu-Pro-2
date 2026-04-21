@@ -1,0 +1,35 @@
+/* =========================================
+   Global Page Transition
+========================================= */
+body.page-transition {
+    opacity: 1;
+    transition: opacity 0.12s ease-out;
+}
+
+body.page-transition.page-leaving {
+    opacity: 0.92;
+    pointer-events: none;
+}
+
+/* =========================================
+   View Transition API (Browser Support)
+========================================= */
+@view-transition {
+    navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 180ms;
+    animation-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.page-transition,
+    body.page-transition.page-leaving,
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+        transition: none !important;
+        animation-duration: 1ms !important;
+    }
+}

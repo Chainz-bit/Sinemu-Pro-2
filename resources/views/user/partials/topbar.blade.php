@@ -58,9 +58,10 @@
                         <div class="notification-item {{ is_null($notification->read_at) ? 'is-unread' : 'is-read' }}">
                             <a href="{{ $notification->action_url ?: route('user.dashboard') }}" class="notification-main">
                                 <div class="notification-text">
-                                    <strong>{{ $notification->title }}: {{ $notification->message }}</strong>
-                                    <small>
-                                        {{ $notification->created_at?->diffForHumans() }}
+                                    <strong class="notification-title">{{ $notification->title }}</strong>
+                                    <p class="notification-message">{{ $notification->message }}</p>
+                                    <small class="notification-meta">
+                                        <span class="notification-time">{{ $notification->created_at?->diffForHumans() }}</span>
                                         @if(is_null($notification->read_at))
                                             <span class="notification-state unread">Belum dibaca</span>
                                         @else

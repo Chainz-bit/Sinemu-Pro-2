@@ -159,7 +159,7 @@
                 <div class="hero-modern-actions">
                     <a href="#hilang-temuan" class="btn btn-sinemu btn-sinemu-primary">Cari Barang Sekarang</a>
                     @auth
-                        <button type="button" class="btn btn-sinemu btn-sinemu-outline" data-action="open-lost-report">Lapor Kehilangan</button>
+                        <a href="{{ route('user.lost-reports.create') }}" class="btn btn-sinemu btn-sinemu-outline">Lapor Kehilangan</a>
                     @else
                         <button type="button" class="btn btn-sinemu btn-sinemu-outline" data-bs-toggle="modal" data-bs-target="#loginPortalModal">Lapor Kehilangan</button>
                     @endauth
@@ -322,15 +322,12 @@
                                 <a href="{{ $item['detail_url'] }}" class="item-detail-link">Lihat Detail Laporan</a>
                                 @auth
                                     @if($isClaimable)
-                                        <button
-                                            class="btn item-action-btn claim-button"
-                                            type="button"
-                                            data-barang-id="{{ $item['id'] }}"
-                                            data-barang-name="{{ $item['name'] }}"
-                                            data-barang-status="{{ $item['claim_status_label'] ?? 'Tersedia untuk Diklaim' }}"
+                                        <a
+                                            class="btn item-action-btn"
+                                            href="{{ route('user.claims.create', ['barang_id' => $item['id']]) }}"
                                         >
                                             {{ $claimButtonLabel }}
-                                        </button>
+                                        </a>
                                     @else
                                         <button class="btn item-action-btn item-action-btn-disabled" type="button" disabled aria-disabled="true">
                                             {{ $claimButtonLabel }}
@@ -593,40 +590,6 @@
         @endpush
 
         @auth
-            <div class="modal fade" id="lostReportModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
-                    <form method="POST" action="{{ route('user.lost-reports.store') }}" class="modal-content">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title">Lapor Barang Hilang</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label">Nama Barang</label>
-                                <input type="text" name="nama_barang" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Lokasi Hilang</label>
-                                <input type="text" name="lokasi_hilang" class="form-control" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Tanggal Hilang</label>
-                                <input type="date" name="tanggal_hilang" class="form-control" required>
-                            </div>
-                            <div class="mb-0">
-                                <label class="form-label">Keterangan</label>
-                                <textarea name="keterangan" class="form-control" rows="3"></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Kirim Laporan</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
             <div class="modal fade" id="foundReportModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog">
                     <form method="POST" action="{{ route('user.found-reports.store') }}" class="modal-content">
@@ -670,117 +633,6 @@
                 </div>
             </div>
 
-            <div class="modal fade" id="claimModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog claim-modal-dialog modal-dialog-centered">
-                    <form method="POST" action="{{ route('user.claims.store') }}" class="modal-content claim-modal-content" enctype="multipart/form-data">
-                        @csrf
-                        <input type="hidden" name="barang_id" id="claimBarangId">
-                        <div class="modal-header claim-modal-header">
-                            <h5 class="modal-title">Ajukan Klaim Barang</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body claim-modal-body">
-                            <div class="claim-modal-note claim-modal-note-warning">
-                                <strong>Klaim Bukan Konfirmasi Otomatis Pemilik</strong>
-                                <span>Isi bukti kepemilikan dengan detail. Admin akan memverifikasi sebelum barang dapat diserahkan.</span>
-                            </div>
-                            <div class="claim-modal-highlight">
-                                <span class="claim-modal-highlight-label">Barang Temuan</span>
-                                <input type="text" id="claimBarangName" class="form-control claim-modal-input is-readonly" readonly>
-                            </div>
-                            <div class="claim-modal-highlight">
-                                <span class="claim-modal-highlight-label">Status Barang Temuan</span>
-                                <input type="text" id="claimBarangStatus" class="form-control claim-modal-input is-readonly" readonly>
-                            </div>
-
-                            <div class="claim-modal-form-grid">
-                                <div class="claim-modal-field claim-modal-field-full" id="claimReportSelectorWrap">
-                                    <label class="form-label claim-modal-label">Pilih Laporan Barang Hilang Anda <span>*</span></label>
-                                    <select name="laporan_hilang_id" id="claimLostReportId" class="form-select claim-modal-input" required>
-                                        <option value="">Pilih laporan Anda</option>
-                                        @foreach(($claimableLostReports ?? collect()) as $report)
-                                            <option
-                                                value="{{ $report->id }}"
-                                                data-report-name="{{ $report->nama_barang }}"
-                                                data-report-location="{{ $report->lokasi_hilang }}"
-                                                data-report-date="{{ !empty($report->tanggal_hilang) ? \Carbon\Carbon::parse((string) $report->tanggal_hilang)->format('d/m/Y') : '-' }}"
-                                                data-report-contact="{{ $report->kontak_pelapor ?? '' }}"
-                                                data-report-ownership="{{ $report->bukti_kepemilikan ?? '' }}"
-                                                data-report-ciri="{{ $report->ciri_khusus ?? '' }}"
-                                                data-report-detail-location="{{ $report->detail_lokasi_hilang ?? '' }}"
-                                                data-report-time="{{ $report->waktu_hilang ?? '' }}"
-                                                @selected((string) old('laporan_hilang_id') === (string) $report->id)
-                                            >
-                                                {{ $report->nama_barang }} - {{ $report->lokasi_hilang }} ({{ !empty($report->tanggal_hilang) ? \Carbon\Carbon::parse((string) $report->tanggal_hilang)->format('d/m/Y') : '-' }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <small class="claim-modal-file-hint">Klaim hanya dapat diajukan untuk laporan hilang yang sudah Anda buat.</small>
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <div class="claim-modal-summary" id="claimLostReportSummary" hidden>
-                                        <div class="claim-modal-summary-title">Ringkasan Laporan Hilang</div>
-                                        <div class="claim-modal-summary-row"><span>Barang</span><strong id="claimSummaryName">-</strong></div>
-                                        <div class="claim-modal-summary-row"><span>Lokasi</span><strong id="claimSummaryLocation">-</strong></div>
-                                        <div class="claim-modal-summary-row"><span>Tanggal</span><strong id="claimSummaryDate">-</strong></div>
-                                    </div>
-                                </div>
-                                <div class="claim-modal-field">
-                                    <label class="form-label claim-modal-label">No. WA yang Bisa Dihubungi <span>*</span></label>
-                                    <input type="text" name="kontak_pelapor" id="claimKontakPelapor" class="form-control claim-modal-input" value="{{ old('kontak_pelapor', auth()->user()?->nomor_telepon) }}" placeholder="Contoh: 081234567890" required>
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Bukti Kepemilikan <span>*</span></label>
-                                    <textarea name="bukti_kepemilikan" id="claimBuktiKepemilikan" class="form-control claim-modal-textarea" rows="3" placeholder="Tuliskan bukti yang hanya pemilik asli tahu: isi barang, foto saat dipakai, nomor seri, nota, atau detail lain." required>{{ old('bukti_kepemilikan') }}</textarea>
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Ciri Unik Barang yang Anda Ketahui <span>*</span></label>
-                                    <textarea name="bukti_ciri_khusus" id="claimBuktiCiriKhusus" class="form-control claim-modal-textarea" rows="2" placeholder="Contoh: ada stiker, goresan, ukiran nama, aksesoris khusus." required>{{ old('bukti_ciri_khusus') }}</textarea>
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Detail Isi / Kondisi Saat Hilang</label>
-                                    <textarea name="bukti_detail_isi" id="claimBuktiDetailIsi" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Contoh: isi tas, casing, wallpaper, atau detail kondisi terakhir.">{{ old('bukti_detail_isi') }}</textarea>
-                                </div>
-                                <div class="claim-modal-field">
-                                    <label class="form-label claim-modal-label">Lokasi Spesifik Hilang <span>*</span></label>
-                                    <input type="text" name="bukti_lokasi_spesifik" id="claimBuktiLokasiSpesifik" class="form-control claim-modal-input" value="{{ old('bukti_lokasi_spesifik') }}" placeholder="Contoh: meja pojok kanan perpustakaan" required>
-                                </div>
-                                <div class="claim-modal-field">
-                                    <label class="form-label claim-modal-label">Perkiraan Waktu Hilang <span>*</span></label>
-                                    <input type="time" name="bukti_waktu_hilang" id="claimBuktiWaktuHilang" class="form-control claim-modal-input" value="{{ old('bukti_waktu_hilang') }}" required>
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Foto Bukti Kepemilikan <span>*</span></label>
-                                    <input type="file" name="bukti_foto[]" id="claimBuktiFoto" class="form-control claim-modal-input-file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple required>
-                                    <small class="claim-modal-file-hint">Unggah 1-3 foto (JPG, PNG, WEBP), maksimal 2MB per file.</small>
-                                    <div id="claimBuktiPreview" class="claim-modal-file-preview" aria-live="polite"></div>
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="form-label claim-modal-label">Catatan Klaim</label>
-                                    <textarea name="catatan" class="form-control claim-modal-textarea claim-modal-textarea-sm" rows="2" placeholder="Tambahkan keterangan pendukung jika diperlukan.">{{ old('catatan') }}</textarea>
-                                </div>
-                                <div class="claim-modal-field claim-modal-field-full">
-                                    <label class="claim-modal-check">
-                                        <input type="checkbox" id="claimPersetujuanKlaim" name="persetujuan_klaim" value="1" @checked(old('persetujuan_klaim')) required>
-                                        <span>Saya menyatakan data klaim ini benar dan siap diverifikasi oleh admin. Saya akan memantau hasilnya di Riwayat Klaim.</span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer claim-modal-footer">
-                            <button type="button" class="btn btn-secondary claim-modal-cancel" data-bs-dismiss="modal">Batal</button>
-                            <button
-                                id="claimSubmitButton"
-                                type="submit"
-                                class="btn btn-primary claim-modal-submit"
-                                @disabled(!old('persetujuan_klaim'))
-                            >
-                                Ajukan Klaim
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
         @endauth
 
         <script id="pickupLocationsData" type="application/json">
