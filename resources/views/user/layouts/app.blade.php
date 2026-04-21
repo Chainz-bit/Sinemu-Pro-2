@@ -8,9 +8,7 @@
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
 
     {{-- BAGIAN: Style reusable dashboard --}}
-    <link rel="stylesheet" href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/user/app.css') }}?v={{ @filemtime(public_path('css/user/app.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/flash-popup.css') }}?v={{ @filemtime(public_path('css/flash-popup.css')) }}">
+    @vite('resources/js/entries/user.js')
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
 </head>
 <body>
@@ -72,8 +70,5 @@
     </div>
 
     {{-- BAGIAN: Script interaksi halaman dashboard user --}}
-    <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
-    <script src="{{ asset('js/flash-popup.js') }}?v={{ @filemtime(public_path('js/flash-popup.js')) }}" defer></script>
-    <script type="module" src="{{ asset('js/user/app.js') }}?v={{ @filemtime(public_path('js/user/app.js')) }}"></script>
 </body>
 </html>

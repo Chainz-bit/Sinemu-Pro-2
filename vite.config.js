@@ -4,7 +4,18 @@ import laravel from 'laravel-vite-plugin';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: [
+                'resources/js/entries/main.js',
+                'resources/js/entries/admin.js',
+                'resources/js/entries/user.js',
+                'resources/js/entries/auth-base.js',
+                'resources/js/entries/auth-login.js',
+                'resources/js/entries/auth-register.js',
+                'resources/js/entries/admin-auth-login.js',
+                'resources/js/entries/admin-auth-register.js',
+                'resources/js/entries/super-auth-login.js',
+                'resources/js/entries/app-layout.js',
+            ],
             refresh: true,
         }),
     ],

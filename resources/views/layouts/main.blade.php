@@ -34,9 +34,7 @@
     <noscript><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"></noscript>
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"></noscript>
-    <link href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}" rel="stylesheet">
-    <link href="{{ asset('css/home.css') }}?v={{ @filemtime(public_path('css/home.css')) }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/flash-popup.css') }}?v={{ @filemtime(public_path('css/flash-popup.css')) }}">
+    @vite('resources/js/entries/main.js')
     @stack('styles')
 </head>
 <body>
@@ -66,9 +64,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
-    <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
-    <script src="{{ asset('js/flash-popup.js') }}?v={{ @filemtime(public_path('js/flash-popup.js')) }}" defer></script>
-    <script type="module" src="{{ asset('js/home.js') }}?v={{ @filemtime(public_path('js/home.js')) }}"></script>
     @stack('scripts')
 </body>
 </html>

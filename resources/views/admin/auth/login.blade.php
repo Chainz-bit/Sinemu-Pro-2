@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/auth/login.css') }}?v={{ @filemtime(public_path('css/auth/login.css')) }}">
+    @vite('resources/js/entries/admin-auth-login.js')
 @endpush
 
 @section('content')
@@ -82,7 +82,3 @@
     </main>
     {{-- Admin Login Page End --}}
 @endsection
-
-@push('scripts')
-    <script src="{{ asset('js/auth/register.js') }}?v={{ @filemtime(public_path('js/auth/register.js')) }}" defer></script>
-@endpush

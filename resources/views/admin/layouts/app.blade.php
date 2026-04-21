@@ -8,9 +8,7 @@
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
 
     {{-- BAGIAN: Gaya Global --}}
-    <link rel="stylesheet" href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/admin/app.css') }}?v={{ @filemtime(public_path('css/admin/app.css')) }}">
-    <link rel="stylesheet" href="{{ asset('css/flash-popup.css') }}?v={{ @filemtime(public_path('css/flash-popup.css')) }}">
+    @vite('resources/js/entries/admin.js')
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
 </head>
 <body>
@@ -78,8 +76,5 @@
     </div>
 
     {{-- BAGIAN: Skrip Global --}}
-    <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
-    <script src="{{ asset('js/flash-popup.js') }}?v={{ @filemtime(public_path('js/flash-popup.js')) }}" defer></script>
-    <script type="module" src="{{ asset('js/admin/app.js') }}?v={{ @filemtime(public_path('js/admin/app.js')) }}"></script>
 </body>
 </html>

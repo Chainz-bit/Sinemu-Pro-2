@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -31,12 +32,39 @@ return Application::configure(basePath: dirname(__DIR__))
     ]);
 
     $middleware->redirectUsersTo(function (Request $request) {
+        $connectionName = (string) Config::get('database.default', 'mysql');
+        $connection = (array) Config::get('database.connections.' . $connectionName, []);
+        $driver = (string) ($connection['driver'] ?? '');
+        $host = (string) ($connection['host'] ?? '');
+        $port = (int) ($connection['port'] ?? 3306);
+        $shouldSkipAuthGuards = false;
+
+        if (in_array($driver, ['mysql', 'mariadb'], true) && in_array($host, ['127.0.0.1', 'localhost'], true) && $port > 0) {
+            $socket = @fsockopen($host, $port, $errno, $errstr, 0.25);
+            if (is_resource($socket)) {
+                stream_set_timeout($socket, 0, 250000);
+                $probe = @fread($socket, 1);
+                $meta = stream_get_meta_data($socket);
+                fclose($socket);
+
+                if ($probe === false || ($probe === '' && (($meta['timed_out'] ?? false) === true))) {
+                    $shouldSkipAuthGuards = true;
+                }
+            } else {
+                $shouldSkipAuthGuards = true;
+            }
+        }
+
+        if ($shouldSkipAuthGuards) {
+            return route('home');
+        }
+
         if (Auth::guard('admin')->check()) {
             return route('admin.dashboard');
         }
 
         if (Auth::guard('super_admin')->check()) {
-            return route('super.admin-verifications.index');
+            return route('super.dashboard');
         }
 
         if (Auth::guard('web')->check()) {

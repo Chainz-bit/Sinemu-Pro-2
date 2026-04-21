@@ -15,12 +15,13 @@ class HomeController extends Controller
 
     public function index(): \Illuminate\View\View|\Illuminate\Http\RedirectResponse
     {
-        if (Auth::guard('admin')->check()) {
+        $databaseResponsive = $this->homePageService->isDatabaseResponsive();
+        if ($databaseResponsive && Auth::guard('admin')->check()) {
             return redirect()->route('admin.dashboard');
         }
 
         $viewData = $this->homePageService->buildHomeViewData(
-            currentUser: Auth::user(),
+            currentUser: $databaseResponsive ? Auth::user() : null,
             includeClaimableReports: false
         );
 

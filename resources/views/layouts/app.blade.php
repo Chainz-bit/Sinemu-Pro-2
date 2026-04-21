@@ -9,9 +9,7 @@
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link href="{{ asset('css/app.css') }}?v={{ @filemtime(public_path('css/app.css')) }}" rel="stylesheet">
-    <link href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/flash-popup.css') }}?v={{ @filemtime(public_path('css/flash-popup.css')) }}">
+    @vite('resources/js/entries/app-layout.js')
 
     <!-- Bootstrap Icons (optional) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -87,9 +85,5 @@
         </div>
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/app.js') }}?v={{ @filemtime(public_path('js/app.js')) }}" defer></script>
-    <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
-    <script src="{{ asset('js/flash-popup.js') }}?v={{ @filemtime(public_path('js/flash-popup.js')) }}" defer></script>
-
 </body>
 </html>

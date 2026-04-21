@@ -22,6 +22,15 @@ class HomePageViewService
     private bool $skipDatabaseCalls = false;
     private bool $databaseFailureReported = false;
     private bool $databaseReachabilityChecked = false;
+    /** @var array<string,bool> */
+    private array $tableExistsCache = [];
+    /** @var array<string,bool> */
+    private array $columnExistsCache = [];
+
+    public function isDatabaseResponsive(): bool
+    {
+        return $this->isDatabaseSocketReachable();
+    }
 
     /**
      * @return array<string,mixed>
@@ -758,12 +767,27 @@ class HomePageViewService
 
     private function hasDatabaseTable(string $table): bool
     {
-        return $this->safeDatabaseCall(fn () => Schema::hasTable($table), false);
+        if (array_key_exists($table, $this->tableExistsCache)) {
+            return $this->tableExistsCache[$table];
+        }
+
+        $exists = $this->safeDatabaseCall(fn () => Schema::hasTable($table), false);
+        $this->tableExistsCache[$table] = (bool) $exists;
+
+        return $this->tableExistsCache[$table];
     }
 
     private function hasDatabaseColumn(string $table, string $column): bool
     {
-        return $this->safeDatabaseCall(fn () => Schema::hasColumn($table, $column), false);
+        $key = $table . '.' . $column;
+        if (array_key_exists($key, $this->columnExistsCache)) {
+            return $this->columnExistsCache[$key];
+        }
+
+        $exists = $this->safeDatabaseCall(fn () => Schema::hasColumn($table, $column), false);
+        $this->columnExistsCache[$key] = (bool) $exists;
+
+        return $this->columnExistsCache[$key];
     }
 
     private function safeDatabaseCall(callable $callback, mixed $fallback): mixed
@@ -818,7 +842,19 @@ class HomePageViewService
 
         $socket = @fsockopen($host, $port, $errno, $errstr, 0.25);
         if (is_resource($socket)) {
+            stream_set_timeout($socket, 0, 250000);
+            $probe = @fread($socket, 1);
+            $meta = stream_get_meta_data($socket);
             fclose($socket);
+
+            if ($probe === false) {
+                return false;
+            }
+
+            if ($probe === '' && (($meta['timed_out'] ?? false) === true)) {
+                return false;
+            }
+
             return true;
         }
 

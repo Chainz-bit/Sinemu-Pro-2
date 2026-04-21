@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
-use App\Models\SuperAdmin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -71,18 +70,8 @@ class RegisteredUserController extends Controller
 
         $username = $this->buildUniqueAdminUsername($validated['username']);
 
-        $superAdmin = SuperAdmin::query()->first();
-        if (!$superAdmin) {
-            $superAdmin = SuperAdmin::query()->create([
-                'nama' => 'Super Admin',
-                'email' => 'superadmin@sinemu.com',
-                'username' => 'superadmin',
-                'password' => Hash::make('super123'),
-            ]);
-        }
-
         Admin::query()->create([
-            'super_admin_id' => $superAdmin->id,
+            'super_admin_id' => null,
             'nama' => $validated['nama'],
             'email' => $validated['email'],
             'nomor_telepon' => $validated['nomor_telepon'],
@@ -90,14 +79,14 @@ class RegisteredUserController extends Controller
             'instansi' => $validated['instansi'],
             'kecamatan' => $validated['kecamatan'],
             'alamat_lengkap' => $validated['alamat_lengkap'],
-            'status_verifikasi' => 'active',
-            'verified_at' => now(),
+            'status_verifikasi' => 'pending',
+            'verified_at' => null,
             'password' => Hash::make($validated['password']),
         ]);
 
         return redirect()
             ->route('admin.login')
-            ->with('status', 'Pendaftaran admin berhasil. Silakan login.');
+            ->with('status', 'Pendaftaran admin berhasil. Akun Anda akan aktif setelah diverifikasi super admin.');
     }
 
     private function buildUniqueAdminUsername(string $usernameInput): string

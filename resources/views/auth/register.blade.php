@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/auth/register.css') }}?v={{ @filemtime(public_path('css/auth/register.css')) }}">
+    @vite('resources/js/entries/auth-register.js')
 @endpush
 
 @section('content')
@@ -110,7 +110,3 @@
     </main>
     {{-- Register Page End --}}
 @endsection
-
-@push('scripts')
-    <script src="{{ asset('js/auth/register.js') }}?v={{ @filemtime(public_path('js/auth/register.js')) }}" defer></script>
-@endpush

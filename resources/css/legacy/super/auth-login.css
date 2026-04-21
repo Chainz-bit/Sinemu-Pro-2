@@ -1,0 +1,240 @@
+.super-login-fixed,
+.super-login-fixed body {
+    overflow: hidden;
+}
+
+body.super-login-fixed {
+    height: 100dvh;
+    overflow: hidden;
+}
+
+.super-login-shell {
+    height: 100dvh;
+    padding: clamp(10px, 2vh, 18px) clamp(20px, 3vw, 36px) clamp(44px, 9vh, 110px);
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    overflow: hidden;
+    background:
+        radial-gradient(1300px 600px at -10% -20%, #dfeafe 0%, transparent 60%),
+        radial-gradient(1000px 500px at 110% 110%, #e8f2ff 0%, transparent 65%),
+        linear-gradient(165deg, #f5f8ff 0%, #eef3ff 45%, #edf6f1 100%);
+}
+
+.super-login-card {
+    width: min(520px, 100%);
+    border: 1px solid #dbe6f7;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 24px 52px rgba(15, 23, 42, 0.14);
+    backdrop-filter: blur(8px);
+    padding: clamp(20px, 2.6vw, 30px);
+    margin-top: clamp(6px, 1.2vh, 16px);
+    margin-bottom: 0;
+}
+
+.super-login-card,
+.super-login-card *,
+.super-login-card *::before,
+.super-login-card *::after {
+    box-sizing: border-box;
+}
+
+.super-login-head {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.super-login-brand {
+    display: flex;
+    justify-content: center;
+}
+
+.super-login-brand img {
+    width: 140px;
+    height: auto;
+}
+
+.super-login-title-wrap {
+    text-align: center;
+}
+
+.super-login-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0 13px;
+    border-radius: 999px;
+    border: 1px solid #c8daf8;
+    background: #edf4ff;
+    color: #2a5b9f;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.super-login-title-wrap h1 {
+    margin: 11px 0 7px;
+    font-size: clamp(1.56rem, 2.4vw, 1.86rem);
+    line-height: 1.2;
+    color: #102f61;
+}
+
+.super-login-title-wrap p {
+    margin: 0;
+    color: #5f7493;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.super-login-alert {
+    margin-bottom: 12px;
+    border: 1px solid #f6c7cd;
+    border-radius: 12px;
+    background: #fff2f4;
+    color: #a12a33;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 11px 12px;
+}
+
+.super-login-form {
+    display: grid;
+    gap: 12px;
+}
+
+.super-login-field {
+    display: grid;
+    gap: 6px;
+}
+
+.super-login-field label {
+    color: #324968;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.super-input-wrap {
+    position: relative;
+}
+
+.super-input-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: #6d86a8;
+    pointer-events: none;
+}
+
+.super-input-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.super-login-field input {
+    width: 100%;
+    height: 46px;
+    border: 1px solid #c6d5ea;
+    border-radius: 12px;
+    background: #f8fbff;
+    color: #13243e;
+    font: inherit;
+    font-size: 14px;
+    padding: 0 42px 0 38px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.super-login-field input::placeholder {
+    color: #8da0bb;
+}
+
+.super-login-field input:focus {
+    border-color: #7ea5dc;
+    box-shadow: 0 0 0 3px rgba(60, 111, 194, 0.16);
+    background: #fff;
+}
+
+.super-password-toggle {
+    position: absolute;
+    right: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #7187a6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.super-password-toggle:hover {
+    background: #eef4ff;
+    color: #325f9d;
+}
+
+.super-password-toggle svg {
+    width: 16px;
+    height: 16px;
+}
+
+.super-login-help {
+    color: #7f8fa7;
+    font-size: 11.5px;
+    line-height: 1.45;
+}
+
+.super-login-submit {
+    border: 0;
+    border-radius: 12px;
+    height: 46px;
+    margin-top: 2px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #2f4ac0 45%, #3730a3 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(37, 69, 171, 0.34);
+}
+
+.super-login-submit:hover {
+    filter: brightness(1.03);
+}
+
+.super-login-note {
+    margin-top: 14px;
+    border: 1px solid #dce8f7;
+    border-radius: 12px;
+    background: #f7fbff;
+    color: #617796;
+    font-size: 12px;
+    line-height: 1.65;
+    padding: 11px 12px;
+}
+
+@media (max-width: 580px) {
+    .super-login-shell {
+        padding: 8px 14px 36px;
+    }
+
+    .super-login-card {
+        border-radius: 18px;
+        padding: 18px;
+        margin-top: 2px;
+        margin-bottom: 0;
+    }
+
+    .super-login-brand img {
+        width: 128px;
+    }
+}

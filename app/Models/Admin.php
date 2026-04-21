@@ -19,7 +19,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $alamat_lengkap
  * @property string|null $status_verifikasi
  * @property string|null $alasan_penolakan
- * @property string|null $verified_at
+ * @property \Illuminate\Support\Carbon|null $verified_at
  * @property float|null $lat
  * @property float|null $lng
  * @property string|null $profil
@@ -53,6 +53,10 @@ class Admin extends Authenticatable
     ];
 
     protected $hidden = ['password'];
+
+    protected $casts = [
+        'verified_at' => 'datetime',
+    ];
 
     public function superAdmin()
     {
