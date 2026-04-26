@@ -26,6 +26,7 @@ class AdminNotification extends Model
         'action_url',
         'meta',
         'read_at',
+        'created_at', // ← DITAMBAHKAN
     ];
 
     protected function casts(): array
