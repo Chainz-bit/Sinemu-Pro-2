@@ -30,7 +30,7 @@ class AdminNotification extends Model
     ];
 
     protected function casts(): array
-    {
+     {
         return [
             'meta' => 'array',
             'read_at' => 'datetime',
@@ -41,4 +41,4 @@ class AdminNotification extends Model
     {
         return $this->belongsTo(Admin::class);
     }
-}
+}   
