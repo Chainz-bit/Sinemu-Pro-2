@@ -87,8 +87,21 @@
                         </div>
 
                         <div class="settings-log-item-actions">
-                            <a href="{{ route('super.admins.index', ['search' => $history->nama]) }}" class="filter-btn">Buka</a>
-                            <a href="{{ route('super.admin-verifications.index', ['search' => $history->nama]) }}" class="filter-btn">Verifikasi</a>
+                            <x-dashboard.action-menu
+                                id="super-settings-log-menu-{{ $history->id }}-{{ $loop->index }}"
+                                label="Aksi riwayat"
+                                trigger-class="settings-log-menu-trigger"
+                                menu-class="settings-log-menu"
+                            >
+                                <a href="{{ route('super.admins.index', ['search' => $history->nama]) }}">
+                                    <iconify-icon icon="mdi:eye-outline" aria-hidden="true"></iconify-icon>
+                                    <span>Buka Detail</span>
+                                </a>
+                                <a href="{{ route('super.admin-verifications.index', ['search' => $history->nama]) }}">
+                                    <iconify-icon icon="mdi:shield-check-outline" aria-hidden="true"></iconify-icon>
+                                    <span>Buka Verifikasi</span>
+                                </a>
+                            </x-dashboard.action-menu>
                         </div>
                     </article>
                 @empty

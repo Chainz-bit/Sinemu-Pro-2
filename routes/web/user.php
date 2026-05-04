@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/lapor-barang-temuan', [FoundReportController::class, 'create'])->name('found-reports.create');
         Route::post('/notifications/read-all', [UserNotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
         Route::post('/notifications/{notification}/read', [UserNotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/notifications/{notification}/unread', [UserNotificationController::class, 'markAsUnread'])->name('notifications.unread');
         Route::delete('/notifications/{notification}', [UserNotificationController::class, 'destroy'])->name('notifications.destroy');
         Route::delete('/notifications', [UserNotificationController::class, 'destroyAll'])->name('notifications.destroy-all');
     });

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property int $id
  * @property int $user_id
+ * @property int|null $region_id
  * @property string $nama_barang
  * @property string|null $kategori_barang
  * @property string|null $warna_barang
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read User $user
+ * @property-read Wilayah|null $region
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Klaim> $klaims
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Pencocokan> $pencocokans
  */
@@ -36,6 +38,7 @@ class LaporanBarangHilang extends Model
 {
     protected $fillable = [
         'user_id',
+        'region_id',
         'nama_barang',
         'kategori_barang',
         'warna_barang',
@@ -60,6 +63,11 @@ class LaporanBarangHilang extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Wilayah::class, 'region_id');
     }
 
     public function klaims()

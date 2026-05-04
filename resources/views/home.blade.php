@@ -185,20 +185,29 @@
                         <label for="keywordInput" class="form-label ps-2 py-2">KATA KUNCI</label>
                         <div class="input-with-icon">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input id="keywordInput" type="text" class="form-control" placeholder="Dompet, Kunci, HP...">
+                            <input id="keywordInput" type="text" class="form-control" placeholder="Dompet, Kunci, HP..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                         </div>
                     </div>
                     <div class="col-md-6 col-xl">
                         <label for="categorySelect" class="form-label ps-2 py-2">KATEGORI</label>
-                        <div class="select-with-icon">
-                            <select id="categorySelect" class="form-select filter-select">
+                        <div class="filter-dropdown" data-filter-dropdown>
+                            <select id="categorySelect" class="native-filter-select-hidden" tabindex="-1" aria-hidden="true">
                                 @foreach ($categories as $category)
                                     <option value="{{ $category }}">{{ $category }}</option>
                                 @endforeach
                             </select>
-                            <span class="field-icon field-icon-right" aria-hidden="true">
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </span>
+                            <button type="button" class="form-select filter-select filter-dropdown-toggle" data-filter-dropdown-toggle>
+                                <span data-filter-dropdown-label>{{ $categories[0] ?? 'Semua Kategori' }}</span>
+                            </button>
+                            <ul class="filter-dropdown-menu" data-filter-dropdown-menu>
+                                @foreach ($categories as $category)
+                                    <li>
+                                        <button type="button" class="filter-option {{ $loop->first ? 'is-active' : '' }}" data-filter-value="{{ $category }}">
+                                            {{ $category }}
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
                     <div class="col-md-6 col-xl">
@@ -210,15 +219,24 @@
                     </div>
                     <div class="col-md-6 col-xl">
                         <label for="regionSelect" class="form-label ps-2 py-2">WILAYAH</label>
-                        <div class="select-with-icon">
-                            <select id="regionSelect" class="form-select filter-region-select filter-select">
+                        <div class="filter-dropdown" data-filter-dropdown>
+                            <select id="regionSelect" class="native-filter-select-hidden" tabindex="-1" aria-hidden="true">
                                 @foreach ($regions as $region)
                                     <option value="{{ $region }}">{{ $region }}</option>
                                 @endforeach
                             </select>
-                            <span class="field-icon field-icon-right" aria-hidden="true">
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </span>
+                            <button type="button" class="form-select filter-select filter-dropdown-toggle" data-filter-dropdown-toggle>
+                                <span data-filter-dropdown-label>{{ $regions[0] ?? 'Seluruh Wilayah' }}</span>
+                            </button>
+                            <ul class="filter-dropdown-menu" data-filter-dropdown-menu>
+                                @foreach ($regions as $region)
+                                    <li>
+                                        <button type="button" class="filter-option {{ $loop->first ? 'is-active' : '' }}" data-filter-value="{{ $region }}">
+                                            {{ $region }}
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
                     <div class="col-md-6 col-xl-2 d-flex">
@@ -569,24 +587,6 @@
         {{-- Contact Us End --}}
 
         @push('styles')
-            <link
-                rel="preload"
-                as="style"
-                href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-                integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-                crossorigin=""
-                onload="this.onload=null;this.rel='stylesheet'"
-            >
-            <noscript>
-                <link
-                    rel="stylesheet"
-                    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-                    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-                    crossorigin=""
-                >
-            </noscript>
-            <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" onload="this.onload=null;this.rel='stylesheet'">
-            <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"></noscript>
         @endpush
 
         @auth
@@ -613,6 +613,15 @@
                                 </select>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">Wilayah Ditemukan</label>
+                                <select name="region_id" class="form-select" required>
+                                    <option value="">Pilih Kecamatan</option>
+                                    @foreach(($wilayahOptions ?? collect()) as $wilayah)
+                                        <option value="{{ $wilayah->id }}">{{ $wilayah->nama_wilayah }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">Lokasi Ditemukan</label>
                                 <input type="text" name="lokasi_ditemukan" class="form-control" required>
                             </div>
@@ -623,6 +632,10 @@
                             <div class="mb-0">
                                 <label class="form-label">Deskripsi</label>
                                 <textarea name="deskripsi" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="mt-3">
+                                <label class="form-label">No. WA Penemu</label>
+                                <input type="text" name="kontak_penemu" class="form-control" placeholder="Contoh: 081234567890" required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -639,15 +652,6 @@
             @json($pickupLocations ?? [])
         </script>
 
-        @push('scripts')
-            <script
-                src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-                crossorigin=""
-            ></script>
-            <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-            <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
-        @endpush
     </div>
     {{-- Main Content Container End --}}
 

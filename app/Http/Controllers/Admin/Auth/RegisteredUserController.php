@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Admin\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminRegisterRequest;
 use App\Models\Admin;
+use App\Models\Wilayah;
+use App\Support\IndramayuDistricts;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -14,36 +17,7 @@ class RegisteredUserController extends Controller
 {
     public function create(): View
     {
-        $kecamatanOptions = [
-            'Balongan',
-            'Bongas',
-            'Cantigi',
-            'Cikedung',
-            'Gabuswetan',
-            'Gantar',
-            'Haurgeulis',
-            'Indramayu Kota',
-            'Jatibarang',
-            'Juntinyuat',
-            'Kandanghaur',
-            'Karangampel',
-            'Kedokanbunder',
-            'Kertasemaya',
-            'Krangkeng',
-            'Kroya',
-            'Lelea',
-            'Lobener',
-            'Losarang',
-            'Pasekan',
-            'Patrol',
-            'Sindang',
-            'Sliyeg',
-            'Sukagumiwang',
-            'Sukra',
-            'Terisi',
-            'Tukdana',
-            'Widasari',
-        ];
+        $kecamatanOptions = IndramayuDistricts::names();
 
         return view('admin.auth.register', compact('kecamatanOptions'));
     }
@@ -56,6 +30,7 @@ class RegisteredUserController extends Controller
 
         Admin::query()->create([
             'super_admin_id' => null,
+            'region_id' => $this->resolveRegionId($validated['kecamatan']),
             'nama' => $validated['nama'],
             'email' => $validated['email'],
             'nomor_telepon' => $validated['nomor_telepon'],
@@ -91,5 +66,16 @@ class RegisteredUserController extends Controller
         }
 
         return $username;
+    }
+
+    private function resolveRegionId(string $kecamatan): ?int
+    {
+        if (!Schema::hasTable('wilayahs') || !Schema::hasColumn('admins', 'region_id')) {
+            return null;
+        }
+
+        return (int) Wilayah::query()->firstOrCreate([
+            'nama_wilayah' => IndramayuDistricts::wilayahName($kecamatan),
+        ])->id;
     }
 }

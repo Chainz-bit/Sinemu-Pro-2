@@ -2,6 +2,7 @@
 
 namespace App\Services\Home;
 
+use App\Models\Wilayah;
 use App\Services\Support\DatabaseHealthService;
 use App\Support\WorkflowStatus;
 use Illuminate\Support\Collection;
@@ -48,6 +49,7 @@ class HomePageViewService
         [$categories, $kategoriOptions] = $this->getCategories($foundItems);
         [$regions, $mapRegions] = $this->getRegions($lostItems, $foundItems);
         $pickupLocations = $this->getPickupLocations();
+        $wilayahOptions = $this->getWilayahOptions();
         $userName = $this->resolveUserDisplayName($currentUser);
         $userAvatar = $this->mediaAssetService->resolveUserAvatarUrl((string) ($currentUser?->profil ?? ''));
         $userLocation = $currentUser?->location ?? 'Lokasi Anda';
@@ -65,6 +67,7 @@ class HomePageViewService
             'regions',
             'mapRegions',
             'pickupLocations',
+            'wilayahOptions',
             'userName',
             'userAvatar',
             'userLocation',
@@ -161,6 +164,18 @@ class HomePageViewService
             hasAdminTable: $this->hasDatabaseTable('admins'),
             safeDatabaseCall: $this->safeDatabaseCall(...),
             hasDatabaseColumn: $this->hasDatabaseColumn(...)
+        );
+    }
+
+    private function getWilayahOptions(): Collection
+    {
+        if (!$this->hasDatabaseTable('wilayahs')) {
+            return collect();
+        }
+
+        return $this->safeDatabaseCall(
+            fn () => Wilayah::query()->orderBy('nama_wilayah')->get(['id', 'nama_wilayah']),
+            collect()
         );
     }
 

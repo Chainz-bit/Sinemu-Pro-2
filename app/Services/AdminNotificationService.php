@@ -36,4 +36,22 @@ class AdminNotificationService
             self::notifyAdmin((int) $admin->id, $type, $title, $message, $actionUrl, $meta);
         });
     }
+
+    public static function notifyAdminsByRegion(
+        int $regionId,
+        string $type,
+        string $title,
+        string $message,
+        ?string $actionUrl = null,
+        array $meta = []
+    ): void {
+        Admin::query()
+            ->select('id')
+            ->where('region_id', $regionId)
+            ->where('status_verifikasi', 'active')
+            ->lazy()
+            ->each(function ($admin) use ($type, $title, $message, $actionUrl, $meta) {
+                self::notifyAdmin((int) $admin->id, $type, $title, $message, $actionUrl, $meta);
+            });
+    }
 }

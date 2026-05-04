@@ -5,6 +5,8 @@ namespace App\Services\Admin\Dashboard;
 use App\Models\Barang;
 use App\Support\WorkflowStatus;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardFoundFeedService
 {
@@ -31,12 +33,23 @@ class DashboardFoundFeedService
         if ($foundHasHomeFlag) {
             $foundSelectColumns[] = 'tampil_di_home';
         }
+        if (Schema::hasColumn('barangs', 'region_id')) {
+            $foundSelectColumns[] = 'region_id';
+        }
 
-        return Barang::query()
+        $query = Barang::query()
             ->with('admin:id,nama')
             ->select($foundSelectColumns)
-            ->orderByDesc('updated_at')
-            ->limit(10)
+            ->orderByDesc('updated_at');
+
+        $admin = Auth::guard('admin')->user();
+        if ($admin && $admin->region_id && Schema::hasColumn('barangs', 'region_id')) {
+            $query->where('region_id', $admin->region_id);
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        return $query->limit(10)
             ->get()
             ->map(fn ($report) => $this->presentReport($report));
     }

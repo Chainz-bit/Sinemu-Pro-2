@@ -7,6 +7,7 @@ use App\Models\LaporanBarangHilang;
 use App\Support\ReportStatusPresenter;
 use App\Support\WorkflowStatus;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 class DashboardLostFeedService
@@ -48,6 +49,10 @@ class DashboardLostFeedService
 
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
             $lostReportsQuery->where('sumber_laporan', 'lapor_hilang');
+        }
+        $admin = Auth::guard('admin')->user();
+        if ($admin && $admin->region_id && Schema::hasColumn('laporan_barang_hilangs', 'region_id')) {
+            $lostReportsQuery->where('region_id', $admin->region_id);
         }
 
         return $lostReportsQuery

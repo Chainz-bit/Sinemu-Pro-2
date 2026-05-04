@@ -36,19 +36,15 @@
                         ['label' => 'Aktif', 'value' => $summary['active'] ?? 0, 'status' => 'active', 'icon' => 'mdi:check-decagram-outline'],
                         ['label' => 'Ditolak', 'value' => $summary['rejected'] ?? 0, 'status' => 'rejected', 'icon' => 'mdi:close-octagon-outline'],
                     ] as $card)
-                        <a
-                            href="{{ route('super.admin-verifications.index', array_filter(['search' => $search, 'status' => $card['status']])) }}#daftar-verifikasi"
-                            class="stat-card super-status-card-link {{ \App\Support\AdminVerificationStatusPresenter::cardClass($card['status']) }} {{ $normalizedStatusFilter === $card['status'] ? 'is-active' : '' }}"
-                        >
-                            <div class="stat-card-head">
-                                <span>{{ $card['label'] }}</span>
-                                <div class="stat-card-icon">
-                                    <iconify-icon icon="{{ $card['icon'] }}"></iconify-icon>
-                                </div>
-                            </div>
-                            <strong>{{ $card['value'] }}</strong>
-                            <small>{{ \App\Support\AdminVerificationStatusPresenter::description($card['status']) }}</small>
-                        </a>
+                        <x-dashboard.stat-card
+                            class="super-status-card-link {{ \App\Support\AdminVerificationStatusPresenter::cardClass($card['status']) }}"
+                            :href="route('super.admin-verifications.index', array_filter(['search' => $search, 'status' => $card['status']])) . '#daftar-verifikasi'"
+                            :active="$normalizedStatusFilter === $card['status']"
+                            :label="$card['label']"
+                            :value="$card['value']"
+                            :icon="$card['icon']"
+                            :description="\App\Support\AdminVerificationStatusPresenter::description($card['status'])"
+                        />
                     @endforeach
                 </div>
             </article>
@@ -121,12 +117,14 @@
                         @endif
                     </article>
                 @empty
-                    <div class="claim-create-empty super-empty-panel super-empty-panel-center">
-                        <iconify-icon icon="mdi:account-search-outline"></iconify-icon>
-                        <strong>Tidak ada data verifikasi</strong>
-                        <p>Filter aktif: <b>{{ $activeFilterLabel }}</b>. Coba ubah ke <b>Semua</b> atau sesuaikan kata kunci pencarian.</p>
-                        <a href="{{ route('super.admin-verifications.index', ['status' => 'semua']) }}" class="super-inline-btn">Tampilkan Semua Data</a>
-                    </div>
+                    <x-dashboard.empty-state
+                        class="super-empty-panel-center"
+                        icon="mdi:account-search-outline"
+                        title="Tidak ada data verifikasi"
+                        :message="'Filter aktif: <b>' . e($activeFilterLabel) . '</b>. Coba ubah ke <b>Semua</b> atau sesuaikan kata kunci pencarian.'"
+                        :action-url="route('super.admin-verifications.index', ['status' => 'semua'])"
+                        action-label="Tampilkan Semua Data"
+                    />
                 @endforelse
             </div>
 

@@ -6,6 +6,7 @@ use App\Models\Barang;
 use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
 use App\Support\WorkflowStatus;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 class DashboardStatsService
@@ -19,6 +20,10 @@ class DashboardStatsService
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
             $totalHilangQuery->where('sumber_laporan', 'lapor_hilang');
         }
+        $admin = Auth::guard('admin')->user();
+        if ($admin && $admin->region_id && Schema::hasColumn('laporan_barang_hilangs', 'region_id')) {
+            $totalHilangQuery->where('region_id', $admin->region_id);
+        }
 
         $menungguVerifikasi = Schema::hasColumn('klaims', 'status_verifikasi')
             ? Klaim::query()
@@ -26,9 +31,16 @@ class DashboardStatsService
                 ->count()
             : Klaim::where('status_klaim', WorkflowStatus::CLAIM_LEGACY_PENDING)->count();
 
+        $totalTemuanQuery = Barang::query();
+        if ($admin && $admin->region_id && Schema::hasColumn('barangs', 'region_id')) {
+            $totalTemuanQuery->where('region_id', $admin->region_id);
+        } else {
+            $totalTemuanQuery->whereRaw('1 = 0');
+        }
+
         return [
             'totalHilang' => $totalHilangQuery->count(),
-            'totalTemuan' => Barang::count(),
+            'totalTemuan' => $totalTemuanQuery->count(),
             'menungguVerifikasi' => $menungguVerifikasi,
         ];
     }

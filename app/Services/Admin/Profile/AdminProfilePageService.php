@@ -7,6 +7,7 @@ use App\Models\Barang;
 use App\Models\Klaim;
 use App\Services\Common\ProfileAvatarService;
 use App\Support\ClaimStatusPresenter;
+use App\Support\IndramayuDistricts;
 use App\Support\WorkflowStatus;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
@@ -209,11 +210,6 @@ class AdminProfilePageService
      */
     private function getKecamatanOptions(): array
     {
-        return [
-            'Balongan', 'Bongas', 'Cantigi', 'Cikedung', 'Gabuswetan', 'Gantar', 'Haurgeulis', 'Indramayu Kota',
-            'Jatibarang', 'Juntinyuat', 'Kandanghaur', 'Karangampel', 'Kedokanbunder', 'Kertasemaya', 'Krangkeng',
-            'Kroya', 'Lelea', 'Lobener', 'Losarang', 'Pasekan', 'Patrol', 'Sindang', 'Sliyeg', 'Sukagumiwang',
-            'Sukra', 'Terisi', 'Tukdana', 'Widasari',
-        ];
+        return IndramayuDistricts::names();
     }
 }

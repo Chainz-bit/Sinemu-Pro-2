@@ -93,22 +93,42 @@
                         </div>
 
                         <div class="settings-log-item-actions">
-                            @if(!empty($log->action_url))
-                                <a href="{{ $log->action_url }}" class="filter-btn">Buka</a>
-                            @endif
+                            <button type="button"
+                                    class="row-menu-trigger settings-log-menu-trigger"
+                                    data-menu-target="admin-settings-log-menu-{{ $log->id }}-{{ $loop->index }}"
+                                    aria-label="Aksi log">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M12 5.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3zm0 5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3zm0 5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3z" fill="currentColor"/>
+                                </svg>
+                            </button>
 
-                            @if($isUnread)
-                                <form method="POST" action="{{ route('admin.notifications.read', $log->id) }}">
+                            <div class="row-menu settings-log-menu" id="admin-settings-log-menu-{{ $log->id }}-{{ $loop->index }}">
+                                @if(!empty($log->action_url))
+                                    <a href="{{ $log->action_url }}">
+                                        <iconify-icon icon="mdi:eye-outline" aria-hidden="true"></iconify-icon>
+                                        <span>Buka Detail</span>
+                                    </a>
+                                @endif
+
+                                @if($isUnread)
+                                    <form method="POST" action="{{ route('admin.notifications.read', $log->id) }}">
+                                        @csrf
+                                        <button type="submit" class="menu-submit">
+                                            <iconify-icon icon="mdi:check" aria-hidden="true"></iconify-icon>
+                                            <span>Tandai Dibaca</span>
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <form method="POST" action="{{ route('admin.notifications.destroy', $log->id) }}" data-confirm-delete data-confirm-message="Hapus log ini?">
                                     @csrf
-                                    <button type="submit" class="filter-btn">Tandai Dibaca</button>
+                                    @method('DELETE')
+                                    <button type="submit" class="menu-submit danger">
+                                        <iconify-icon icon="mdi:trash-can-outline" aria-hidden="true"></iconify-icon>
+                                        <span>Hapus Log</span>
+                                    </button>
                                 </form>
-                            @endif
-
-                            <form method="POST" action="{{ route('admin.notifications.destroy', $log->id) }}" data-confirm-delete data-confirm-message="Hapus log ini?">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="filter-btn danger">Hapus</button>
-                            </form>
+                            </div>
                         </div>
                     </article>
                 @empty

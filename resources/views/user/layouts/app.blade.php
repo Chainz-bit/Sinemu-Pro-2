@@ -42,7 +42,7 @@
             <button type="button" class="sidebar-backdrop" aria-label="Tutup menu"></button>
         @endif
 
-        <main class="main-content">
+        <main class="main-content user-main-content">
             @include('user.partials.topbar', [
                 'searchAction' => $searchAction ?? request()->url(),
                 'searchPlaceholder' => $searchPlaceholder ?? 'Cari laporan Anda',

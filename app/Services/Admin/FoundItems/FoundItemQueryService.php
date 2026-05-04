@@ -5,6 +5,8 @@ namespace App\Services\Admin\FoundItems;
 use App\Http\Requests\Admin\FoundItemIndexRequest;
 use App\Models\Barang;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FoundItemQueryService
@@ -17,6 +19,8 @@ class FoundItemQueryService
         $query = Barang::query()
             ->with(['kategori', 'admin:id,nama']);
 
+        $this->applyAdminRegion($query);
+
         $sort = $request->sort();
 
         $this->applySearch($query, $request->search());
@@ -28,6 +32,17 @@ class FoundItemQueryService
             'query' => $query,
             'sort' => $sort,
         ];
+    }
+
+    private function applyAdminRegion(Builder $query): void
+    {
+        $admin = Auth::guard('admin')->user();
+        if (!$admin || empty($admin->region_id) || !Schema::hasColumn('barangs', 'region_id')) {
+            $query->whereRaw('1 = 0');
+            return;
+        }
+
+        $query->where('region_id', $admin->region_id);
     }
 
     private function applySearch(Builder $query, ?string $search): void

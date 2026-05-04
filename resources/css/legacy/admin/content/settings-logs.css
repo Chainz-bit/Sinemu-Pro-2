@@ -102,6 +102,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
+    position: relative;
 }
 
 .settings-log-item:last-child {
@@ -160,25 +161,65 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    flex-wrap: wrap;
     justify-content: flex-end;
     flex-shrink: 0;
+    position: relative;
 }
 
 .settings-log-item-actions form {
     margin: 0;
 }
 
-.settings-log-item-actions .filter-btn {
-    min-height: 30px;
-    display: inline-flex;
-    align-items: center;
+.settings-log-menu-trigger {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    display: inline-grid;
+    place-items: center;
+    background: #ffffff;
+    border-color: #dce8f6;
+    color: #5f7894;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 
-.settings-log-item-actions .filter-btn.danger {
-    color: #c24141;
-    border-color: #f2c7c7;
-    background: #fff5f5;
+.settings-log-menu-trigger:hover {
+    background: #f4f8ff;
+    border-color: #c7d8ee;
+    color: #315b86;
+    transform: translateY(-1px);
+}
+
+.settings-log-menu {
+    min-width: 210px;
+    border-radius: 12px;
+    box-shadow: 0 18px 36px rgba(17, 38, 72, 0.18);
+}
+
+.settings-log-menu a,
+.settings-log-menu .menu-submit {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 38px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+.settings-log-menu a iconify-icon,
+.settings-log-menu .menu-submit iconify-icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+}
+
+.settings-log-menu .menu-submit.danger {
+    border-top: 1px solid #eef2f7;
+    color: #dc2626;
+}
+
+.settings-log-menu .menu-submit.danger:hover {
+    background: #fff1f2;
 }
 
 .settings-log-empty {
@@ -228,10 +269,13 @@
     }
 
     .settings-log-item {
-        flex-direction: column;
+        padding-right: 56px;
     }
 
     .settings-log-item-actions {
-        justify-content: flex-start;
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        justify-content: flex-end;
     }
 }

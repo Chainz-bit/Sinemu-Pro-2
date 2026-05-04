@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 /**
  * @property int $id
  * @property int|null $super_admin_id
+ * @property int|null $region_id
  * @property string $nama
  * @property string $email
  * @property string|null $nomor_telepon
@@ -26,6 +27,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read SuperAdmin|null $superAdmin
+ * @property-read Wilayah|null $region
  * @property-read Collection<int, Barang> $barangs
  * @property-read Collection<int, Klaim> $klaims
  * @property-read Collection<int, AdminNotification> $notifications
@@ -36,6 +38,7 @@ class Admin extends Authenticatable
 
     protected $fillable = [
         'super_admin_id',
+        'region_id',
         'nama',
         'email',
         'nomor_telepon',
@@ -61,6 +64,11 @@ class Admin extends Authenticatable
     public function superAdmin()
     {
         return $this->belongsTo(SuperAdmin::class);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Wilayah::class, 'region_id');
     }
 
     public function barangs()

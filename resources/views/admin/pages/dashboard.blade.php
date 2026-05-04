@@ -13,7 +13,7 @@
 {{-- BAGIAN: Pembuka --}}
         <section class="intro">
             <h1>Ringkasan Dashboard Admin</h1>
-            <p>Selamat Datang, {{ $admin?->nama ?? 'Admin' }}! Kelola barang hilang &amp; temuan dengan efisien.</p>
+            <p>Selamat datang kembali, {{ \Illuminate\Support\Str::title($admin?->nama ?? 'Admin') }}! Pantau statistik terbaru, kelola laporan barang hilang, serta verifikasi temuan secara real-time di sini.</p>
         </section>
 
         {{-- BAGIAN: Kartu Statistik --}}
@@ -91,7 +91,7 @@
             </div>
 
             <div class="report-table-wrap">
-                <table class="report-table">
+                <table class="report-table responsive-card-table">
                     <thead>
                         <tr>
                             <th>Detail Barang</th>
@@ -103,7 +103,7 @@
                     <tbody>
                         @forelse($latestReports as $index => $report)
                             <tr>
-                                <td>
+                                <td class="card-primary-cell" data-label="Detail Aktivitas">
                                     <div class="item-cell">
                                         <div class="item-avatar {{ $report->avatar_class ?? '' }}">
                                             <span class="item-avatar-fallback">{{ $report->avatar ?? '?' }}</span>
@@ -185,7 +185,7 @@
                                     </div>
                                 </td>
 
-                                <td>
+                                <td class="card-date-cell" data-label="Tanggal">
                                     <div class="date-cell">
                                         <strong>
                                             {{ !empty($report->incident_date) ? \Carbon\Carbon::parse($report->incident_date)->format('d M Y') : '-' }}
@@ -196,13 +196,13 @@
                                     </div>
                                 </td>
 
-                                <td>
+                                <td class="card-status-cell" data-label="Status">
                                     <span class="status-chip {{ $report->status_class ?? ('status-' . ($report->status ?? 'default')) }}">
                                         {{ $report->status_text ?? strtoupper(str_replace('_', ' ', $report->status ?? 'TIDAK DIKETAHUI')) }}
                                     </span>
                                 </td>
 
-                                <td class="menu-cell">
+                                <td class="menu-cell card-action-cell" data-label="Aksi">
                                     <button
                                         type="button"
                                         class="row-menu-trigger"

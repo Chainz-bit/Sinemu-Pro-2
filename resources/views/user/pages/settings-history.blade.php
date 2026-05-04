@@ -85,30 +85,60 @@
                             <small>
                                 {{ $history->created_at?->translatedFormat('d M Y, H:i') }} WIB
                                 @if($isUnread)
-                                    <span class="status-chip status-dalam_peninjauan">Belum Dibaca</span>
+                                    <span class="settings-log-status-badge is-unread">Belum Dibaca</span>
                                 @else
-                                    <span class="status-chip status-selesai">Sudah Dibaca</span>
+                                    <span class="settings-log-status-badge is-read">Sudah Dibaca</span>
                                 @endif
                             </small>
                         </div>
 
                         <div class="settings-log-item-actions">
-                            @if(!empty($history->action_url))
-                                <a href="{{ $history->action_url }}" class="filter-btn">Buka</a>
-                            @endif
+                            <button type="button"
+                                    class="row-menu-trigger settings-log-menu-trigger"
+                                    data-menu-target="settings-log-menu-{{ $history->id }}-{{ $loop->index }}"
+                                    aria-label="Aksi log">
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle cx="12" cy="5" r="1.8" fill="currentColor"></circle>
+                                    <circle cx="12" cy="12" r="1.8" fill="currentColor"></circle>
+                                    <circle cx="12" cy="19" r="1.8" fill="currentColor"></circle>
+                                </svg>
+                            </button>
 
-                            @if($isUnread)
-                                <form method="POST" action="{{ route('user.notifications.read', $history->id) }}">
+                            <div class="row-menu settings-log-menu" id="settings-log-menu-{{ $history->id }}-{{ $loop->index }}">
+                                @if(!empty($history->action_url))
+                                    <a href="{{ $history->action_url }}">
+                                        <iconify-icon icon="mdi:eye-outline" aria-hidden="true"></iconify-icon>
+                                        <span>Buka Detail</span>
+                                    </a>
+                                @endif
+
+                                @if($isUnread)
+                                    <form method="POST" action="{{ route('user.notifications.read', $history->id) }}">
+                                        @csrf
+                                        <button type="submit" class="menu-submit">
+                                            <iconify-icon icon="mdi:check" aria-hidden="true"></iconify-icon>
+                                            <span>Tandai Sudah Dibaca</span>
+                                        </button>
+                                    </form>
+                                @else
+                                    <form method="POST" action="{{ route('user.notifications.unread', $history->id) }}">
+                                        @csrf
+                                        <button type="submit" class="menu-submit">
+                                            <iconify-icon icon="mdi:email-outline" aria-hidden="true"></iconify-icon>
+                                            <span>Tandai Belum Dibaca</span>
+                                        </button>
+                                    </form>
+                                @endif
+
+                                <form method="POST" action="{{ route('user.notifications.destroy', $history->id) }}" data-confirm-delete data-confirm-message="Hapus riwayat ini?">
                                     @csrf
-                                    <button type="submit" class="filter-btn">Tandai Dibaca</button>
+                                    @method('DELETE')
+                                    <button type="submit" class="menu-submit danger">
+                                        <iconify-icon icon="mdi:trash-can-outline" aria-hidden="true"></iconify-icon>
+                                        <span>Hapus Log</span>
+                                    </button>
                                 </form>
-                            @endif
-
-                            <form method="POST" action="{{ route('user.notifications.destroy', $history->id) }}" data-confirm-delete data-confirm-message="Hapus riwayat ini?">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="filter-btn danger">Hapus</button>
-                            </form>
+                            </div>
                         </div>
                     </article>
                 @empty

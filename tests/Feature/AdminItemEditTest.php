@@ -8,6 +8,7 @@ use App\Models\Kategori;
 use App\Models\LaporanBarangHilang;
 use App\Models\SuperAdmin;
 use App\Models\User;
+use App\Models\Wilayah;
 use App\Support\WorkflowStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -203,6 +204,7 @@ class AdminItemEditTest extends TestCase
     {
         return Barang::query()->create([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'Tas Abu-abu',
@@ -273,9 +275,15 @@ class AdminItemEditTest extends TestCase
             'username' => 'super-item-admin',
             'password' => Hash::make('password123'),
         ]);
+        $region = Wilayah::query()->create([
+            'nama_wilayah' => 'Wilayah Admin Item',
+            'lat' => -6.326,
+            'lng' => 108.32,
+        ]);
 
         return Admin::query()->create([
             'super_admin_id' => $superAdmin->id,
+            'region_id' => $region->id,
             'nama' => 'Admin Item',
             'email' => 'admin-item@example.com',
             'username' => 'admin-item',

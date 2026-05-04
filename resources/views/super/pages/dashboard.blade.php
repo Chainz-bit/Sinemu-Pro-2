@@ -18,46 +18,10 @@
         </section>
 
         <section class="stats-grid super-stats-grid">
-            <article class="stat-card super-stat-card super-stat-card-primary">
-                <div class="stat-card-head">
-                    <span>Total Admin Terdaftar</span>
-                    <div class="stat-card-icon">
-                        <iconify-icon icon="mdi:account-group-outline"></iconify-icon>
-                    </div>
-                </div>
-                <strong>{{ $summary['total'] ?? 0 }}</strong>
-                <small>Semua akun admin yang pernah terdaftar di sistem.</small>
-            </article>
-            <article class="stat-card super-stat-card super-stat-card-warning">
-                <div class="stat-card-head">
-                    <span>Menunggu Verifikasi</span>
-                    <div class="stat-card-icon">
-                        <iconify-icon icon="mdi:clock-alert-outline"></iconify-icon>
-                    </div>
-                </div>
-                <strong>{{ $summary['pending'] ?? 0 }}</strong>
-                <small>Pendaftar yang perlu keputusan super admin.</small>
-            </article>
-            <article class="stat-card super-stat-card super-stat-card-danger">
-                <div class="stat-card-head">
-                    <span>Ditolak / Revisi</span>
-                    <div class="stat-card-icon">
-                        <iconify-icon icon="mdi:close-octagon-outline"></iconify-icon>
-                    </div>
-                </div>
-                <strong>{{ $summary['rejected'] ?? 0 }}</strong>
-                <small>Akun yang ditolak dan menunggu perbaikan data.</small>
-            </article>
-            <article class="stat-card super-stat-card super-stat-card-success">
-                <div class="stat-card-head">
-                    <span>Admin Baru 7 Hari</span>
-                    <div class="stat-card-icon">
-                        <iconify-icon icon="mdi:chart-timeline-variant"></iconify-icon>
-                    </div>
-                </div>
-                <strong>{{ $summary['newThisWeek'] ?? 0 }}</strong>
-                <small>Pertumbuhan pendaftaran admin selama satu minggu terakhir.</small>
-            </article>
+            <x-dashboard.stat-card class="super-stat-card super-stat-card-primary" label="Total Admin Terdaftar" :value="$summary['total'] ?? 0" icon="mdi:account-group-outline" description="Semua akun admin yang pernah terdaftar di sistem." />
+            <x-dashboard.stat-card class="super-stat-card super-stat-card-warning" label="Menunggu Verifikasi" :value="$summary['pending'] ?? 0" icon="mdi:clock-alert-outline" description="Pendaftar yang perlu keputusan super admin." />
+            <x-dashboard.stat-card class="super-stat-card super-stat-card-danger" label="Ditolak / Revisi" :value="$summary['rejected'] ?? 0" icon="mdi:close-octagon-outline" description="Akun yang ditolak dan menunggu perbaikan data." />
+            <x-dashboard.stat-card class="super-stat-card super-stat-card-success" label="Admin Baru 7 Hari" :value="$summary['newThisWeek'] ?? 0" icon="mdi:chart-timeline-variant" description="Pertumbuhan pendaftaran admin selama satu minggu terakhir." />
         </section>
 
         <section class="super-dashboard-focus">
@@ -92,11 +56,11 @@
                             <a class="super-activity-link" href="{{ route('super.admin-verifications.index', ['search' => $admin->nama]) }}">Buka</a>
                         </article>
                     @empty
-                        <div class="claim-create-empty super-empty-panel">
-                            <iconify-icon icon="mdi:timeline-clock-outline"></iconify-icon>
-                            <strong>Belum ada aktivitas</strong>
-                            <p>Riwayat verifikasi akan muncul setelah super admin mulai memproses data.</p>
-                        </div>
+                        <x-dashboard.empty-state
+                            icon="mdi:timeline-clock-outline"
+                            title="Belum ada aktivitas"
+                            message="Riwayat verifikasi akan muncul setelah super admin mulai memproses data."
+                        />
                     @endforelse
                 </div>
             </article>
@@ -113,7 +77,7 @@
                 </header>
 
                 <div class="report-table-wrap">
-                    <table class="report-table">
+                    <table class="report-table responsive-card-table">
                         <thead>
                             <tr>
                                 <th>Detail Admin</th>
@@ -128,7 +92,7 @@
                                     $statusKey = \App\Support\AdminVerificationStatusPresenter::key($admin->status_verifikasi);
                                 @endphp
                                 <tr>
-                                    <td>
+                                    <td class="card-primary-cell" data-label="Detail Aktivitas">
                                         <div class="item-cell">
                                             <div class="item-avatar avatar-claim">
                                                 <span class="item-avatar-fallback">{{ strtoupper(substr((string) $admin->nama, 0, 1)) }}</span>
@@ -139,37 +103,33 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="card-date-cell" data-label="Tanggal">
                                         <div class="date-cell">
                                             <strong>{{ optional($admin->created_at)->format('d M Y') ?? '-' }}</strong>
                                             <small>{{ optional($admin->created_at)->format('H:i') ?? '-' }} WIB</small>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="card-status-cell" data-label="Status">
                                         <span class="status-chip {{ \App\Support\AdminVerificationStatusPresenter::badgeClass($statusKey) }}">
                                             {{ \App\Support\AdminVerificationStatusPresenter::label($statusKey) }}
                                         </span>
                                     </td>
-                                    <td class="menu-cell">
-                                        <button type="button" class="row-menu-trigger" data-menu-target="super-dashboard-menu-{{ $index }}" aria-label="Aksi">
-                                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                                                <path d="M12 5.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3zm0 5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3zm0 5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3z" fill="currentColor"/>
-                                            </svg>
-                                        </button>
-                                        <div class="row-menu" id="super-dashboard-menu-{{ $index }}">
+                                    <td class="menu-cell card-action-cell" data-label="Aksi">
+                                        <x-dashboard.action-menu id="super-dashboard-menu-{{ $index }}">
                                             <a href="{{ route('super.admins.index', ['search' => $admin->nama]) }}">Lihat Detail</a>
                                             <a href="{{ route('super.admin-verifications.index', ['search' => $admin->nama]) }}">Buka Verifikasi</a>
-                                        </div>
+                                        </x-dashboard.action-menu>
                                     </td>
                                 </tr>
                             @empty
                                 <tr class="super-table-empty-row">
                                     <td colspan="4" class="empty-row">
-                                        <div class="super-table-empty-state">
-                                            <iconify-icon icon="mdi:account-search-outline"></iconify-icon>
-                                            <strong>Belum ada admin terdaftar</strong>
-                                            <p>Data admin baru akan muncul di sini setelah ada pendaftaran akun admin.</p>
-                                        </div>
+                                        <x-dashboard.empty-state
+                                            class="super-table-empty-state"
+                                            icon="mdi:account-search-outline"
+                                            title="Belum ada admin terdaftar"
+                                            message="Data admin baru akan muncul di sini setelah ada pendaftaran akun admin."
+                                        />
                                     </td>
                                 </tr>
                             @endforelse

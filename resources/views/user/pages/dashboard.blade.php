@@ -93,19 +93,19 @@
             </div>
 
             <div class="report-table-wrap">
-                <table class="report-table">
+                <table class="report-table mobile-stack-table">
                     <thead>
                         <tr>
                             <th>Detail Aktivitas</th>
-                            <th>Tanggal Aktivitas</th>
-                            <th>Status</th>
+                            <th class="d-none d-md-table-cell">Tanggal Aktivitas</th>
+                            <th class="d-none d-md-table-cell">Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($latestActivities as $activity)
-                            <tr>
-                                <td>
+                            <tr class="mobile-stack-row">
+                                <td class="mobile-stack-primary" data-label="Detail Aktivitas">
                                     <div class="item-cell">
                                         <div class="item-avatar {{ $activity->avatar_class ?? '' }}">
                                             @if(!empty($activity->image_url))
@@ -119,7 +119,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="mobile-stack-meta" data-label="Tanggal">
                                     <div class="date-cell">
                                         <strong>
                                             {{ !empty($activity->incident_date) ? \Carbon\Carbon::parse($activity->incident_date)->format('d M Y') : '-' }}
@@ -129,12 +129,12 @@
                                         </small>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="mobile-stack-status" data-label="Status">
                                     <span class="status-chip {{ $activity->status_class ?? 'status-dalam_peninjauan' }}">
                                         {{ $activity->status_text ?? '-' }}
                                     </span>
                                 </td>
-                                <td class="menu-cell">
+                                <td class="menu-cell mobile-stack-action" data-label="Aksi">
                                     <button type="button" class="row-menu-trigger" data-menu-target="user-menu-{{ $loop->index }}" aria-label="Aksi">
                                         <svg viewBox="0 0 24 24" aria-hidden="true">
                                             <circle cx="12" cy="5" r="2" fill="currentColor"></circle>
@@ -156,7 +156,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="empty-row">Belum ada aktivitas untuk ditampilkan.</td>
+                                <td colspan="4" class="empty-row dashboard-empty-row">Belum ada aktivitas untuk ditampilkan.</td>
                             </tr>
                         @endforelse
                     </tbody>

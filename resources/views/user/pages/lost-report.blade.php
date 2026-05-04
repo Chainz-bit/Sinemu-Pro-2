@@ -9,7 +9,7 @@
 @endphp
 
 @section('page-content')
-    <div class="input-page-content">
+    <div class="input-page-content report-form-page lost-report-page">
 {{-- BAGIAN: Header halaman --}}
         <section class="intro">
             <h1>{{ $editingReport ? 'Edit Laporan Barang Hilang' : 'Lapor Barang Hilang' }}</h1>
@@ -26,6 +26,19 @@
                 <div class="form-col-6 form-group">
                     <label class="form-label" for="nama_barang">Nama Barang <span>*</span></label>
                     <input id="nama_barang" name="nama_barang" type="text" class="form-input" value="{{ old('nama_barang', $editingReport?->nama_barang) }}" placeholder="Contoh: Dompet Coklat" required>
+                </div>
+
+                <div class="form-col-6 form-group">
+                    <label class="form-label" for="region_id">Wilayah Kejadian <span>*</span></label>
+                    <select id="region_id" name="region_id" class="form-input" required>
+                        <option value="">Pilih kecamatan</option>
+                        @foreach(($wilayahOptions ?? collect()) as $wilayah)
+                            <option value="{{ $wilayah->id }}" @selected((string) old('region_id', $editingReport?->region_id) === (string) $wilayah->id)>
+                                {{ $wilayah->nama_wilayah }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="form-note">Laporan akan masuk ke admin wilayah yang dipilih.</small>
                 </div>
 
                 <div class="form-col-6 form-group">
@@ -117,7 +130,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.body.classList.add('input-page-mode');
+            document.documentElement.classList.add('lost-report-page-mode');
+            document.body.classList.add('lost-report-page-mode');
         });
     </script>
 @endsection

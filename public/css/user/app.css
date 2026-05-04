@@ -13,19 +13,328 @@
 @import url('../admin/responsive.css');
 @import url('./sidebar.css');
 
-.claim-status-guide {
+.dashboard-hub-page {
+    gap: 14px;
+}
+
+.dashboard-hub-page .intro {
+    margin: 8px 0 0;
+    padding: 24px 30px;
+}
+
+.dashboard-hub-page .intro h1 {
+    max-width: 18ch;
+    font-size: clamp(26px, 2.2vw, 31px);
+    line-height: 1.14;
+    letter-spacing: -0.02em;
+}
+
+.dashboard-hub-page .intro p {
+    margin-top: 8px;
+}
+
+.dashboard-hub-page .stats-grid {
+    margin-bottom: 0;
+}
+
+.dashboard-hub-page .dashboard-report-card {
+    min-height: 0;
+}
+
+.dashboard-hub-page .report-table-wrap {
+    padding-bottom: 18px;
+    scroll-padding-bottom: 18px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #b7c6da #eef3fa;
+}
+
+.dashboard-hub-page .report-table-wrap::-webkit-scrollbar,
+.claim-history-card .report-table-wrap::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dashboard-hub-page .report-table-wrap::-webkit-scrollbar-track,
+.claim-history-card .report-table-wrap::-webkit-scrollbar-track {
+    background: #eef3fa;
+    border-radius: 999px;
+}
+
+.dashboard-hub-page .report-table-wrap::-webkit-scrollbar-thumb,
+.claim-history-card .report-table-wrap::-webkit-scrollbar-thumb {
+    background: #b7c6da;
+    border-radius: 999px;
+    border: 2px solid #eef3fa;
+}
+
+.dashboard-hub-page .report-table-wrap::-webkit-scrollbar-thumb:hover,
+.claim-history-card .report-table-wrap::-webkit-scrollbar-thumb:hover {
+    background: #98aac2;
+}
+
+.dashboard-hub-page .report-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.lost-report-page-mode,
+body.lost-report-page-mode {
+    height: 100%;
+    overflow: hidden;
+}
+
+body.lost-report-page-mode .admin-shell,
+body.lost-report-page-mode .main-content {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+body.lost-report-page-mode .main-content-scroll {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.lost-report-page {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+    gap: 14px;
+    overflow: hidden;
+    padding-bottom: 22px;
+}
+
+.lost-report-page .intro {
+    margin: 14px 2px 0;
+}
+
+.lost-report-page .intro h1 {
+    font-size: clamp(26px, 2.2vw, 30px);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+}
+
+.lost-report-page .intro p {
+    margin-top: 8px;
+}
+
+.lost-report-page .input-card {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    max-height: calc(100dvh - 210px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 14px 18px 22px 14px;
+    scrollbar-width: thin;
+    scrollbar-color: #b5c5db #eef3fa;
+}
+
+.lost-report-page .input-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.lost-report-page .input-card::-webkit-scrollbar-track {
+    background: #eef3fa;
+    border-radius: 999px;
+}
+
+.lost-report-page .input-card::-webkit-scrollbar-thumb {
+    background: #b5c5db;
+    border-radius: 999px;
+    border: 2px solid #eef3fa;
+}
+
+.lost-report-page .input-card::-webkit-scrollbar-thumb:hover {
+    background: #95a8c2;
+}
+
+.lost-report-page .input-form {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 4px 12px 0 2px;
+}
+
+.lost-report-page .form-actions {
+    position: sticky;
+    bottom: -22px;
+    z-index: 2;
+    margin: 12px -18px -22px -14px;
+    padding: 14px 18px 16px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, #ffffff 38%);
+    border-top: 1px solid #e8eef6;
+}
+
+.settings-log-page {
+    gap: 14px;
+}
+
+.settings-log-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.settings-log-card > header {
+    margin-bottom: 0;
+}
+
+.settings-log-toolbar-meta {
     margin-bottom: 10px;
 }
 
+.settings-log-list {
+    max-height: calc(100dvh - 430px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: #b7c6da transparent;
+}
+
+.settings-log-list::-webkit-scrollbar {
+    width: 7px;
+}
+
+.settings-log-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.settings-log-list::-webkit-scrollbar-thumb {
+    background: #b7c6da;
+    border-radius: 999px;
+}
+
+.settings-log-list::-webkit-scrollbar-thumb:hover {
+    background: #98aac2;
+}
+
+.settings-log-item {
+    margin: 0 6px 8px 12px;
+    border: 1px solid #e2eaf4;
+    border-bottom: 1px solid #dbe6f2;
+    border-radius: 10px;
+    background: #fbfdff;
+    box-shadow: 0 8px 18px rgba(35, 67, 112, 0.035);
+}
+
+.settings-log-item:last-child {
+    margin-bottom: 12px;
+    border-bottom: 1px solid #dbe6f2;
+}
+
+.settings-log-item.is-unread {
+    background: #f3f8ff;
+    border-color: #cfe0f7;
+}
+
+.settings-log-status-badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.settings-log-status-badge.is-unread {
+    background: #dbeafe;
+    border: 1px solid #93c5fd;
+    color: #0b5ed7;
+}
+
+.settings-log-status-badge.is-read {
+    background: #f1f5f9;
+    border: 1px solid #d6dee9;
+    color: #64748b;
+}
+
+.settings-log-item-actions {
+    gap: 8px;
+    position: relative;
+}
+
+.settings-log-menu-trigger {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    display: inline-grid;
+    place-items: center;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.settings-log-menu-trigger:hover {
+    transform: translateY(-1px);
+}
+
+.settings-log-menu {
+    min-width: 210px;
+    border-radius: 12px;
+    box-shadow: 0 18px 36px rgba(17, 38, 72, 0.18);
+    transform: translateY(-4px) scale(0.98);
+    opacity: 0;
+    transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.settings-log-menu.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.settings-log-menu a,
+.settings-log-menu .menu-submit {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 38px;
+    padding: 10px 12px;
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+.settings-log-menu a iconify-icon,
+.settings-log-menu .menu-submit iconify-icon {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+}
+
+.settings-log-menu .menu-submit.danger {
+    border-top: 1px solid #eef2f7;
+    color: #dc2626;
+}
+
+.settings-log-menu .menu-submit.danger:hover {
+    background: #fff1f2;
+}
+
+.claim-status-guide {
+    flex: 0 0 auto;
+    height: auto;
+    min-height: fit-content;
+    max-height: none;
+    margin-bottom: 18px;
+    overflow: visible;
+}
+
 .claim-status-guide > header {
+    flex: 0 0 auto;
     padding-bottom: 10px;
 }
 
 .claim-status-guide-body {
-    padding: 12px 14px 14px;
+    padding: 12px 14px 18px;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    align-items: flex-start;
+    min-height: fit-content;
+    overflow: visible;
 }
 
 .claim-history-card .claim-history-toolbar {
@@ -41,11 +350,25 @@
 }
 
 .claim-history-card.dashboard-report-card {
-    margin-top: 8px;
+    margin-top: 0;
 }
 
 .claim-history-card .claim-history-table {
     min-width: 760px;
+}
+
+.claim-history-filter-grid {
+    width: 100%;
+    margin: 0;
+}
+
+.claim-history-filter-grid .claim-history-filter-form {
+    margin: 0;
+}
+
+.claim-history-card .report-table-wrap {
+    scrollbar-width: thin;
+    scrollbar-color: #b7c6da #eef3fa;
 }
 
 .claim-history-card .claim-history-table .col-item {
@@ -132,6 +455,18 @@
 }
 
 @media (max-width: 992px) {
+    .dashboard-hub-page {
+        gap: 12px;
+    }
+
+    .dashboard-hub-page .intro {
+        padding: 22px 24px;
+    }
+
+    .lost-report-page {
+        gap: 12px;
+    }
+
     .claim-status-guide-body {
         padding-top: 10px;
     }
@@ -146,6 +481,228 @@
 
     .claim-history-card .claim-status-detail {
         max-width: 26ch;
+    }
+}
+
+@media (max-width: 640px) {
+    .dashboard-hub-page .intro h1 {
+        font-size: 25px;
+        max-width: none;
+    }
+
+    .lost-report-page .intro {
+        margin-top: 10px;
+    }
+
+    .lost-report-page .intro h1 {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .claim-history-page {
+        height: auto;
+        min-height: 100%;
+        overflow: visible;
+        padding-inline: 4px;
+        padding-bottom: 18px;
+    }
+
+    .claim-history-page .intro {
+        margin: 12px 2px 12px;
+    }
+
+    .claim-history-page .intro h1 {
+        font-size: 26px;
+        line-height: 1.18;
+    }
+
+    .claim-history-page .intro p {
+        font-size: 12.5px;
+        line-height: 1.45;
+    }
+
+    .claim-history-page .report-card,
+    .claim-history-page .dashboard-report-card {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .claim-status-guide {
+        margin-bottom: 16px;
+    }
+
+    .claim-status-guide > header,
+    .claim-history-card > header {
+        padding: 14px 16px;
+    }
+
+    .claim-status-guide-body {
+        padding: 12px 14px 16px;
+    }
+
+    .claim-history-filter-grid {
+        margin-top: 12px;
+    }
+
+    .claim-history-filter-grid .dashboard-filter-select {
+        min-width: 0;
+        height: 42px;
+    }
+
+    .dashboard-hub-page,
+    .dashboard-page-content {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    .dashboard-hub-page .dashboard-report-card,
+    .claim-history-card.dashboard-report-card {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .dashboard-hub-page .report-table-wrap,
+    .claim-history-card .report-table-wrap {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        padding: 12px;
+    }
+
+    .mobile-stack-table,
+    .claim-history-card .claim-history-table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        border-collapse: separate;
+    }
+
+    .mobile-stack-table colgroup,
+    .mobile-stack-table thead {
+        display: none;
+    }
+
+    .mobile-stack-table tbody {
+        display: grid;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .mobile-stack-table tr {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 100%;
+        min-height: 190px;
+        padding: 16px 54px 16px 14px;
+        border: 1px solid #dfe8f4;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 10px 22px rgba(33, 66, 112, 0.07);
+    }
+
+    .mobile-stack-table td {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border-bottom: 0;
+        font-size: 12px;
+    }
+
+    .mobile-stack-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 4px;
+        color: #7a8ca3;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .mobile-stack-table .mobile-stack-primary::before,
+    .mobile-stack-table .mobile-stack-action::before {
+        display: none;
+    }
+
+    .mobile-stack-table .mobile-stack-primary .item-cell {
+        align-items: flex-start;
+        gap: 12px;
+        padding-right: 4px;
+    }
+
+    .mobile-stack-table .item-avatar,
+    .claim-history-card .avatar-claim-image {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        flex: 0 0 52px;
+    }
+
+    .mobile-stack-table .item-cell strong,
+    .mobile-stack-table .date-cell strong {
+        font-size: 15px;
+        line-height: 1.25;
+    }
+
+    .mobile-stack-table .item-cell small,
+    .mobile-stack-table .date-cell small {
+        margin-top: 3px;
+        display: block;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .mobile-stack-table .mobile-stack-status {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .mobile-stack-table .mobile-stack-status::before {
+        flex-basis: 100%;
+    }
+
+    .mobile-stack-table .status-chip {
+        padding: 6px 10px;
+        font-size: 10.5px;
+    }
+
+    .claim-history-card .claim-status-detail {
+        margin-top: 0;
+        max-width: none;
+        font-size: 11px;
+    }
+
+    .claim-history-card .mobile-stack-meta {
+        color: #425a74;
+        line-height: 1.45;
+    }
+
+    .mobile-stack-table .mobile-stack-action {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: auto;
+        text-align: right;
+    }
+
+    .mobile-stack-table .row-menu-trigger {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+    }
+
+    .mobile-stack-table .empty-row {
+        padding: 18px 14px;
+        text-align: center;
     }
 }
 
@@ -248,4 +805,85 @@
     justify-content: center;
     gap: 8px;
     flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+    html,
+    body,
+    body.dashboard-fixed-mode,
+    .lost-report-page-mode,
+    body.lost-report-page-mode {
+        height: auto;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-shell,
+    .admin-shell.admin-shell-no-sidebar,
+    body.dashboard-fixed-mode .admin-shell,
+    body.lost-report-page-mode .admin-shell {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .user-main-content,
+    body.dashboard-fixed-mode .main-content,
+    body.lost-report-page-mode .main-content {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body.lost-report-page-mode .main-content-scroll {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        display: block;
+    }
+
+    .dashboard-page-content,
+    .dashboard-hub-page,
+    .claim-history-page,
+    .input-page-content,
+    .lost-report-page,
+    .settings-page,
+    body.dashboard-fixed-mode .dashboard-page-content {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .report-card,
+    .dashboard-report-card,
+    .claim-history-card,
+    .input-card,
+    .settings-card,
+    body.dashboard-fixed-mode .dashboard-report-card,
+    body.dashboard-fixed-mode .dashboard-report-card .report-table-wrap {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .lost-report-page .input-card,
+    .lost-report-page .input-form,
+    .settings-log-list,
+    .report-table-wrap {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .user-settings-actions {
+        position: sticky;
+        bottom: 0;
+    }
 }

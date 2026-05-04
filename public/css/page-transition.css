@@ -11,25 +11,9 @@ body.page-transition.page-leaving {
     pointer-events: none;
 }
 
-/* =========================================
-   View Transition API (Browser Support)
-========================================= */
-@view-transition {
-    navigation: auto;
-}
-
-::view-transition-old(root),
-::view-transition-new(root) {
-    animation-duration: 180ms;
-    animation-timing-function: ease-out;
-}
-
 @media (prefers-reduced-motion: reduce) {
     body.page-transition,
-    body.page-transition.page-leaving,
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
+    body.page-transition.page-leaving {
         transition: none !important;
-        animation-duration: 1ms !important;
     }
 }

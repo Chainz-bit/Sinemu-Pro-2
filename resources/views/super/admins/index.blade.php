@@ -8,45 +8,17 @@
 @endphp
 
 @section('page-content')
-    <div class="dashboard-page-content super-page-content">
+    <div class="dashboard-page-content super-page-content super-admins-page">
         <section class="intro">
             <h1>Daftar Admin Terdaftar</h1>
             <p>Pantau semua admin yang sudah masuk ke sistem, termasuk status aktif, antrean verifikasi, dan akun yang perlu revisi.</p>
         </section>
 
         <section class="stats-grid super-stats-grid compact">
-            <article class="stat-card stat-card-found">
-                <div class="stat-card-head">
-                    <span>Total Admin</span>
-                    <div class="stat-card-icon"><iconify-icon icon="mdi:account-group-outline"></iconify-icon></div>
-                </div>
-                <strong>{{ $summary['total'] ?? 0 }}</strong>
-                <small>Total akun admin yang terdaftar.</small>
-            </article>
-            <article class="stat-card stat-card-claim">
-                <div class="stat-card-head">
-                    <span>Menunggu</span>
-                    <div class="stat-card-icon"><iconify-icon icon="mdi:clock-alert-outline"></iconify-icon></div>
-                </div>
-                <strong>{{ $summary['pending'] ?? 0 }}</strong>
-                <small>Pendaftar yang butuh keputusan.</small>
-            </article>
-            <article class="stat-card stat-card-found">
-                <div class="stat-card-head">
-                    <span>Aktif</span>
-                    <div class="stat-card-icon"><iconify-icon icon="mdi:check-decagram-outline"></iconify-icon></div>
-                </div>
-                <strong>{{ $summary['active'] ?? 0 }}</strong>
-                <small>Admin yang sudah lolos verifikasi.</small>
-            </article>
-            <article class="stat-card stat-card-lost">
-                <div class="stat-card-head">
-                    <span>Ditolak</span>
-                    <div class="stat-card-icon"><iconify-icon icon="mdi:close-octagon-outline"></iconify-icon></div>
-                </div>
-                <strong>{{ $summary['rejected'] ?? 0 }}</strong>
-                <small>Akun yang ditolak atau perlu revisi.</small>
-            </article>
+            <x-dashboard.stat-card class="stat-card-found" label="Total Admin" :value="$summary['total'] ?? 0" icon="mdi:account-group-outline" description="Total akun admin yang terdaftar." />
+            <x-dashboard.stat-card class="stat-card-claim" label="Menunggu" :value="$summary['pending'] ?? 0" icon="mdi:clock-alert-outline" description="Pendaftar yang butuh keputusan." />
+            <x-dashboard.stat-card class="stat-card-found" label="Aktif" :value="$summary['active'] ?? 0" icon="mdi:check-decagram-outline" description="Admin yang sudah lolos verifikasi." />
+            <x-dashboard.stat-card class="stat-card-lost" label="Ditolak" :value="$summary['rejected'] ?? 0" icon="mdi:close-octagon-outline" description="Akun yang ditolak atau perlu revisi." />
         </section>
 
         <section class="report-card dashboard-report-card">
@@ -83,7 +55,7 @@
             </div>
 
             <div class="report-table-wrap">
-                <table class="report-table">
+                <table class="report-table responsive-card-table super-admins-table">
                     <thead>
                         <tr>
                             <th>Detail Admin</th>
@@ -98,7 +70,7 @@
                                 $statusKey = \App\Support\AdminVerificationStatusPresenter::key($admin->status_verifikasi);
                             @endphp
                             <tr>
-                                <td>
+                                <td class="card-primary-cell" data-label="Detail Aktivitas">
                                     <div class="item-cell">
                                         <div class="item-avatar avatar-claim">
                                             <span class="item-avatar-fallback">{{ strtoupper(substr((string) $admin->nama, 0, 1)) }}</span>
@@ -110,27 +82,22 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="card-date-cell" data-label="Tanggal">
                                     <div class="date-cell">
                                         <strong>{{ optional($admin->created_at)->format('d M Y') ?? '-' }}</strong>
                                         <small>{{ optional($admin->created_at)->format('H:i') ?? '-' }} WIB</small>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="card-status-cell" data-label="Status">
                                     <span class="status-chip {{ \App\Support\AdminVerificationStatusPresenter::badgeClass($statusKey) }}">
                                         {{ \App\Support\AdminVerificationStatusPresenter::label($statusKey) }}
                                     </span>
                                 </td>
-                                <td class="menu-cell">
-                                    <button type="button" class="row-menu-trigger" data-menu-target="super-admin-menu-{{ $index }}" aria-label="Aksi">
-                                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                                            <path d="M12 5.5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3zm0 5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3zm0 5a1.5 1.5 0 1 1 0 3a1.5 1.5 0 0 1 0-3z" fill="currentColor"/>
-                                        </svg>
-                                    </button>
-                                    <div class="row-menu" id="super-admin-menu-{{ $index }}">
+                                <td class="menu-cell card-action-cell" data-label="Aksi">
+                                    <x-dashboard.action-menu id="super-admin-menu-{{ $index }}">
                                         <a href="{{ route('super.admins.index', ['search' => $admin->nama]) }}">Lihat Detail</a>
                                         <a href="{{ route('super.admin-verifications.index', ['search' => $admin->nama]) }}">Kelola Verifikasi</a>
-                                    </div>
+                                    </x-dashboard.action-menu>
                                 </td>
                             </tr>
                             @if($search !== '' && str_contains(strtolower($admin->nama . ' ' . $admin->email . ' ' . $admin->instansi . ' ' . $admin->kecamatan), strtolower($search)))
@@ -173,4 +140,3 @@
         </section>
     </div>
 @endsection
-

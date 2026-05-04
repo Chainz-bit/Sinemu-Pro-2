@@ -51,7 +51,7 @@ class InputItemController extends Controller
             return back()->with('status', 'Laporan barang hilang berhasil ditambahkan.');
         }
 
-        $this->inputItemService->storeFoundItem((int) $admin->id, $validated, $photo);
+        $this->inputItemService->storeFoundItem((int) $admin->id, $admin->region_id ? (int) $admin->region_id : null, $validated, $photo);
 
         return back()->with('status', 'Laporan barang temuan berhasil ditambahkan.');
     }

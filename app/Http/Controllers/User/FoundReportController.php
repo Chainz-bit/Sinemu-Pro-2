@@ -7,9 +7,11 @@ use App\Http\Requests\User\SubmitFoundReportRequest;
 use App\Models\Admin;
 use App\Models\Barang;
 use App\Models\Kategori;
+use App\Models\Wilayah;
 use App\Support\WorkflowStatus;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 
 class FoundReportController extends Controller
@@ -26,6 +28,9 @@ class FoundReportController extends Controller
         return view('user.pages.found-report', [
             'user' => Auth::user(),
             'categories' => $categories,
+            'wilayahOptions' => Cache::remember('indramayu:wilayah-options', 600, static fn () => Wilayah::query()
+                ->orderBy('nama_wilayah')
+                ->get(['id', 'nama_wilayah'])),
         ]);
     }
 
@@ -33,9 +38,15 @@ class FoundReportController extends Controller
     {
         $validated = $request->validated();
 
-        $admin = Admin::query()->select('id')->orderBy('id')->first();
+        $regionId = (int) $validated['region_id'];
+        $admin = Admin::query()
+            ->select(['id', 'region_id'])
+            ->where('region_id', $regionId)
+            ->where('status_verifikasi', 'active')
+            ->orderBy('id')
+            ->first();
         if (!$admin) {
-            return back()->with('error', 'Belum ada admin aktif untuk menerima laporan temuan.');
+            return back()->withInput()->with('error', 'Belum ada admin aktif pada wilayah yang dipilih.');
         }
 
         $kategoriId = $validated['kategori_id'] ?? Kategori::query()->value('id');
@@ -66,6 +77,9 @@ class FoundReportController extends Controller
         }
         if (Schema::hasColumn('barangs', 'tampil_di_home')) {
             $payload['tampil_di_home'] = false;
+        }
+        if (Schema::hasColumn('barangs', 'region_id')) {
+            $payload['region_id'] = $regionId;
         }
 
         $photo = $request->file('foto_barang');

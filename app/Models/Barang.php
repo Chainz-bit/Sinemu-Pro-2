@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property int $id
  * @property int|null $admin_id
+ * @property int|null $region_id
  * @property int|null $user_id
  * @property int|null $kategori_id
  * @property string $nama_barang
@@ -36,6 +37,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  * @property-read Admin|null $admin
+ * @property-read Wilayah|null $region
  * @property-read User|null $user
  * @property-read Kategori|null $kategori
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Klaim> $klaims
@@ -46,6 +48,7 @@ class Barang extends Model
 {
     protected $fillable = [
         'admin_id',
+        'region_id',
         'user_id',
         'kategori_id',
         'nama_barang',
@@ -77,6 +80,11 @@ class Barang extends Model
     public function admin()
     {
         return $this->belongsTo(Admin::class);
+    }
+
+    public function region()
+    {
+        return $this->belongsTo(Wilayah::class, 'region_id');
     }
 
     public function user()

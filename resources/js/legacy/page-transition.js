@@ -2,7 +2,6 @@
     const body = document.body;
     if (!body) return;
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let navigating = false;
 
     body.classList.add('page-transition');
@@ -39,14 +38,6 @@
         event.preventDefault();
         navigating = true;
 
-        // Jika browser mendukung View Transition API, biarkan navigasi langsung.
-        // CSS `@view-transition { navigation: auto; }` akan meng-handle animasi.
-        if ('startViewTransition' in document && !prefersReducedMotion) {
-            window.location.href = url.href;
-            return;
-        }
-
-        // Fallback ringan untuk browser lama.
         body.classList.add('page-leaving');
         window.setTimeout(function () {
             window.location.href = url.href;

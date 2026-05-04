@@ -18,6 +18,7 @@ class SubmitFoundReportRequest extends FormRequest
     {
         return [
             'nama_barang' => ['required', 'string', 'max:255'],
+            'region_id' => ['required', 'integer', 'exists:wilayahs,id'],
             'kategori_id' => ['nullable', 'integer', 'exists:kategoris,id'],
             'warna_barang' => ['nullable', 'string', 'max:100'],
             'merek_barang' => ['nullable', 'string', 'max:120'],

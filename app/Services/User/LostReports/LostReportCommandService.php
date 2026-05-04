@@ -71,6 +71,7 @@ class LostReportCommandService
 
         $payload = [
             'user_id' => (int) Auth::id(),
+            'region_id' => $validated['region_id'],
             'nama_barang' => $validated['nama_barang'],
             'kategori_barang' => $validated['kategori_barang'] ?? null,
             'warna_barang' => $validated['warna_barang'] ?? null,

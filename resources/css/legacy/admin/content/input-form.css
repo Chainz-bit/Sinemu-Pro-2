@@ -3,8 +3,8 @@
     border: 1px solid var(--line);
     border-radius: 12px;
     background: var(--surface);
-    padding: 14px;
-    max-width: 980px;
+    padding: 18px;
+    max-width: 1060px;
     width: 100%;
     flex: 1 1 auto;
     min-height: 0;
@@ -15,12 +15,13 @@
 .input-form {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 14px;
+    column-gap: 16px;
+    row-gap: 16px;
     height: 100%;
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 4px 10px 12px 2px;
+    padding: 2px 8px 18px 2px;
     align-content: start;
 }
 
@@ -49,7 +50,9 @@
 
 .form-group {
     display: grid;
-    gap: 8px;
+    align-content: start;
+    gap: 7px;
+    min-width: 0;
 }
 
 .pickup-section {
@@ -75,6 +78,7 @@
     font-size: 13px;
     font-weight: 600;
     color: #37465d;
+    line-height: 1.25;
 }
 
 .form-label span {
@@ -88,10 +92,17 @@
     background: #f8fafc;
     color: #1f2937;
     font-size: 13px;
-    padding: 10px 12px;
-    height: 42px;
+    line-height: 1.35;
+    padding: 0 12px;
+    min-height: 44px;
+    height: 44px;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select.form-input {
+    padding-right: 36px;
+    text-overflow: ellipsis;
 }
 
 .form-input:focus {
@@ -103,6 +114,8 @@
     resize: vertical;
     min-height: 110px;
     height: auto;
+    padding-top: 11px;
+    padding-bottom: 11px;
 }
 
 .form-textarea-sm {
@@ -133,6 +146,7 @@
 
 .form-note {
     font-size: 11px;
+    line-height: 1.35;
     color: var(--muted);
 }
 

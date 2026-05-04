@@ -7,6 +7,7 @@ use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
 use App\Support\WorkflowStatus;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 class LostItemQueryService
@@ -45,6 +46,10 @@ class LostItemQueryService
 
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
             $query->where('laporan_barang_hilangs.sumber_laporan', 'lapor_hilang');
+        }
+        $admin = Auth::guard('admin')->user();
+        if ($admin && $admin->region_id && Schema::hasColumn('laporan_barang_hilangs', 'region_id')) {
+            $query->where('laporan_barang_hilangs.region_id', $admin->region_id);
         }
 
         $this->applySearch($query, $request->search());

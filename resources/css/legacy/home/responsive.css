@@ -109,8 +109,8 @@
     }
 
     .filter-wrap {
-        padding: 1rem;
-        transform: translateY(6px);
+        padding: 0.8rem;
+        transform: translateY(2px);
     }
 
     .filter-subtitle {
@@ -178,6 +178,29 @@
 
     .filter-wrap {
         transform: translateY(0);
+        padding: 0.72rem;
+        border-radius: 16px;
+    }
+
+    .filter-title {
+        font-size: 0.82rem;
+    }
+
+    .filter-subtitle {
+        font-size: 0.68rem;
+        margin-bottom: 0 !important;
+    }
+
+    .form-control,
+    .form-select,
+    .filter-search-btn {
+        min-height: 38px;
+        height: 38px;
+        font-size: 0.82rem;
+    }
+
+    .form-label {
+        font-size: 0.62rem;
     }
 
     .hero-modern-meta {

@@ -9,6 +9,7 @@ use App\Services\ReportImageCleaner;
 use App\Support\WorkflowStatus;
 use App\Support\Media\OptimizedImageUploader;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 
 class ReportCommandService
@@ -76,6 +77,7 @@ class ReportCommandService
     private function updateFoundReport(int $id, array $validated, ?UploadedFile $photo, OptimizedImageUploader $imageUploader): string
     {
         $report = Barang::query()->findOrFail($id);
+        $this->ensureAdminCanAccessFoundReport($report);
 
         $payload = [
             'nama_barang' => $validated['nama_barang'],
@@ -173,6 +175,8 @@ class ReportCommandService
     private function publishFoundReportToHome(int $id): array
     {
         $report = Barang::query()->findOrFail($id);
+        $this->ensureAdminCanAccessFoundReport($report);
+
         if (!Schema::hasColumn('barangs', 'tampil_di_home')) {
             return ['status' => false, 'message' => 'Kolom tampil_di_home belum tersedia pada barang temuan.'];
         }
@@ -198,6 +202,7 @@ class ReportCommandService
             if (!$report) {
                 return ['status' => false, 'message' => 'Data barang temuan terkait klaim tidak ditemukan.'];
             }
+            $this->ensureAdminCanAccessFoundReport($report);
 
             if (!Schema::hasColumn('barangs', 'tampil_di_home')) {
                 return ['status' => false, 'message' => 'Kolom tampil_di_home belum tersedia pada barang temuan.'];
@@ -224,5 +229,16 @@ class ReportCommandService
         }
 
         abort(404);
+    }
+
+    private function ensureAdminCanAccessFoundReport(Barang $barang): void
+    {
+        $admin = Auth::guard('admin')->user();
+        if (!Schema::hasColumn('barangs', 'region_id')) {
+            return;
+        }
+
+        abort_if(!$admin || empty($admin->region_id), 403, 'Admin belum memiliki wilayah akses.');
+        abort_if((int) $barang->region_id !== (int) $admin->region_id, 403, 'Anda tidak memiliki akses ke barang dari wilayah lain.');
     }
 }

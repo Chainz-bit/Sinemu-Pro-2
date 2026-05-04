@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\SubmitLostReportRequest;
 use App\Models\Kategori;
 use App\Models\LaporanBarangHilang;
+use App\Models\Wilayah;
 use App\Services\User\LostReports\LostReportCommandService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,6 +32,9 @@ class LostReportController extends Controller
                 ->pluck('nama_kategori')
                 ->filter()
                 ->values()),
+            'wilayahOptions' => Cache::remember('indramayu:wilayah-options', 600, static fn () => Wilayah::query()
+                ->orderBy('nama_wilayah')
+                ->get(['id', 'nama_wilayah'])),
             'editingReport' => $editingReport,
         ]);
     }

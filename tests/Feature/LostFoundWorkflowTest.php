@@ -9,6 +9,7 @@ use App\Models\LaporanBarangHilang;
 use App\Models\Pencocokan;
 use App\Models\SuperAdmin;
 use App\Models\User;
+use App\Models\Wilayah;
 use App\Services\Admin\Matching\MatchingService;
 use App\Support\WorkflowStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,6 +53,7 @@ class LostFoundWorkflowTest extends TestCase
 
         $approvedFound = Barang::query()->create([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'Handphone Samsung',
@@ -67,6 +69,7 @@ class LostFoundWorkflowTest extends TestCase
 
         $submittedFound = Barang::query()->create([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'Kunci Motor',
@@ -112,6 +115,7 @@ class LostFoundWorkflowTest extends TestCase
 
         $foundItem = Barang::query()->create([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'Tablet Xiaomi',
@@ -247,6 +251,7 @@ class LostFoundWorkflowTest extends TestCase
 
         $foundItemA = Barang::query()->create([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'Laptop Temuan A',
@@ -261,6 +266,7 @@ class LostFoundWorkflowTest extends TestCase
         ]);
         $foundItemB = Barang::query()->create([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'Laptop Temuan B',
@@ -324,6 +330,7 @@ class LostFoundWorkflowTest extends TestCase
 
         $foundItem = Barang::query()->create([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'Laptop Asus',
@@ -388,6 +395,7 @@ class LostFoundWorkflowTest extends TestCase
 
         $foundItem = Barang::query()->create([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'iPad Air',
@@ -456,9 +464,15 @@ class LostFoundWorkflowTest extends TestCase
             'username' => 'super-admin',
             'password' => Hash::make('password123'),
         ]);
+        $region = Wilayah::query()->create([
+            'nama_wilayah' => 'Wilayah Admin Uji',
+            'lat' => -6.326,
+            'lng' => 108.32,
+        ]);
 
         return Admin::query()->create([
             'super_admin_id' => $superAdmin->id,
+            'region_id' => $region->id,
             'nama' => 'Admin Uji',
             'email' => 'admin@example.com',
             'username' => 'admin-uji',

@@ -9,6 +9,7 @@ use App\Models\LaporanBarangHilang;
 use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\Wilayah;
+use App\Support\IndramayuDistricts;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -113,21 +114,8 @@ class HomeDataSeeder extends Seeder
         }
 
         if (Schema::hasTable('wilayahs')) {
-            $wilayahItems = [
-                ['nama_wilayah' => 'Kecamatan Indramayu', 'lat' => -6.3275000, 'lng' => 108.3207000],
-                ['nama_wilayah' => 'Kecamatan Lohbener', 'lat' => -6.3852000, 'lng' => 108.2793000],
-                ['nama_wilayah' => 'Kecamatan Pasekan', 'lat' => -6.3201000, 'lng' => 108.3388000],
-                ['nama_wilayah' => 'Kecamatan Balongan', 'lat' => -6.3502000, 'lng' => 108.4108000],
-                ['nama_wilayah' => 'Kecamatan Jatibarang', 'lat' => -6.4741000, 'lng' => 108.3061000],
-                ['nama_wilayah' => 'Kecamatan Haurgeulis', 'lat' => -6.4477000, 'lng' => 107.9398000],
-                ['nama_wilayah' => 'Kecamatan Bangodua', 'lat' => -6.4941000, 'lng' => 108.1455000],
-                ['nama_wilayah' => 'Kecamatan Sliyeg', 'lat' => -6.4406000, 'lng' => 108.3693000],
-                ['nama_wilayah' => 'Kecamatan Kandanghaur', 'lat' => -6.3433000, 'lng' => 107.9816000],
-                ['nama_wilayah' => 'Kecamatan Krangkeng', 'lat' => -6.4415000, 'lng' => 108.4841000],
-            ];
-
-            foreach ($wilayahItems as $wilayah) {
-                Wilayah::updateOrCreate(
+            foreach (IndramayuDistricts::wilayahItems() as $wilayah) {
+                Wilayah::firstOrCreate(
                     ['nama_wilayah' => $wilayah['nama_wilayah']],
                     ['lat' => $wilayah['lat'], 'lng' => $wilayah['lng']]
                 );

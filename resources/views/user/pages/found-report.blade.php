@@ -9,7 +9,7 @@
 @endphp
 
 @section('page-content')
-    <div class="input-page-content">
+    <div class="input-page-content report-form-page found-report-page">
 {{-- BAGIAN: Header halaman --}}
         <section class="intro">
             <h1>Lapor Barang Temuan</h1>
@@ -23,6 +23,19 @@
                 <div class="form-col-6 form-group">
                     <label class="form-label" for="nama_barang">Nama Barang <span>*</span></label>
                     <input id="nama_barang" name="nama_barang" type="text" class="form-input" value="{{ old('nama_barang') }}" placeholder="Contoh: HP Android warna hitam" required>
+                </div>
+
+                <div class="form-col-6 form-group">
+                    <label class="form-label" for="region_id">Wilayah Ditemukan <span>*</span></label>
+                    <select id="region_id" name="region_id" class="form-input" required>
+                        <option value="">Pilih kecamatan</option>
+                        @foreach(($wilayahOptions ?? collect()) as $wilayah)
+                            <option value="{{ $wilayah->id }}" @selected((string) old('region_id') === (string) $wilayah->id)>
+                                {{ $wilayah->nama_wilayah }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="form-note">Barang temuan akan diteruskan ke admin wilayah ini.</small>
                 </div>
 
                 <div class="form-col-6 form-group">

@@ -10,6 +10,7 @@ use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
 use App\Models\SuperAdmin;
 use App\Models\User;
+use App\Models\Wilayah;
 use App\Support\WorkflowStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -208,6 +209,7 @@ class AdminItemWorkflowTest extends TestCase
     {
         return Barang::query()->create(array_merge([
             'admin_id' => $admin->id,
+            'region_id' => $admin->region_id,
             'user_id' => $user->id,
             'kategori_id' => $kategori->id,
             'nama_barang' => 'Headset Hitam',
@@ -261,9 +263,15 @@ class AdminItemWorkflowTest extends TestCase
             'username' => 'super-item-workflow',
             'password' => Hash::make('password123'),
         ]);
+        $region = Wilayah::query()->create([
+            'nama_wilayah' => 'Wilayah Admin Workflow',
+            'lat' => -6.326,
+            'lng' => 108.32,
+        ]);
 
         return Admin::query()->create([
             'super_admin_id' => $superAdmin->id,
+            'region_id' => $region->id,
             'nama' => 'Admin Workflow',
             'email' => 'admin-item-workflow@example.com',
             'username' => 'admin-item-workflow',

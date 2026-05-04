@@ -64,7 +64,7 @@ class InputItemService
     /**
      * @param array<string, mixed> $validated
      */
-    public function storeFoundItem(int $adminId, array $validated, ?UploadedFile $photo): void
+    public function storeFoundItem(int $adminId, ?int $regionId, array $validated, ?UploadedFile $photo): void
     {
         $kategoriId = $validated['kategori_id'] ?? null;
 
@@ -103,6 +103,9 @@ class InputItemService
 
         if (Schema::hasColumn('barangs', 'tampil_di_home')) {
             $payload['tampil_di_home'] = true;
+        }
+        if ($regionId && Schema::hasColumn('barangs', 'region_id')) {
+            $payload['region_id'] = $regionId;
         }
         if (Schema::hasColumn('barangs', 'status_laporan')) {
             $payload['status_laporan'] = WorkflowStatus::REPORT_APPROVED;

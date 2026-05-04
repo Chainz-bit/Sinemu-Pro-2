@@ -33,6 +33,18 @@ class UserNotificationController extends Controller
         return back();
     }
 
+    public function markAsUnread(UserNotification $notification): RedirectResponse
+    {
+        $userId = (int) Auth::id();
+        abort_if((int) $notification->user_id !== $userId, 403);
+
+        if (!is_null($notification->read_at)) {
+            $notification->update(['read_at' => null]);
+        }
+
+        return back();
+    }
+
     public function destroy(UserNotification $notification): RedirectResponse
     {
         $userId = (int) Auth::id();
