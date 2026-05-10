@@ -52,8 +52,8 @@ class HomePickupLocationService
 
                         return [
                             'id' => $admin->id,
-                            'name' => $instansi !== '' ? $instansi : 'Admin SiNemu',
-                            'manager_label' => 'Admin Pengelola',
+                            'name' => $instansi !== '' ? $instansi : \App\Support\RoleLabels::manager() . ' SiNemu',
+                            'manager_label' => \App\Support\RoleLabels::manager(),
                             'address' => $address,
                             'kecamatan' => $kecamatan,
                             'lat' => $hasLat && $admin->lat !== null ? (float) $admin->lat : null,

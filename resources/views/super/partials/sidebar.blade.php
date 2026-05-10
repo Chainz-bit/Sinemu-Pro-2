@@ -1,4 +1,5 @@
 @php
+    $managerRoleLabel = \App\Support\RoleLabels::manager();
     $sidebarProfileAvatar = asset('img/profil.jpg');
     $rawProfilePath = trim((string) ($superAdmin?->profil ?? ''));
     if ($rawProfilePath !== '') {
@@ -16,8 +17,8 @@
     }
     $superSidebarItems = [
         ['key' => 'dashboard', 'label' => 'Dashboard', 'url' => route('super.dashboard'), 'icon' => ''],
-        ['key' => 'admins', 'label' => 'Daftar Admin', 'url' => route('super.admins.index'), 'icon' => ''],
-        ['key' => 'admin-verifications', 'label' => 'Verifikasi Admin', 'url' => route('super.admin-verifications.index'), 'icon' => ''],
+        ['key' => 'admins', 'label' => 'Daftar ' . $managerRoleLabel, 'url' => route('super.admins.index'), 'icon' => ''],
+        ['key' => 'admin-verifications', 'label' => 'Verifikasi ' . $managerRoleLabel, 'url' => route('super.admin-verifications.index'), 'icon' => ''],
     ];
 @endphp
 

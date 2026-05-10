@@ -28,7 +28,7 @@ class ClaimVerificationController extends Controller
     public function index(ClaimVerificationIndexRequest $request): View|StreamedResponse
     {
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         $indexState = $this->listingService->prepareIndexQuery($request);
         $query = $indexState['query'];
         $sort = $indexState['sort'];
@@ -39,13 +39,13 @@ class ClaimVerificationController extends Controller
 
         $claims = $query->paginate(12)->withQueryString();
 
-        return view('admin.pages.claim-verifications', compact('claims', 'admin', 'sort'));
+        return view('manager::pages.claims.index', compact('claims', 'admin', 'sort'));
     }
 
     public function approve(ApproveClaimRequest $request, Klaim $klaim): RedirectResponse
     {
         $this->ensureClaimOwnedByAdmin($klaim);
-        $adminId = (int) Auth::guard('admin')->id();
+        $adminId = (int) \App\Support\ManagerPortal::id();
 
         if (!$this->workflowService->canApprove($klaim)) {
             return redirect()->back()->with('error', 'Klaim tidak berada pada state yang dapat disetujui.');
@@ -64,7 +64,7 @@ class ClaimVerificationController extends Controller
     public function reject(RejectClaimRequest $request, Klaim $klaim): RedirectResponse
     {
         $this->ensureClaimOwnedByAdmin($klaim);
-        $adminId = (int) Auth::guard('admin')->id();
+        $adminId = (int) \App\Support\ManagerPortal::id();
 
         if (!$this->workflowService->canReject($klaim)) {
             return redirect()->back()->with('error', 'Klaim tidak berada pada state yang dapat ditolak.');
@@ -79,7 +79,7 @@ class ClaimVerificationController extends Controller
     {
         $this->ensureClaimOwnedByAdmin($klaim);
         abort_if(!$this->workflowService->canComplete($klaim), 422, 'Klaim harus disetujui sebelum ditandai selesai.');
-        $this->workflowService->complete($klaim, (int) Auth::guard('admin')->id());
+        $this->workflowService->complete($klaim, (int) \App\Support\ManagerPortal::id());
 
         return redirect()->back()->with('status', 'Klaim ditandai selesai.');
     }
@@ -88,7 +88,7 @@ class ClaimVerificationController extends Controller
     {
         $this->ensureClaimOwnedByAdmin($klaim);
         /** @var \App\Models\Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
 
         $klaim->load([
             'barang.kategori:id,nama_kategori',
@@ -97,7 +97,7 @@ class ClaimVerificationController extends Controller
             'admin:id,nama,email',
         ]);
 
-        return view('admin.pages.claim-verification-detail', [
+        return view('manager::pages.claims.show', [
             'admin' => $admin,
             'klaim' => $klaim,
             ...$this->detailPageService->build($klaim),
@@ -106,7 +106,7 @@ class ClaimVerificationController extends Controller
 
     public function destroy(Klaim $klaim): RedirectResponse
     {
-        abort_if(!Auth::guard('admin')->check(), 403);
+        abort_if(!\App\Support\ManagerPortal::check(), 403);
 
         foreach ((array) ($klaim->bukti_foto ?? []) as $path) {
             if (is_string($path) && trim($path) !== '') {
@@ -121,7 +121,7 @@ class ClaimVerificationController extends Controller
 
     private function ensureClaimOwnedByAdmin(Klaim $klaim): void
     {
-        $adminId = Auth::guard('admin')->id();
+        $adminId = \App\Support\ManagerPortal::id();
         if (is_null($klaim->admin_id)) {
             return;
         }

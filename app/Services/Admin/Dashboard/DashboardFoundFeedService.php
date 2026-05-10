@@ -42,7 +42,7 @@ class DashboardFoundFeedService
             ->select($foundSelectColumns)
             ->orderByDesc('updated_at');
 
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         if ($admin && $admin->region_id && Schema::hasColumn('barangs', 'region_id')) {
             $query->where('region_id', $admin->region_id);
         } else {
@@ -57,7 +57,7 @@ class DashboardFoundFeedService
     private function presentReport(Barang $report): object
     {
         $statusPayload = $this->buildStatusPayload((string) $report->status_barang);
-        $pelapor = $report->admin?->nama ?? 'Admin';
+        $pelapor = $report->admin?->nama ?? \App\Support\RoleLabels::manager();
         $activityAt = strtotime((string) ($report->updated_at ?? $report->created_at));
 
         return (object) [
@@ -75,8 +75,8 @@ class DashboardFoundFeedService
             'avatar' => 'T',
             'avatar_class' => 'avatar-mint',
             'foto_barang' => $report->foto_barang,
-            'detail_url' => route('admin.found-items.show', $report->id),
-            'edit_url' => route('admin.found-items.edit', $report->id),
+            'detail_url' => route(\App\Support\ManagerPortal::routeName('found-items.show'), $report->id),
+            'edit_url' => route(\App\Support\ManagerPortal::routeName('found-items.edit'), $report->id),
             'edit_nama_barang' => $report->nama_barang,
             'edit_kategori_id' => $report->kategori_id,
             'edit_deskripsi' => $report->deskripsi,
@@ -89,12 +89,12 @@ class DashboardFoundFeedService
             'edit_kontak_pengambilan' => $report->kontak_pengambilan,
             'edit_jam_layanan_pengambilan' => $report->jam_layanan_pengambilan,
             'edit_catatan_pengambilan' => $report->catatan_pengambilan,
-            'update_url' => route('admin.dashboard.reports.update', ['type' => 'temuan', 'id' => $report->id]),
-            'upload_home_url' => route('admin.dashboard.reports.publish-home', ['type' => 'temuan', 'id' => $report->id]),
+            'update_url' => route(\App\Support\ManagerPortal::routeName('dashboard.reports.update'), ['type' => 'temuan', 'id' => $report->id]),
+            'upload_home_url' => route(\App\Support\ManagerPortal::routeName('dashboard.reports.publish-home'), ['type' => 'temuan', 'id' => $report->id]),
             'home_published' => (bool) ($report->tampil_di_home ?? false),
-            'target_url' => route('admin.found-items.show', $report->id),
+            'target_url' => route(\App\Support\ManagerPortal::routeName('found-items.show'), $report->id),
             'target_label' => 'Buka Barang Temuan',
-            'delete_url' => route('admin.found-items.destroy', $report->id),
+            'delete_url' => route(\App\Support\ManagerPortal::routeName('found-items.destroy'), $report->id),
         ];
     }
 

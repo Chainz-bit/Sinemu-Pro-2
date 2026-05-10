@@ -130,7 +130,7 @@ class AdminProfilePageService
                     'timestamp' => $barang->updated_at ?? $barang->created_at,
                     'status_class' => $statusClass,
                     'status_label' => $statusLabel,
-                    'detail_url' => route('admin.found-items.show', $barang->id),
+                    'detail_url' => route(\App\Support\ManagerPortal::routeName('found-items.show'), $barang->id),
                 ];
             });
 
@@ -181,7 +181,7 @@ class AdminProfilePageService
                     'timestamp' => $klaim->updated_at ?? $klaim->created_at,
                     'status_class' => $statusClass,
                     'status_label' => $statusLabel,
-                    'detail_url' => route('admin.claim-verifications.show', $klaim->id),
+                    'detail_url' => route(\App\Support\ManagerPortal::routeName('claim-verifications.show'), $klaim->id),
                 ];
             });
 

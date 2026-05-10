@@ -33,7 +33,7 @@ class HomeLostDetailService
             WorkflowStatus::REPORT_MATCHED => ['Sudah Dicocokkan', 'is-found'],
             WorkflowStatus::REPORT_CLAIMED => ['Sedang Diproses Klaim', 'is-in-progress'],
             WorkflowStatus::REPORT_COMPLETED => ['Selesai', 'is-returned'],
-            WorkflowStatus::REPORT_REJECTED => ['Ditolak Admin', 'is-returned'],
+            WorkflowStatus::REPORT_REJECTED => ['Ditolak ' . \App\Support\RoleLabels::manager(), 'is-returned'],
             default => ['Menunggu Verifikasi', 'is-in-progress'],
         };
 

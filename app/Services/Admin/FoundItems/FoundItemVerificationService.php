@@ -17,7 +17,7 @@ class FoundItemVerificationService
 
         $barang->update([
             'status_laporan' => $newStatus,
-            'verified_by_admin_id' => (int) Auth::guard('admin')->id(),
+            'verified_by_admin_id' => (int) \App\Support\ManagerPortal::id(),
             'verified_at' => now(),
             'tampil_di_home' => $newStatus === WorkflowStatus::REPORT_APPROVED,
         ]);
@@ -28,7 +28,7 @@ class FoundItemVerificationService
                 userId: (int) $barang->user_id,
                 type: 'verifikasi_laporan_temuan',
                 title: 'Verifikasi Laporan Temuan',
-                message: 'Laporan barang temuan "' . $barang->nama_barang . '" ' . $label . ' admin.',
+                message: 'Laporan barang temuan "' . $barang->nama_barang . '" ' . $label . ' ' . \App\Support\RoleLabels::managerLower() . '.',
                 actionUrl: route('user.dashboard'),
                 meta: ['barang_id' => $barang->id]
             );

@@ -7,6 +7,8 @@ use App\Http\Requests\Admin\AdminRegisterRequest;
 use App\Models\Admin;
 use App\Models\Wilayah;
 use App\Support\IndramayuDistricts;
+use App\Support\ManagerPortal;
+use App\Support\RoleLabels;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -19,7 +21,7 @@ class RegisteredUserController extends Controller
     {
         $kecamatanOptions = IndramayuDistricts::names();
 
-        return view('admin.auth.register', compact('kecamatanOptions'));
+        return view('manager::auth.register', compact('kecamatanOptions'));
     }
 
     public function store(AdminRegisterRequest $request): RedirectResponse
@@ -44,8 +46,8 @@ class RegisteredUserController extends Controller
         ]);
 
         return redirect()
-            ->route('admin.login')
-            ->with('status', 'Pendaftaran admin berhasil. Akun Anda akan aktif setelah diverifikasi super admin.');
+            ->route(ManagerPortal::loginRoute())
+            ->with('status', 'Pendaftaran ' . RoleLabels::managerLower() . ' berhasil. Akun Anda akan aktif setelah diverifikasi super admin.');
     }
 
     private function buildUniqueAdminUsername(string $usernameInput): string

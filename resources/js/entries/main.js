@@ -10,9 +10,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import flatpickr from 'flatpickr';
 import { Indonesian } from 'flatpickr/dist/l10n/id.js';
 import * as L from 'leaflet';
-import '../legacy/page-transition.js';
-import '../legacy/flash-popup.js';
-import '../legacy/home.js';
+import '../shared/page-transition.js';
+import '../shared/flash-popup.js';
+import '../apps/home/app.js';
 
 flatpickr.localize(Indonesian);
 window.flatpickr = flatpickr;

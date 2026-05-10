@@ -69,7 +69,7 @@ class HomeFoundDetailService
             $claimActionLabel = 'Lihat Riwayat Klaim';
         }
 
-        $penanggungJawab = $barang->admin?->instansi ?? $barang->admin?->nama ?? 'Admin';
+        $penanggungJawab = $barang->admin?->instansi ?? $barang->admin?->nama ?? \App\Support\RoleLabels::manager();
         $detail = (object) [
             'id' => (int) $barang->id,
             'type' => 'temuan',
@@ -90,7 +90,7 @@ class HomeFoundDetailService
             'is_claimable' => $statusMeta['claimable'],
             'claim_action_url' => $claimActionUrl,
             'claim_action_label' => $claimActionLabel,
-            'preclaim_note' => 'Kecocokan barang tidak otomatis membuktikan kepemilikan. Anda wajib mengajukan klaim dengan bukti kepemilikan untuk diverifikasi admin.',
+            'preclaim_note' => 'Kecocokan barang tidak otomatis membuktikan kepemilikan. Anda wajib mengajukan klaim dengan bukti kepemilikan untuk diverifikasi ' . \App\Support\RoleLabels::managerLower() . '.',
         ];
 
         return [

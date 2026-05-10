@@ -72,7 +72,7 @@ class UserSettingsTest extends TestCase
             'user_id' => $user->id,
             'type' => 'klaim_disetujui',
             'title' => 'Klaim Disetujui',
-            'message' => 'Klaim Anda sudah disetujui admin.',
+            'message' => 'Klaim Anda sudah disetujui pengelola barang.',
             'created_at' => '2026-04-24 08:00:00',
         ]);
 

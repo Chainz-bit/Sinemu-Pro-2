@@ -1,0 +1,82 @@
+/* Halaman direktori pengelola barang untuk super admin. */
+.super-managers-page {
+    align-content: start;
+    gap: 8px;
+}
+
+.super-managers-page .intro {
+    margin: 0 2px 4px;
+}
+
+.super-managers-page .intro p {
+    margin-top: 5px;
+}
+
+.super-managers-page .super-stats-grid {
+    margin-top: 0;
+}
+
+
+.super-status-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 14px;
+}
+
+.super-status-summary .stat-card {
+    grid-column: auto;
+    margin: 0;
+}
+
+.super-status-card-link {
+    display: block;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.super-status-card-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.super-status-card-link.is-active {
+    border-color: #9dbdf2;
+    box-shadow: 0 0 0 2px rgba(31, 79, 214, 0.12);
+}
+
+.super-manager-detail-row td {
+    background: #fbfdff;
+    padding-top: 0;
+}
+
+.super-manager-detail-card {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 11px;
+    border-radius: 10px;
+    background: #f8fbff;
+    border: 1px solid #e3ebf7;
+}
+
+.super-manager-detail-card div {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.super-manager-detail-card span {
+    color: #789;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.super-manager-detail-card strong {
+    color: #16304d;
+    font-size: 13px;
+    line-height: 1.5;
+    word-break: break-word;
+}
+

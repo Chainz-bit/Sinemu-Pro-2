@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Support\ManagerPortal;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,10 +15,11 @@ class AdminMiddleware
      * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next)
-{
-    if (!auth()->guard('admin')->check()) {
-        return redirect()->route('admin.login');
+    {
+        if (!ManagerPortal::check()) {
+            return redirect()->route(ManagerPortal::loginRoute());
+        }
+
+        return $next($request);
     }
-    return $next($request);
-}
 }

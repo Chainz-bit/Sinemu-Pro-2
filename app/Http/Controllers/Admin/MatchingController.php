@@ -17,7 +17,7 @@ class MatchingController extends Controller
 
     public function store(ConfirmMatchRequest $request): RedirectResponse
     {
-        $result = $this->commandService->confirm((int) Auth::guard('admin')->id(), $request->validated());
+        $result = $this->commandService->confirm((int) \App\Support\ManagerPortal::id(), $request->validated());
         $flashType = $result['ok'] ? 'status' : 'error';
 
         return back()->with($flashType, $result['message']);
@@ -25,7 +25,7 @@ class MatchingController extends Controller
 
     public function dismiss(DismissMatchRequest $request): RedirectResponse
     {
-        $result = $this->commandService->dismiss((int) Auth::guard('admin')->id(), $request->validated());
+        $result = $this->commandService->dismiss((int) \App\Support\ManagerPortal::id(), $request->validated());
         $flashType = $result['ok'] ? 'status' : 'error';
 
         return back()->with($flashType, $result['message']);

@@ -21,7 +21,7 @@ class ProfileController extends Controller
         abort_if(!$user, 403);
         $data = $this->profileService->buildProfileData($user);
 
-        return view('user.pages.profile', [
+        return view('user.pages.profile.show', [
             'user' => $user,
             'laporanDiajukan' => $data['laporanDiajukan'],
             'klaimMenunggu' => $data['klaimMenunggu'],

@@ -25,7 +25,7 @@ class FoundReportController extends Controller
                 ->get(['id', 'nama_kategori']);
         }
 
-        return view('user.pages.found-report', [
+        return view('user.pages.reports.found-create', [
             'user' => Auth::user(),
             'categories' => $categories,
             'wilayahOptions' => Cache::remember('indramayu:wilayah-options', 600, static fn () => Wilayah::query()
@@ -46,7 +46,7 @@ class FoundReportController extends Controller
             ->orderBy('id')
             ->first();
         if (!$admin) {
-            return back()->withInput()->with('error', 'Belum ada admin aktif pada wilayah yang dipilih.');
+            return back()->withInput()->with('error', 'Belum ada ' . \App\Support\RoleLabels::managerLower() . ' aktif pada wilayah yang dipilih.');
         }
 
         $kategoriId = $validated['kategori_id'] ?? Kategori::query()->value('id');

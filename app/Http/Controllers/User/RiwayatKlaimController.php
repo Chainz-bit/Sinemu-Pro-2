@@ -23,7 +23,7 @@ class RiwayatKlaimController extends Controller
         $user = Auth::user();
         $historyData = $this->claimHistoryService->buildHistoryData((int) $user->id, (array) $request->query());
 
-        return view('user.pages.claim-history', [
+        return view('user.pages.claims.history', [
             'user' => $user,
             'search' => $historyData['search'],
             'statusFilter' => $historyData['statusFilter'],

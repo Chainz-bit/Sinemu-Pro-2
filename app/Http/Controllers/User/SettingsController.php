@@ -16,7 +16,7 @@ class SettingsController extends Controller
     {
         $user = $this->currentUser();
 
-        return view('user.pages.settings', compact('user'));
+        return view('user.pages.settings.index', compact('user'));
     }
 
     public function update(UpdateSettingsRequest $request): RedirectResponse
@@ -79,7 +79,7 @@ class SettingsController extends Controller
             'read' => $user->notifications()->whereNotNull('read_at')->count(),
         ];
 
-        return view('user.pages.settings-history', compact(
+        return view('user.pages.settings.history', compact(
             'user',
             'histories',
             'summary',

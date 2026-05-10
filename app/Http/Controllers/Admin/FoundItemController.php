@@ -42,7 +42,7 @@ class FoundItemController extends Controller
     public function index(FoundItemIndexRequest $request): View|StreamedResponse
     {
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         $state = $this->queryService->buildIndexQuery($request);
         $query = $state['query'];
         $sort = $state['sort'];
@@ -53,13 +53,13 @@ class FoundItemController extends Controller
 
         $items = $query->paginate(12)->withQueryString();
 
-        return view('admin.pages.found-items', compact('items', 'admin', 'sort'));
+        return view('manager::pages.found-items.index', compact('items', 'admin', 'sort'));
     }
 
     public function show(Barang $barang): View
     {
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
 
         $barang->loadMissing([
             'kategori:id,nama_kategori',
@@ -72,18 +72,18 @@ class FoundItemController extends Controller
             $matchingCandidates = $this->matchingService->findCandidatesForFoundItem($barang);
         }
 
-        return view('admin.pages.found-item-detail', compact('barang', 'admin', 'matchingCandidates'));
+        return view('manager::pages.found-items.show', compact('barang', 'admin', 'matchingCandidates'));
     }
 
     public function edit(Barang $barang): View
     {
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         $kategoriOptions = Kategori::query()
             ->forForm()
             ->get(['id', 'nama_kategori']);
 
-        return view('admin.pages.found-item-edit', compact('barang', 'admin', 'kategoriOptions'));
+        return view('manager::pages.found-items.edit', compact('barang', 'admin', 'kategoriOptions'));
     }
 
     public function update(UpdateFoundItemRequest $request, Barang $barang): RedirectResponse
@@ -91,7 +91,7 @@ class FoundItemController extends Controller
         $this->commandService->update($barang, $request->validated(), $request->file('foto_barang'), $this->imageUploader);
 
         return redirect()
-            ->route('admin.found-items.show', $barang->id)
+            ->route(\App\Support\ManagerPortal::routeName('found-items.show'), $barang->id)
             ->with('status', 'Data barang temuan berhasil diperbarui.');
     }
 
@@ -101,7 +101,7 @@ class FoundItemController extends Controller
         $flashType = $result['ok'] ? 'status' : 'error';
 
         return redirect()
-            ->route('admin.found-items.show', $barang->id)
+            ->route(\App\Support\ManagerPortal::routeName('found-items.show'), $barang->id)
             ->with($flashType, $result['message']);
     }
 

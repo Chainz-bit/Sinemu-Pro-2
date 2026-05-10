@@ -309,29 +309,9 @@
     border: 1px solid var(--sinemu-border);
     border-radius: 14px;
     box-shadow: 0 12px 30px rgba(20, 18, 35, 0.12);
-    max-height: 190px;
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    scrollbar-color: #b9afdf #f3f0ff;
+    max-height: none;
+    overflow: visible;
     display: none;
-}
-
-.filter-dropdown-menu::-webkit-scrollbar {
-    width: 8px;
-}
-
-.filter-dropdown-menu::-webkit-scrollbar-track {
-    background: #f3f0ff;
-    border-radius: 10px;
-}
-
-.filter-dropdown-menu::-webkit-scrollbar-thumb {
-    background: #b9afdf;
-    border-radius: 10px;
-}
-
-.filter-dropdown-menu::-webkit-scrollbar-thumb:hover {
-    background: #a393df;
 }
 
 .filter-dropdown.open .filter-dropdown-menu {

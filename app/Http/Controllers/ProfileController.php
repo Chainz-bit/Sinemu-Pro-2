@@ -28,7 +28,7 @@ class ProfileController extends Controller
         $verificationLabel = $data['verificationLabel'];
         $verificationClass = $data['verificationClass'];
 
-        return view('user.pages.profile-edit', compact(
+        return view('user.pages.profile.edit', compact(
             'user',
             'profileAvatar',
             'verificationLabel',

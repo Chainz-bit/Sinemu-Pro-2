@@ -7,6 +7,7 @@ use App\Models\Kategori;
 use App\Models\LaporanBarangHilang;
 use App\Models\User;
 use App\Support\Media\OptimizedImageUploader;
+use App\Support\RoleLabels;
 use App\Support\WorkflowStatus;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
@@ -120,7 +121,7 @@ class InputItemService
     {
         $normalizedReporter = trim($reporterName);
         if ($normalizedReporter === '') {
-            $normalizedReporter = 'Pelapor Admin';
+            $normalizedReporter = 'Pelapor ' . RoleLabels::manager();
         }
 
         $hasNamaColumn = Schema::hasColumn('users', 'nama');
@@ -150,7 +151,7 @@ class InputItemService
 
         $baseSlug = Str::slug($normalizedReporter);
         if ($baseSlug === '') {
-            $baseSlug = 'pelapor-admin';
+            $baseSlug = 'pelapor-' . Str::slug(RoleLabels::manager());
         }
 
         $username = $baseSlug;

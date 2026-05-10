@@ -29,7 +29,7 @@ class AdminDirectoryController extends Controller
             superAdminId: $superAdmin?->id
         );
 
-        return view('super.admins.index', [
+        return view('super.pages.admins.index', [
             'superAdmin' => $superAdmin,
             'search' => $search,
             'statusFilter' => $statusFilter,

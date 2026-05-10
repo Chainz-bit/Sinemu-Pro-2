@@ -84,7 +84,7 @@ class LostItemCommandService
 
         $item->update([
             'status_laporan' => $newStatus,
-            'verified_by_admin_id' => (int) Auth::guard('admin')->id(),
+            'verified_by_admin_id' => (int) \App\Support\ManagerPortal::id(),
             'verified_at' => now(),
             'tampil_di_home' => $newStatus === WorkflowStatus::REPORT_APPROVED,
         ]);
@@ -95,7 +95,7 @@ class LostItemCommandService
                 userId: (int) $item->user_id,
                 type: 'verifikasi_laporan_hilang',
                 title: 'Verifikasi Laporan Hilang',
-                message: 'Laporan barang hilang "' . $item->nama_barang . '" ' . $label . ' admin.',
+                message: 'Laporan barang hilang "' . $item->nama_barang . '" ' . $label . ' ' . \App\Support\RoleLabels::managerLower() . '.',
                 actionUrl: route('user.dashboard'),
                 meta: ['laporan_hilang_id' => $item->id]
             );

@@ -1,4 +1,7 @@
 <header class="topbar {{ ($hideSearch ?? false) ? 'topbar-no-search' : '' }}">
+    @php
+        $managerRoleLabelLower = \App\Support\RoleLabels::managerLower();
+    @endphp
     @if(!empty($topbarBackUrl))
         <a href="{{ $topbarBackUrl }}" class="topbar-back-link" aria-label="{{ $topbarBackLabel ?? 'Kembali' }}">
             <svg class="topbar-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -102,7 +105,7 @@
                             </details>
                         </div>
                     @empty
-                        <div class="notification-empty">Belum ada notifikasi dari admin.</div>
+                        <div class="notification-empty">Belum ada notifikasi dari {{ $managerRoleLabelLower }}.</div>
                     @endforelse
                 </div>
             </div>

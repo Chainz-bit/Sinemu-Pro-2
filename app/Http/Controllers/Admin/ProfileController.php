@@ -19,11 +19,11 @@ class ProfileController extends Controller
     public function index(): View
     {
         /** @var \App\Models\Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_if(!$admin, 403);
         $data = $this->profileService->buildProfileData($admin);
 
-        return view('admin.pages.profile', [
+        return view('manager::pages.profile.show', [
             'admin' => $admin,
             'laporanDiajukan' => $data['laporanDiajukan'],
             'klaimMenunggu' => $data['klaimMenunggu'],
@@ -38,11 +38,11 @@ class ProfileController extends Controller
     public function edit(): View
     {
         /** @var \App\Models\Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_if(!$admin, 403);
         $data = $this->profileService->buildEditData($admin);
 
-        return view('admin.pages.profile-edit', [
+        return view('manager::pages.profile.edit', [
             'admin' => $admin,
             'profileAvatar' => $data['profileAvatar'],
             'verificationLabel' => $data['verificationLabel'],
@@ -54,12 +54,12 @@ class ProfileController extends Controller
     public function update(UpdateAdminProfileRequest $request): RedirectResponse
     {
         /** @var \App\Models\Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_if(!$admin, 403);
         $this->profileService->update($admin, $request->validated(), $request->file('profil'));
 
         return redirect()
-            ->route('admin.profile')
-            ->with('status', 'Profil admin berhasil diperbarui.');
+            ->route(\App\Support\ManagerPortal::routeName('profile'))
+            ->with('status', 'Profil ' . \App\Support\RoleLabels::managerLower() . ' berhasil diperbarui.');
     }
 }

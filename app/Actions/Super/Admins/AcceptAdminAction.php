@@ -11,10 +11,12 @@ class AcceptAdminAction
      */
     public function execute(Admin $admin, ?int $superAdminId = null): array
     {
+        $managerRoleLabelLower = \App\Support\RoleLabels::managerLower();
+
         if ($superAdminId !== null && !$this->isOwnedBySuperAdmin($admin, $superAdminId)) {
             return [
                 'key' => 'error',
-                'message' => 'Admin ini tidak berada dalam cakupan akun super admin Anda.',
+                'message' => ucfirst($managerRoleLabelLower) . ' ini tidak berada dalam cakupan akun super admin Anda.',
             ];
         }
 
@@ -27,7 +29,7 @@ class AcceptAdminAction
 
         return [
             'key' => 'status',
-            'message' => 'Admin berhasil diverifikasi dan diaktifkan.',
+            'message' => ucfirst($managerRoleLabelLower) . ' berhasil diverifikasi dan diaktifkan.',
         ];
     }
 

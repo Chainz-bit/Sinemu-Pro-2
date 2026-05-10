@@ -14,7 +14,7 @@ class FoundItemExportService
     {
         $barang->loadMissing(['kategori:id,nama_kategori', 'admin:id,nama,email']);
 
-        $pdf = Pdf::loadView('admin.pdf.found-item-report', [
+        $pdf = Pdf::loadView('manager::pdf.found-item-report', [
             'barang' => $barang,
             'statusLabel' => $this->resolveStatusLabel((string) $barang->status_barang),
             'photoDataUri' => $this->resolvePhotoDataUri((string) ($barang->foto_barang ?? '')),

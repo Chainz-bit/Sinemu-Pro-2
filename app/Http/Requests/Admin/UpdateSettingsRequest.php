@@ -9,7 +9,7 @@ class UpdateSettingsRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user('admin') !== null;
+        return $this->user(\App\Support\ManagerPortal::guard()) !== null;
     }
 
     /**
@@ -17,7 +17,7 @@ class UpdateSettingsRequest extends FormRequest
      */
     public function rules(): array
     {
-        $adminId = $this->user('admin')?->id;
+        $adminId = $this->user(\App\Support\ManagerPortal::guard())?->id;
 
         return [
             'kecamatan' => ['required', 'string', 'max:100'],

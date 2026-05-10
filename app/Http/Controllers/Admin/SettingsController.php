@@ -16,29 +16,29 @@ class SettingsController extends Controller
     public function index(): View
     {
         /** @var Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_if(!$admin, 403);
 
-        return view('admin.pages.settings', compact('admin'));
+        return view('manager::pages.settings.index', compact('admin'));
     }
 
     public function update(UpdateSettingsRequest $request): RedirectResponse
     {
         /** @var Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_if(!$admin, 403);
 
         $admin->forceFill($request->validated())->save();
 
         return redirect()
-            ->route('admin.settings')
+            ->route(\App\Support\ManagerPortal::routeName('settings'))
             ->with('status', 'Pengaturan sistem berhasil diperbarui.');
     }
 
     public function logs(SettingsLogIndexRequest $request): View
     {
         /** @var Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_if(!$admin, 403);
 
         $query = AdminNotification::query()
@@ -99,7 +99,7 @@ class SettingsController extends Controller
             'read' => AdminNotification::query()->where('admin_id', $admin->id)->whereNotNull('read_at')->count(),
         ];
 
-        return view('admin.pages.settings-logs', compact(
+        return view('manager::pages.settings.logs', compact(
             'logs',
             'summary',
             'typeOptions',

@@ -1,0 +1,13 @@
+/*
+|--------------------------------------------------------------------------
+| Super Admin Styles (Aggregator)
+|--------------------------------------------------------------------------
+| Super admin memakai fondasi shell pengelola barang, lalu menambahkan style khusus super.
+*/
+
+@import url('../manager/app.css');
+@import url('./common.css');
+@import url('./pages/dashboard.css');
+@import url('./pages/managers.css');
+@import url('./pages/verifications.css');
+@import url('./responsive.css');

@@ -297,24 +297,13 @@
 
 .lokasi-list {
     display: flex;
+    flex-wrap: wrap;
     gap: 14px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
+    overflow: visible;
     scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
     min-height: 214px;
     padding: 3px 3px 10px;
-    cursor: grab;
-    touch-action: pan-y;
-    user-select: none;
-    scrollbar-width: thin;
-    scrollbar-color: #d4cbf3 #f6f4ff;
-}
-
-.lokasi-list.dragging {
-    cursor: grabbing;
-    scroll-behavior: auto;
+    user-select: auto;
 }
 
 .lokasi-list.is-single {
@@ -323,24 +312,10 @@
     min-height: 224px;
 }
 
-.lokasi-list::-webkit-scrollbar {
-    height: 8px;
-}
-
-.lokasi-list::-webkit-scrollbar-track {
-    background: #f6f4ff;
-    border-radius: 999px;
-}
-
-.lokasi-list::-webkit-scrollbar-thumb {
-    background: #d4cbf3;
-    border-radius: 999px;
-}
-
 .lokasi-item {
     position: relative;
-    flex: 0 0 clamp(320px, 31vw, 410px);
-    scroll-snap-align: start;
+    flex: 1 1 clamp(320px, 31vw, 410px);
+    max-width: 430px;
     border: 1px solid rgba(226, 232, 240, 0.95);
     border-radius: 18px;
     padding: 1rem;

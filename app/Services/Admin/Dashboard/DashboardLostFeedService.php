@@ -50,7 +50,7 @@ class DashboardLostFeedService
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
             $lostReportsQuery->where('sumber_laporan', 'lapor_hilang');
         }
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         if ($admin && $admin->region_id && Schema::hasColumn('laporan_barang_hilangs', 'region_id')) {
             $lostReportsQuery->where('region_id', $admin->region_id);
         }
@@ -86,18 +86,18 @@ class DashboardLostFeedService
             'avatar' => 'H',
             'avatar_class' => 'avatar-sand',
             'foto_barang' => $report->foto_barang,
-            'detail_url' => route('admin.lost-items.show', $report->id),
-            'edit_url' => route('admin.lost-items.edit', $report->id),
+            'detail_url' => route(\App\Support\ManagerPortal::routeName('lost-items.show'), $report->id),
+            'edit_url' => route(\App\Support\ManagerPortal::routeName('lost-items.edit'), $report->id),
             'edit_nama_barang' => $report->nama_barang,
             'edit_lokasi_hilang' => $report->lokasi_hilang,
             'edit_tanggal_hilang' => $report->tanggal_hilang,
             'edit_keterangan' => $report->keterangan,
-            'update_url' => route('admin.dashboard.reports.update', ['type' => 'hilang', 'id' => $report->id]),
-            'upload_home_url' => route('admin.dashboard.reports.publish-home', ['type' => 'hilang', 'id' => $report->id]),
+            'update_url' => route(\App\Support\ManagerPortal::routeName('dashboard.reports.update'), ['type' => 'hilang', 'id' => $report->id]),
+            'upload_home_url' => route(\App\Support\ManagerPortal::routeName('dashboard.reports.publish-home'), ['type' => 'hilang', 'id' => $report->id]),
             'home_published' => (bool) ($report->tampil_di_home ?? false),
-            'target_url' => route('admin.lost-items', ['search' => $report->nama_barang]),
+            'target_url' => route(\App\Support\ManagerPortal::routeName('lost-items'), ['search' => $report->nama_barang]),
             'target_label' => 'Buka Barang Hilang',
-            'delete_url' => route('admin.lost-items.destroy', $report->id),
+            'delete_url' => route(\App\Support\ManagerPortal::routeName('lost-items.destroy'), $report->id),
         ];
     }
 

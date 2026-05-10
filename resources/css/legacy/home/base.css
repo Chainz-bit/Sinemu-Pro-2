@@ -46,18 +46,12 @@ body {
     min-height: 100vh;
 }
 
-/* Sembunyikan scrollbar halaman utama, tapi tetap bisa scroll */
-html,
-body {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+html {
+    scroll-behavior: smooth;
 }
 
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    display: none;
+body {
+    overflow-x: hidden;
 }
 
 .page-shell {

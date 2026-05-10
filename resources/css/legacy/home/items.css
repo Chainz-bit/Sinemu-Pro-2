@@ -71,24 +71,11 @@
 
 .carousel-track {
     display: flex;
+    flex-wrap: wrap;
     gap: 1rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
+    overflow: visible;
     padding-bottom: 6px;
-    cursor: grab;
-    user-select: none;
-    -webkit-overflow-scrolling: touch;
-    touch-action: pan-y;
-}
-
-.carousel-track:active {
-    cursor: grabbing;
-}
-
-.carousel-track.dragging {
-    cursor: grabbing;
-    scroll-behavior: auto;
+    user-select: auto;
 }
 
 .carousel-track.is-single {
@@ -97,20 +84,11 @@
     padding-bottom: 10px;
 }
 
-.carousel-track::-webkit-scrollbar {
-    height: 8px;
-}
-
-.carousel-track::-webkit-scrollbar-thumb {
-    background: rgba(108, 99, 90, 0.22);
-    border-radius: 999px;
-}
-
 .carousel-item {
-    flex: 0 0 clamp(220px, 28vw, 320px);
-    scroll-snap-align: start;
+    flex: 1 1 clamp(220px, 28vw, 320px);
     display: block;
     float: none;
+    max-width: 360px;
     width: auto;
     margin-right: 0;
 }
@@ -276,7 +254,6 @@
     padding: 0;
 }
 
-/* Hide carousel nav buttons (use drag/swipe only) */
 .carousel-nav-btn {
     display: none;
 }
@@ -401,6 +378,11 @@
 }
 
 @media (max-width: 575.98px) {
+    .carousel-item {
+        flex-basis: 100%;
+        max-width: none;
+    }
+
     .empty-state {
         padding: 1.1rem;
     }

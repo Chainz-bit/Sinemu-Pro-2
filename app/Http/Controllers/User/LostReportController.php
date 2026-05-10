@@ -25,7 +25,7 @@ class LostReportController extends Controller
         $editId = (int) $request->query('edit', 0);
         $editingReport = $this->commandService->resolveEditableReport($userId, $editId);
 
-        return view('user.pages.lost-report', [
+        return view('user.pages.reports.lost-create', [
             'user' => Auth::user(),
             'lostCategoryOptions' => Cache::remember('lost-report:category-options', 600, static fn () => Kategori::query()
                 ->forForm()

@@ -19,20 +19,20 @@ class InputItemController extends Controller
     public function index(): View
     {
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         $kategoriOptions = Kategori::query()
             ->forForm()
             ->get(['id', 'nama_kategori']);
 
-        return view('admin.pages.input-items', compact('admin', 'kategoriOptions'));
+        return view('manager::pages.input-items.create', compact('admin', 'kategoriOptions'));
     }
 
     public function store(StoreInputItemRequest $request): RedirectResponse
     {
         /** @var \App\Models\Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         if (!$admin) {
-            return back()->with('error', 'Sesi admin tidak ditemukan. Silakan login ulang.');
+            return back()->with('error', 'Sesi ' . \App\Support\RoleLabels::managerLower() . ' tidak ditemukan. Silakan login ulang.');
         }
 
         $validated = $request->validated();

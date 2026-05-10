@@ -28,12 +28,12 @@ class SuperTopbarNotificationTest extends TestCase
         $pendingNotification = $notifications->firstWhere('is_urgent', true);
         $activityNotification = $notifications->firstWhere('is_urgent', false);
 
-        $this->assertSame('Admin menunggu verifikasi', $pendingNotification['title']);
+        $this->assertSame('Pengelola barang menunggu verifikasi', $pendingNotification['title']);
         $this->assertStringContainsString($pendingAdmin->nama, $pendingNotification['message']);
         $this->assertSame('Perlu tindakan', $pendingNotification['tag']);
         $this->assertStringContainsString('admin-verifications', $pendingNotification['action_url']);
 
-        $this->assertSame('Status admin Aktif', $activityNotification['title']);
+        $this->assertSame('Status pengelola barang Aktif', $activityNotification['title']);
         $this->assertStringContainsString($activeAdmin->nama, $activityNotification['message']);
         $this->assertSame('Aktivitas', $activityNotification['tag']);
         $this->assertStringContainsString('super/admins', $activityNotification['action_url']);

@@ -8,7 +8,7 @@ class RejectClaimRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return auth('admin')->check();
+        return \App\Support\ManagerPortal::check();
     }
 
     /**

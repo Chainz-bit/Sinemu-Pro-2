@@ -40,6 +40,23 @@ class AppServiceProvider extends ServiceProvider
         Barang::observe(BarangObserver::class);
         Klaim::observe(KlaimObserver::class);
 
+        View::addNamespace('manager', resource_path('views/manager'));
+        View::addNamespace('admin', resource_path('views/manager'));
+
+        View::composer(['manager::*', 'admin::*'], function ($view): void {
+            $data = $view->getData();
+
+            if (array_key_exists('admin', $data) && !array_key_exists('manager', $data)) {
+                $view->with('manager', $data['admin']);
+            }
+
+            if (array_key_exists('manager', $data) && !array_key_exists('admin', $data)) {
+                $view->with('admin', $data['manager']);
+            }
+        });
+
+        View::composer('manager::partials.topbar', AdminTopbarComposer::class);
+        View::composer('admin::partials.topbar', AdminTopbarComposer::class);
         View::composer('admin.partials.topbar', AdminTopbarComposer::class);
         View::composer('user.partials.topbar', UserTopbarComposer::class);
         View::composer('super.partials.topbar', SuperTopbarComposer::class);

@@ -11,10 +11,12 @@ class RejectAdminAction
      */
     public function execute(Admin $admin, ?string $reason = null, ?int $superAdminId = null): array
     {
+        $managerRoleLabelLower = \App\Support\RoleLabels::managerLower();
+
         if ($superAdminId !== null && !$this->isOwnedBySuperAdmin($admin, $superAdminId)) {
             return [
                 'key' => 'error',
-                'message' => 'Admin ini tidak berada dalam cakupan akun super admin Anda.',
+                'message' => ucfirst($managerRoleLabelLower) . ' ini tidak berada dalam cakupan akun super admin Anda.',
             ];
         }
 
@@ -27,7 +29,7 @@ class RejectAdminAction
 
         return [
             'key' => 'status',
-            'message' => 'Pendaftaran admin ditolak.',
+            'message' => 'Pendaftaran ' . $managerRoleLabelLower . ' ditolak.',
         ];
     }
 

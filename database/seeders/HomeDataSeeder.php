@@ -41,7 +41,7 @@ class HomeDataSeeder extends Seeder
                 ['username' => 'admin'],
                 [
                     'super_admin_id' => $superAdmin->id,
-                    'nama' => 'Admin Kecamatan',
+                    'nama' => 'Pengelola Barang Kecamatan',
                     'email' => 'admin@sinemu.local',
                     'password' => Hash::make('password'),
                     'instansi' => 'Kecamatan Indramayu',

@@ -47,7 +47,7 @@ class RejectClaimAction
             $klaim->pencocokan->update(['status_pencocokan' => WorkflowStatus::MATCH_CLAIM_REJECTED]);
         }
 
-        $this->notifyUser($klaim, 'klaim_ditolak', 'Klaim Ditolak', 'Admin menolak klaim untuk ');
+        $this->notifyUser($klaim, 'klaim_ditolak', 'Klaim Ditolak', ucfirst(\App\Support\RoleLabels::managerLower()) . ' menolak klaim untuk ');
     }
 
     /**

@@ -78,15 +78,15 @@ class DashboardClaimFeedService
             'avatar_class' => 'avatar-claim',
             'foto_barang' => $claim->barang?->foto_barang ?? $claim->laporanHilang?->foto_barang,
             'detail_url' => $this->resolveDetailUrl($claim),
-            'edit_url' => route('admin.claim-verifications.show', $claim->id),
+            'edit_url' => route(\App\Support\ManagerPortal::routeName('claim-verifications.show'), $claim->id),
             'edit_status_klaim' => $claim->status_klaim,
             'edit_catatan' => $claim->catatan,
-            'update_url' => route('admin.dashboard.reports.update', ['type' => 'klaim', 'id' => $claim->id]),
+            'update_url' => route(\App\Support\ManagerPortal::routeName('dashboard.reports.update'), ['type' => 'klaim', 'id' => $claim->id]),
             'upload_home_url' => $this->resolveUploadHomeUrl($claim),
             'home_published' => $this->resolveHomePublished($claim),
             'target_url' => $this->resolveTargetUrl($namaBarang, $claimStatusKey),
             'target_label' => 'Buka Verifikasi Klaim',
-            'delete_url' => route('admin.claim-verifications.destroy', $claim->id),
+            'delete_url' => route(\App\Support\ManagerPortal::routeName('claim-verifications.destroy'), $claim->id),
         ];
     }
 
@@ -110,17 +110,17 @@ class DashboardClaimFeedService
     private function resolveDetailUrl(Klaim $claim): string
     {
         return match (true) {
-            !is_null($claim->barang_id) => route('admin.found-items.show', $claim->barang_id),
-            !is_null($claim->laporan_hilang_id) => route('admin.lost-items.show', $claim->laporan_hilang_id),
-            default => route('admin.claim-verifications.show', $claim->id),
+            !is_null($claim->barang_id) => route(\App\Support\ManagerPortal::routeName('found-items.show'), $claim->barang_id),
+            !is_null($claim->laporan_hilang_id) => route(\App\Support\ManagerPortal::routeName('lost-items.show'), $claim->laporan_hilang_id),
+            default => route(\App\Support\ManagerPortal::routeName('claim-verifications.show'), $claim->id),
         };
     }
 
     private function resolveUploadHomeUrl(Klaim $claim): ?string
     {
         return match (true) {
-            !is_null($claim->barang_id) => route('admin.dashboard.reports.publish-home', ['type' => 'temuan', 'id' => $claim->barang_id]),
-            !is_null($claim->laporan_hilang_id) => route('admin.dashboard.reports.publish-home', ['type' => 'hilang', 'id' => $claim->laporan_hilang_id]),
+            !is_null($claim->barang_id) => route(\App\Support\ManagerPortal::routeName('dashboard.reports.publish-home'), ['type' => 'temuan', 'id' => $claim->barang_id]),
+            !is_null($claim->laporan_hilang_id) => route(\App\Support\ManagerPortal::routeName('dashboard.reports.publish-home'), ['type' => 'hilang', 'id' => $claim->laporan_hilang_id]),
             default => null,
         };
     }
@@ -136,7 +136,7 @@ class DashboardClaimFeedService
 
     private function resolveTargetUrl(string $namaBarang, string $claimStatusKey): string
     {
-        return route('admin.claim-verifications', [
+        return route(\App\Support\ManagerPortal::routeName('claim-verifications'), [
             'search' => $namaBarang,
             'status' => match ($claimStatusKey) {
                 'menunggu' => 'menunggu',

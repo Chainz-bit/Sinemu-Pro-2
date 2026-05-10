@@ -113,7 +113,7 @@ class MatchingCommandService
                 userId: (int) $laporan->user_id,
                 type: 'pencocokan_ditemukan',
                 title: 'Ada Kecocokan Barang',
-                message: 'Admin menemukan barang temuan yang diduga cocok dengan laporan Anda: ' . $laporan->nama_barang . '. Lanjutkan dengan proses klaim.',
+                message: ucfirst(\App\Support\RoleLabels::managerLower()) . ' menemukan barang temuan yang diduga cocok dengan laporan Anda: ' . $laporan->nama_barang . '. Lanjutkan dengan proses klaim.',
                 actionUrl: route('home.found-detail', $barang->id),
                 meta: [
                     'pencocokan_id' => $pencocokan->id,
@@ -128,7 +128,7 @@ class MatchingCommandService
                 userId: (int) $barang->user_id,
                 type: 'pencocokan_ditemukan',
                 title: 'Barang Temuan Diduga Cocok',
-                message: 'Admin menandai barang temuan Anda sebagai diduga cocok dengan laporan barang hilang: ' . $barang->nama_barang . '.',
+                message: ucfirst(\App\Support\RoleLabels::managerLower()) . ' menandai barang temuan Anda sebagai diduga cocok dengan laporan barang hilang: ' . $barang->nama_barang . '.',
                 actionUrl: route('home.lost-detail', $laporan->id),
                 meta: [
                     'pencocokan_id' => $pencocokan->id,
@@ -189,7 +189,7 @@ class MatchingCommandService
                 [
                     'admin_id' => $adminId,
                     'status_pencocokan' => WorkflowStatus::MATCH_CANCELLED,
-                    'catatan' => $validated['catatan'] ?? 'Ditandai tidak cocok oleh admin.',
+                    'catatan' => $validated['catatan'] ?? 'Ditandai tidak cocok oleh ' . \App\Support\RoleLabels::managerLower() . '.',
                     'matched_at' => now(),
                 ]
             );

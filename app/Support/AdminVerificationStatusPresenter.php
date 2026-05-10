@@ -43,9 +43,9 @@ class AdminVerificationStatusPresenter
     public static function description(?string $status): string
     {
         return match (self::key($status)) {
-            'active' => 'Admin sudah bisa mengakses dashboard dan mengelola laporan.',
+            'active' => \App\Support\RoleLabels::manager() . ' sudah bisa mengakses dashboard dan mengelola laporan.',
             'rejected' => 'Pendaftaran ditolak dan menunggu perbaikan data oleh pendaftar.',
-            default => 'Admin menunggu tinjauan dan keputusan super admin.',
+            default => \App\Support\RoleLabels::manager() . ' menunggu tinjauan dan keputusan super admin.',
         };
     }
 }

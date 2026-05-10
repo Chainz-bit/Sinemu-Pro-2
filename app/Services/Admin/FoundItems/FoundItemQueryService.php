@@ -36,7 +36,7 @@ class FoundItemQueryService
 
     private function applyAdminRegion(Builder $query): void
     {
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         if (!$admin || empty($admin->region_id) || !Schema::hasColumn('barangs', 'region_id')) {
             $query->whereRaw('1 = 0');
             return;

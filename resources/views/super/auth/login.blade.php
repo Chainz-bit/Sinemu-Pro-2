@@ -5,6 +5,9 @@
 @endpush
 
 @section('content')
+@php
+    $managerRoleLabelLower = \App\Support\RoleLabels::managerLower();
+@endphp
 <main class="super-login-shell">
     <section class="super-login-card">
         <div class="super-login-circuit super-login-circuit-left" aria-hidden="true"></div>
@@ -18,7 +21,7 @@
             <div class="super-login-title-wrap">
                 <span class="super-login-pill">Login</span>
                 <h1>Super Admin</h1>
-                <p>Kelola verifikasi admin dan operasional sistem internal SiNemu.</p>
+                <p>Kelola verifikasi {{ $managerRoleLabelLower }} dan operasional sistem internal SiNemu.</p>
             </div>
         </div>
 

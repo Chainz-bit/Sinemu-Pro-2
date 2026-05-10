@@ -5,6 +5,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
+use App\Support\ManagerPortal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 
@@ -60,8 +61,8 @@ return Application::configure(basePath: dirname(__DIR__))
             return route('home');
         }
 
-        if (Auth::guard('admin')->check()) {
-            return route('admin.dashboard');
+        if (Auth::guard(ManagerPortal::guard())->check()) {
+            return route(ManagerPortal::dashboardRoute());
         }
 
         if (Auth::guard('super_admin')->check()) {
@@ -90,7 +91,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             $loginRoute = match (true) {
-                $request->is('admin') || $request->is('admin/*') => 'admin.login',
+                ManagerPortal::isPortalRequest($request) => ManagerPortal::loginRoute(),
                 $request->is('super') || $request->is('super/*') => 'super.login',
                 default => 'login',
             };

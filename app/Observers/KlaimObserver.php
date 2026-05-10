@@ -14,7 +14,7 @@ class KlaimObserver
             type: 'klaim_baru',
             title: 'Klaim baru',
             message: 'Ada pengajuan klaim baru untuk diverifikasi.',
-            actionUrl: route('admin.claim-verifications'),
+            actionUrl: route(\App\Support\ManagerPortal::routeName('claim-verifications')),
             meta: ['klaim_id' => $klaim->id]
         );
     }

@@ -47,7 +47,7 @@ class LostItemQueryService
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
             $query->where('laporan_barang_hilangs.sumber_laporan', 'lapor_hilang');
         }
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         if ($admin && $admin->region_id && Schema::hasColumn('laporan_barang_hilangs', 'region_id')) {
             $query->where('laporan_barang_hilangs.region_id', $admin->region_id);
         }

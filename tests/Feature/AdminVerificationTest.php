@@ -77,7 +77,7 @@ class AdminVerificationTest extends TestCase
             ->post(route('super.admin-verifications.accept', $admin));
 
         $response->assertRedirect(route('super.admin-verifications.index'));
-        $response->assertSessionHas('status', 'Admin berhasil diverifikasi dan diaktifkan.');
+        $response->assertSessionHas('status', 'Pengelola barang berhasil diverifikasi dan diaktifkan.');
 
         $admin->refresh();
         $this->assertSame('active', $admin->status_verifikasi);
@@ -103,7 +103,7 @@ class AdminVerificationTest extends TestCase
             ]);
 
         $response->assertRedirect(route('super.admin-verifications.index'));
-        $response->assertSessionHas('error', 'Admin ini tidak berada dalam cakupan akun super admin Anda.');
+        $response->assertSessionHas('error', 'Pengelola barang ini tidak berada dalam cakupan akun super admin Anda.');
 
         $admin->refresh();
         $this->assertSame('pending', $admin->status_verifikasi);

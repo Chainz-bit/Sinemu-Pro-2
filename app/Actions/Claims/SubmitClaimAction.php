@@ -19,6 +19,8 @@ class SubmitClaimAction
      */
     public function execute(array $validated, array $photos = []): array
     {
+        $managerRoleLabelLower = \App\Support\RoleLabels::managerLower();
+
         $user = Auth::user();
         if (!$user) {
             return ['ok' => false, 'message' => 'Anda harus login sebelum mengajukan klaim.'];
@@ -48,7 +50,7 @@ class SubmitClaimAction
         }
 
         if (!in_array((string) $laporan->status_laporan, [WorkflowStatus::REPORT_APPROVED, WorkflowStatus::REPORT_MATCHED, WorkflowStatus::REPORT_CLAIMED], true)) {
-            return ['ok' => false, 'message' => 'Laporan barang hilang harus disetujui admin terlebih dahulu sebelum klaim.'];
+            return ['ok' => false, 'message' => 'Laporan barang hilang harus disetujui ' . $managerRoleLabelLower . ' terlebih dahulu sebelum klaim.'];
         }
 
         $pencocokan = Pencocokan::query()
@@ -59,7 +61,7 @@ class SubmitClaimAction
             ->first();
 
         if (!$pencocokan) {
-            return ['ok' => false, 'message' => 'Barang ini belum ditandai cocok oleh admin dengan laporan Anda.'];
+            return ['ok' => false, 'message' => 'Barang ini belum ditandai cocok oleh ' . $managerRoleLabelLower . ' dengan laporan Anda.'];
         }
 
         $hasBlockingClaimForReport = Klaim::query()

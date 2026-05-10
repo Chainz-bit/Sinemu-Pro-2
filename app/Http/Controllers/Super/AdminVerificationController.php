@@ -33,7 +33,7 @@ class AdminVerificationController extends Controller
             superAdminId: $superAdmin?->id
         );
 
-        return view('super.admin-verifications.index', [
+        return view('super.pages.verifications.index', [
             'superAdmin' => $superAdmin,
             'search' => $search,
             'statusFilter' => $statusFilter,

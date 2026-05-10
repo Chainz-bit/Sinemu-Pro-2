@@ -1,0 +1,327 @@
+/* Halaman verifikasi pengelola barang untuk super admin. */
+.super-verification-card {
+    padding: 14px;
+}
+
+.super-verification-head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.super-verification-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.super-reject-form {
+    display: grid;
+    gap: 8px;
+    flex: 1 1 320px;
+}
+
+.super-reject-form textarea {
+    width: 100%;
+    min-height: 92px;
+    border: 1px solid #dfe7f1;
+    border-radius: 10px;
+    padding: 11px 12px;
+    resize: vertical;
+    font: inherit;
+    color: #16304d;
+    background: #fff;
+}
+
+.super-verification-page .intro {
+    margin: 8px 2px 10px;
+}
+
+.super-verification-page .intro h1 {
+    font-size: 28px;
+}
+
+.super-verification-page .intro p {
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+.super-verification-page .super-dashboard-grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.super-verification-page .super-dashboard-grid-single {
+    grid-template-columns: 1fr;
+}
+
+.super-verification-page .report-card > header {
+    padding: 8px 10px;
+}
+
+.super-verification-page .report-card h2 {
+    font-size: 16px;
+}
+
+.super-verification-page .report-heading p {
+    font-size: 11px;
+}
+
+.super-verification-page .super-status-summary {
+    gap: 8px;
+    padding: 10px;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+    align-items: stretch;
+}
+
+.super-verification-page .super-status-summary .stat-card {
+    padding: 10px 11px;
+    border-radius: 10px;
+    min-height: 124px;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+}
+
+.super-verification-page .super-status-summary .stat-card-head {
+    margin-bottom: 6px;
+}
+
+.super-verification-page .super-status-summary .stat-card strong {
+    font-size: 34px;
+    margin-bottom: 2px;
+}
+
+.super-verification-page .super-status-summary .stat-card small {
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.super-verification-page .super-status-summary .stat-card-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+}
+
+.super-verification-page .super-status-summary .stat-card-icon iconify-icon {
+    width: 13px;
+    height: 13px;
+}
+
+.super-verification-page .super-status-summary .stat-card span {
+    font-size: 13px;
+}
+
+.super-verification-page .super-activity-list {
+    gap: 8px;
+    padding: 10px;
+}
+
+.super-verification-page .super-activity-item {
+    gap: 8px;
+    padding: 10px 11px;
+    border-radius: 12px;
+}
+
+.super-verification-page .super-activity-item strong {
+    font-size: 14px;
+}
+
+.super-verification-page .super-activity-item small {
+    font-size: 12px;
+}
+
+.super-verification-page .super-activity-item .status-chip {
+    font-size: 9px;
+    padding: 4px 7px;
+}
+
+.super-verification-page .super-activity-card .super-empty-panel {
+    min-height: 112px;
+    padding: 11px 12px;
+}
+
+.super-verification-page .super-activity-card .super-empty-panel strong {
+    font-size: 15px;
+}
+
+.super-verification-page .super-activity-card .super-empty-panel p {
+    font-size: 12px;
+}
+
+.super-verification-page .dashboard-table-toolbar {
+    padding: 9px 12px;
+    background: #f8fbff;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    border-top: 1px solid #e6edf8;
+    border-bottom: 1px solid #e6edf8;
+}
+
+.super-verification-page .dashboard-quick-filters {
+    gap: 4px;
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid #d9e3f2;
+    background: #eef4ff;
+}
+
+.super-verification-page .dashboard-filter-chip {
+    min-height: 28px;
+    padding: 0 11px;
+    font-size: 12px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+}
+
+.super-verification-page .dashboard-toolbar-note {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.super-verification-page .dashboard-filter-chip:hover {
+    border-color: #c8d7ef;
+    background: #f5f9ff;
+}
+
+.super-verification-page .dashboard-filter-chip.is-active {
+    border-color: #9abaf0;
+    background: #ffffff;
+    color: #1f4fd6;
+    box-shadow: 0 3px 8px rgba(31, 79, 214, 0.14);
+}
+
+.super-verification-page .super-verification-stack .super-empty-panel {
+    gap: 6px;
+    min-height: 148px;
+    padding: 16px 14px;
+}
+
+.super-verification-page .super-verification-stack .super-empty-panel strong {
+    font-size: 15px;
+}
+
+.super-verification-page .super-verification-stack .super-empty-panel p {
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.super-priority-focus-card {
+    border-color: #e1eaf8;
+    background: linear-gradient(180deg, #f9fcff 0%, #ffffff 100%);
+}
+
+.super-priority-focus-card > header {
+    background: linear-gradient(180deg, #f2f7ff 0%, rgba(242, 247, 255, 0.4) 100%);
+}
+
+.dashboard-page-content.super-page-content:not(.super-verification-page) .report-card,
+.super-verification-page .report-card,
+.dashboard-report-card {
+    border-color: #e6edf7;
+    border-radius: 10px;
+}
+
+.super-priority-focus-card .report-heading h2 {
+    color: #123a72;
+}
+
+.super-priority-focus-card .report-actions .super-inline-btn {
+    min-height: 32px;
+    padding: 0 12px;
+}
+
+.super-verification-page .dashboard-report-card.is-empty .pagination {
+    display: none;
+}
+
+.super-verification-page .super-verification-stack.is-empty {
+    padding: 10px 12px 12px;
+}
+
+.super-verification-page .super-verification-stack.is-empty .super-empty-panel {
+    min-height: 112px;
+    padding: 12px 12px;
+    gap: 5px;
+}
+
+.super-verification-page .super-verification-stack {
+    gap: 10px;
+}
+
+.super-verification-page .super-verification-card {
+    padding: 14px;
+    border-radius: 12px;
+}
+
+.super-verification-page .super-verification-head {
+    margin-bottom: 10px;
+}
+
+.super-verification-page .super-verification-head h3 {
+    font-size: 16px;
+}
+
+.super-verification-page .super-verification-head p {
+    font-size: 12px;
+}
+
+.super-verification-page .super-verification-grid {
+    align-items: stretch;
+    gap: 10px;
+}
+
+.super-verification-page .super-manager-detail-card {
+    min-height: 108px;
+    gap: 8px;
+}
+
+.super-verification-page .super-verification-actions {
+    gap: 10px;
+}
+
+.super-verification-page .super-inline-btn {
+    min-height: 34px;
+    font-size: 12px;
+}
+
+.super-verification-page .super-reject-form textarea {
+    min-height: 86px;
+}
+
+.super-table-empty-row td {
+    padding: 28px 20px;
+}
+
+.super-table-empty-state {
+    display: grid;
+    justify-items: center;
+    gap: 8px;
+    padding: 14px 10px;
+}
+
+.super-table-empty-state iconify-icon {
+    width: 26px;
+    height: 26px;
+    color: #7c92ad;
+}
+
+.super-table-empty-state strong {
+    color: #13233f;
+    font-size: 15px;
+}
+
+.super-table-empty-state p {
+    margin: 0;
+    max-width: 420px;
+    color: #728197;
+    font-size: 12px;
+    line-height: 1.6;
+}
+

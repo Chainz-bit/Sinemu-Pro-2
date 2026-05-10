@@ -6,7 +6,7 @@
     <title>{{ $pageTitle ?? 'Super Admin - SiNemu' }}</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
-    @vite('resources/js/entries/admin.js')
+    @vite('resources/js/entries/super.js')
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" defer></script>
 </head>
 <body>

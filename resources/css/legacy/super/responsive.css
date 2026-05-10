@@ -1,0 +1,309 @@
+/* Responsive khusus super admin. */
+@media (max-width: 1024px) {
+    .super-dashboard-spotlight {
+        grid-template-columns: 1fr;
+    }
+
+    .super-dashboard-focus {
+        grid-template-columns: 1fr;
+    }
+
+    .super-control-bar {
+        grid-template-columns: 1fr;
+    }
+
+    .super-control-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .super-control-btn {
+        width: 100%;
+    }
+
+    .super-stats-grid .stat-card {
+        grid-column: span 6;
+    }
+
+    .super-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .super-verification-page .dashboard-table-toolbar {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-shell:has(.super-managers-page),
+    .admin-shell:has(.super-managers-page) .main-content,
+    .admin-shell:has(.super-managers-page) .main-content-scroll {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .admin-shell:has(.super-managers-page) .main-content-scroll {
+        padding-bottom: 28px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .super-managers-page {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        padding-bottom: 28px;
+    }
+
+    .super-managers-page .super-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .super-managers-page .super-stats-grid .stat-card {
+        grid-column: auto;
+        min-height: 112px;
+        padding: 12px;
+    }
+
+    .super-managers-page .super-stats-grid .stat-card-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+    }
+
+    .super-managers-page .super-stats-grid .stat-card span {
+        font-size: 11px;
+    }
+
+    .super-managers-page .super-stats-grid .stat-card strong {
+        font-size: 26px;
+    }
+
+    .super-managers-page .super-stats-grid .stat-card small {
+        font-size: 10px;
+        line-height: 1.35;
+    }
+
+    .super-dashboard-focus .responsive-card-table {
+        display: block;
+        min-width: 0;
+    }
+
+    .super-dashboard-focus .responsive-card-table tbody {
+        display: grid;
+        flex: initial;
+    }
+
+    .super-dashboard-focus .dashboard-report-card .responsive-card-table th,
+    .super-dashboard-focus .dashboard-report-card .responsive-card-table td {
+        padding: 0;
+    }
+
+    .super-control-summary h2 {
+        font-size: 18px;
+    }
+
+    .super-control-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .super-control-metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .super-stats-grid .stat-card {
+        grid-column: span 12;
+    }
+
+    .super-status-summary,
+    .super-verification-grid,
+    .super-manager-detail-card {
+        grid-template-columns: 1fr;
+    }
+
+    .super-priority-item,
+    .super-verification-head,
+    .super-verification-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .super-priority-actions {
+        width: 100%;
+    }
+
+    .super-inline-btn {
+        width: 100%;
+    }
+
+    .super-activity-item {
+        grid-template-columns: 1fr;
+    }
+
+    .super-activity-link {
+        align-self: flex-start;
+    }
+
+    .admin-shell:has(.super-verification-page),
+    .admin-shell:has(.super-verification-page) .main-content,
+    .admin-shell:has(.super-verification-page) .main-content-scroll {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .admin-shell:has(.super-verification-page) .main-content-scroll {
+        padding-bottom: 28px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .super-verification-page {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        padding-bottom: 28px;
+    }
+
+    .super-verification-page .intro {
+        margin: 6px 2px 8px;
+    }
+
+    .super-verification-page .intro h1 {
+        font-size: 24px;
+        line-height: 1.15;
+    }
+
+    .super-verification-page .intro p {
+        font-size: 11.5px;
+        line-height: 1.45;
+    }
+
+    .super-verification-page .super-dashboard-grid {
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .super-verification-page .super-status-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .super-verification-page .super-status-summary .stat-card {
+        min-height: 106px;
+        padding: 10px;
+    }
+
+    .super-verification-page .super-status-summary .stat-card:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .super-verification-page .super-status-summary .stat-card-head {
+        margin-bottom: 5px;
+    }
+
+    .super-verification-page .super-status-summary .stat-card span {
+        font-size: 11px;
+    }
+
+    .super-verification-page .super-status-summary .stat-card strong {
+        font-size: 26px;
+        line-height: 1;
+    }
+
+    .super-verification-page .super-status-summary .stat-card small {
+        margin-top: 5px;
+        font-size: 10px;
+        line-height: 1.35;
+    }
+
+    .super-verification-page .super-status-summary .stat-card-icon {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+/* Konsistensi kartu ringkasan Super Admin lintas halaman. */
+.super-page-content .super-stats-grid .stat-card,
+.super-verification-page .super-status-summary .stat-card {
+    border-radius: 10px;
+    padding: 12px;
+    min-height: 116px;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+}
+
+.super-page-content .super-stats-grid .stat-card-head,
+.super-verification-page .super-status-summary .stat-card-head {
+    align-items: flex-start;
+    margin-bottom: 7px;
+}
+
+.super-page-content .super-stats-grid .stat-card-icon,
+.super-verification-page .super-status-summary .stat-card-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+}
+
+.super-page-content .super-stats-grid .stat-card-icon iconify-icon,
+.super-verification-page .super-status-summary .stat-card-icon iconify-icon {
+    width: 14px;
+    height: 14px;
+}
+
+.super-page-content .super-stats-grid .stat-card span,
+.super-verification-page .super-status-summary .stat-card span {
+    font-size: 11.5px;
+    line-height: 1.25;
+}
+
+.super-page-content .super-stats-grid .stat-card strong,
+.super-verification-page .super-status-summary .stat-card strong,
+.super-page-content .super-stats-grid.compact .stat-card strong {
+    font-size: 28px;
+    line-height: 1;
+}
+
+.super-page-content .super-stats-grid .stat-card small,
+.super-verification-page .super-status-summary .stat-card small {
+    margin-top: 6px;
+    font-size: 10.5px;
+    line-height: 1.35;
+}
+
+@media (max-width: 768px) {
+    .super-page-content .super-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .super-page-content .super-stats-grid .stat-card {
+        grid-column: auto !important;
+        min-height: 112px;
+        padding: 12px;
+    }
+
+    .super-verification-page .super-status-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .super-verification-page .super-status-summary .stat-card {
+        grid-column: auto;
+        min-height: 112px;
+        padding: 12px;
+    }
+
+    .super-verification-page .super-status-summary .stat-card:last-child {
+        grid-column: 1 / -1;
+    }
+
+    .super-page-content .super-stats-grid .stat-card strong,
+    .super-verification-page .super-status-summary .stat-card strong,
+    .super-page-content .super-stats-grid.compact .stat-card strong {
+        font-size: 26px;
+    }
+}

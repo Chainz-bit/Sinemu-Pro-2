@@ -28,7 +28,7 @@ class DashboardController extends Controller
             page: max((int) $request->query('page', 1), 1)
         );
 
-        return view('user.pages.dashboard', [
+        return view('user.pages.dashboard.index', [
             'user' => $user,
             'search' => $search,
             'statusFilter' => $statusFilter,

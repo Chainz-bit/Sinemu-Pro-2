@@ -19,7 +19,7 @@ class SettingsController extends Controller
     {
         $superAdmin = $this->currentSuperAdmin();
 
-        return view('super.pages.settings', compact('superAdmin'));
+        return view('super.pages.settings.index', compact('superAdmin'));
     }
 
     public function update(UpdateSettingsRequest $request): RedirectResponse
@@ -91,7 +91,7 @@ class SettingsController extends Controller
             'reviewed' => (clone $baseSummaryQuery)->whereIn('status_verifikasi', ['active', 'rejected'])->count(),
         ];
 
-        return view('super.pages.settings-history', [
+        return view('super.pages.settings.history', [
             'superAdmin' => $superAdmin,
             'histories' => $histories,
             'summary' => $summary,

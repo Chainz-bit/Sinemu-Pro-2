@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Admin;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\View;
 use Tests\TestCase;
 
 class AdminAuthTest extends TestCase
@@ -15,6 +16,24 @@ class AdminAuthTest extends TestCase
     {
         $this->get(route('admin.login'))->assertOk();
         $this->get(route('admin.register'))->assertOk();
+    }
+
+    public function test_admin_routes_use_pengelola_barang_public_urls(): void
+    {
+        $this->assertSame(url('/pengelola-barang/login'), route('admin.login'));
+        $this->assertSame(url('/pengelola-barang/register'), route('admin.register'));
+        $this->assertSame(url('/pengelola-barang/dashboard'), route('admin.dashboard'));
+
+        $this->get('/admin/login')
+            ->assertRedirect('/pengelola-barang/login');
+    }
+
+    public function test_manager_view_namespace_points_to_admin_views(): void
+    {
+        $this->assertTrue(View::exists('manager::auth.login'));
+        $this->assertTrue(View::exists('manager::auth.register'));
+        $this->assertTrue(View::exists('manager::pages.dashboard.index'));
+        $this->assertTrue(View::exists('admin::auth.login'));
     }
 
     public function test_active_admin_can_login_with_username(): void
@@ -51,7 +70,7 @@ class AdminAuthTest extends TestCase
 
         $response->assertRedirect(route('admin.login'));
         $response->assertSessionHasErrors([
-            'login' => 'Akun admin belum aktif. Tunggu verifikasi dari super admin.',
+            'login' => 'Akun pengelola barang belum aktif. Tunggu verifikasi dari super admin.',
         ]);
         $this->assertGuest('admin');
     }
@@ -77,7 +96,7 @@ class AdminAuthTest extends TestCase
         ]);
 
         $response->assertRedirect(route('admin.login'));
-        $response->assertSessionHas('status', 'Pendaftaran admin berhasil. Akun Anda akan aktif setelah diverifikasi super admin.');
+        $response->assertSessionHas('status', 'Pendaftaran pengelola barang berhasil. Akun Anda akan aktif setelah diverifikasi super admin.');
 
         $this->assertDatabaseHas('admins', [
             'nama' => 'Admin Baru',

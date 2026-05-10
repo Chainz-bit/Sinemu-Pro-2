@@ -17,7 +17,7 @@ class FoundItemStatusService
     public function updateStatus(Barang $barang, array $validated): array
     {
         /** @var \App\Models\Admin|null $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
 
         $oldStatus = (string) $barang->status_barang;
         $newStatus = (string) $validated['status_barang'];
@@ -80,7 +80,7 @@ class FoundItemStatusService
                     userId: (int) $userId,
                     type: 'status_barang_temuan',
                     title: 'Status Barang Temuan Diperbarui',
-                    message: 'Admin memperbarui status ' . $barang->nama_barang . ' menjadi ' . $statusLabel . '.',
+                    message: ucfirst(\App\Support\RoleLabels::managerLower()) . ' memperbarui status ' . $barang->nama_barang . ' menjadi ' . $statusLabel . '.',
                     actionUrl: route('user.dashboard'),
                     meta: ['barang_id' => $barang->id]
                 );

@@ -23,7 +23,7 @@ class AdminTopbarComposer
             return;
         }
 
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         if (!$admin) {
             $this->bindEmptyState($view);
             return;
@@ -40,12 +40,16 @@ class AdminTopbarComposer
             ->count();
 
         $view->with('adminNotifications', $notifications)
-            ->with('adminUnreadNotificationsCount', $unreadCount);
+            ->with('adminUnreadNotificationsCount', $unreadCount)
+            ->with('managerNotifications', $notifications)
+            ->with('managerUnreadNotificationsCount', $unreadCount);
     }
 
     private function bindEmptyState(View $view): void
     {
         $view->with('adminNotifications', collect())
-            ->with('adminUnreadNotificationsCount', 0);
+            ->with('adminUnreadNotificationsCount', 0)
+            ->with('managerNotifications', collect())
+            ->with('managerUnreadNotificationsCount', 0);
     }
 }

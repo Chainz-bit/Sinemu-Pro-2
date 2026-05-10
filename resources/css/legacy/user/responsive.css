@@ -1,0 +1,544 @@
+/* Responsive khusus halaman user. */
+@media (max-width: 992px) {
+    .dashboard-hub-page {
+        gap: 12px;
+    }
+
+    .dashboard-hub-page .intro {
+        padding: 22px 24px;
+    }
+
+    .lost-report-page {
+        gap: 12px;
+    }
+
+    .claim-status-guide-body {
+        padding-top: 10px;
+    }
+
+    .claim-history-card .claim-history-search {
+        max-width: 100%;
+    }
+
+    .claim-history-card .claim-history-table {
+        min-width: 700px;
+    }
+
+    .claim-history-card .claim-status-detail {
+        max-width: 26ch;
+    }
+}
+
+@media (max-width: 640px) {
+    .dashboard-hub-page .intro h1 {
+        font-size: 23px;
+        line-height: 1.18;
+        max-width: none;
+    }
+
+    .lost-report-page .intro {
+        margin-top: 10px;
+    }
+
+    .lost-report-page .intro h1 {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .claim-history-page {
+        height: auto;
+        min-height: 100%;
+        overflow: visible;
+        padding-inline: 4px;
+        padding-bottom: 18px;
+    }
+
+    .claim-history-page .intro {
+        margin: 12px 2px 12px;
+    }
+
+    .claim-history-page .intro h1 {
+        font-size: 26px;
+        line-height: 1.18;
+    }
+
+    .claim-history-page .intro p {
+        font-size: 12.5px;
+        line-height: 1.45;
+    }
+
+    .claim-history-page .report-card,
+    .claim-history-page .dashboard-report-card {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .claim-status-guide {
+        margin-bottom: 16px;
+    }
+
+    .claim-status-guide > header,
+    .claim-history-card > header {
+        padding: 14px 16px;
+    }
+
+    .claim-status-guide-body {
+        padding: 12px 14px 16px;
+    }
+
+    .claim-history-filter-grid {
+        margin-top: 12px;
+        width: 100%;
+        justify-content: stretch;
+        row-gap: 8px;
+    }
+
+    .claim-history-filter-grid .claim-history-filter-form {
+        flex: 1 1 100%;
+    }
+
+    .claim-history-filter-grid .dashboard-filter-select {
+        min-width: 0;
+        height: 42px;
+    }
+
+    .dashboard-hub-page,
+    .dashboard-page-content {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    .dashboard-hub-page .dashboard-report-card,
+    .claim-history-card.dashboard-report-card {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .dashboard-hub-page .report-table-wrap,
+    .claim-history-card .report-table-wrap {
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        padding: 12px;
+    }
+
+    .mobile-stack-table,
+    .claim-history-card .claim-history-table {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        border-collapse: separate;
+    }
+
+    .mobile-stack-table colgroup,
+    .mobile-stack-table thead {
+        display: none;
+    }
+
+    .mobile-stack-table tbody {
+        display: grid;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .mobile-stack-table tr {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 100%;
+        min-height: 190px;
+        padding: 16px 54px 16px 14px;
+        border: 1px solid #dfe8f4;
+        border-radius: 14px;
+        background: #ffffff;
+        box-shadow: 0 10px 22px rgba(33, 66, 112, 0.07);
+    }
+
+    .mobile-stack-table td {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border-bottom: 0;
+        font-size: 12px;
+    }
+
+    .mobile-stack-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 4px;
+        color: #7a8ca3;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .mobile-stack-table .mobile-stack-primary::before,
+    .mobile-stack-table .mobile-stack-action::before {
+        display: none;
+    }
+
+    .mobile-stack-table .mobile-stack-primary .item-cell {
+        align-items: flex-start;
+        gap: 12px;
+        padding-right: 4px;
+    }
+
+    .mobile-stack-table .item-avatar,
+    .claim-history-card .avatar-claim-image {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        flex: 0 0 52px;
+    }
+
+    .mobile-stack-table .item-cell strong,
+    .mobile-stack-table .date-cell strong {
+        font-size: 15px;
+        line-height: 1.25;
+    }
+
+    .mobile-stack-table .item-cell small,
+    .mobile-stack-table .date-cell small {
+        margin-top: 3px;
+        display: block;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .mobile-stack-table .mobile-stack-status {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .mobile-stack-table .mobile-stack-status::before {
+        flex-basis: 100%;
+    }
+
+    .mobile-stack-table .status-chip {
+        padding: 6px 10px;
+        font-size: 10.5px;
+    }
+
+    .claim-history-card .claim-status-detail {
+        margin-top: 0;
+        max-width: none;
+        font-size: 11px;
+    }
+
+    .claim-history-card .mobile-stack-meta {
+        color: #425a74;
+        line-height: 1.45;
+    }
+
+    .mobile-stack-table .mobile-stack-action {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: auto;
+        text-align: right;
+    }
+
+    .mobile-stack-table .row-menu-trigger {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+    }
+
+    .mobile-stack-table .empty-row {
+        padding: 18px 14px;
+        text-align: center;
+    }
+
+    .claim-history-card > header {
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .claim-history-card .report-actions,
+    .claim-history-filter-grid .claim-history-filter-form {
+        width: 100%;
+    }
+
+    .claim-history-mobile-list {
+        padding: 12px;
+    }
+
+    .claim-history-mobile-card .avatar-claim-image {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        flex: 0 0 52px;
+    }
+
+    .claim-history-mobile-card .row-menu-trigger,
+    .settings-log-menu-trigger {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+@media (max-width: 768px) {
+    html,
+    body,
+    body.dashboard-fixed-mode,
+    .lost-report-page-mode,
+    body.lost-report-page-mode {
+        height: auto;
+        min-height: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    body {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .admin-shell,
+    .admin-shell.admin-shell-no-sidebar,
+    body.dashboard-fixed-mode .admin-shell,
+    body.lost-report-page-mode .admin-shell {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    .user-main-content,
+    body.dashboard-fixed-mode .main-content,
+    body.lost-report-page-mode .main-content {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+        padding-bottom: calc(80px + env(safe-area-inset-bottom));
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .main-content {
+        overflow-x: hidden;
+    }
+
+    body.lost-report-page-mode .main-content-scroll {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        display: block;
+    }
+
+    .dashboard-page-content,
+    .dashboard-hub-page,
+    .claim-history-page,
+    .input-page-content,
+    .report-form-page,
+    .lost-report-page,
+    .settings-page,
+    body.dashboard-fixed-mode .dashboard-page-content {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .report-card,
+    .dashboard-report-card,
+    .claim-history-card,
+    .input-card,
+    .settings-card,
+    body.dashboard-fixed-mode .dashboard-report-card,
+    body.dashboard-fixed-mode .dashboard-report-card .report-table-wrap {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .report-form-page .input-card,
+    .report-form-page .input-form,
+    .lost-report-page .input-card,
+    .lost-report-page .input-form,
+    .settings-log-list,
+    .report-table-wrap {
+        height: auto;
+        min-height: 0;
+        max-height: none;
+        overflow: visible;
+    }
+
+    .report-form-page {
+        gap: 10px;
+        padding: 0 0 96px;
+    }
+
+    .report-form-page .intro {
+        margin: 10px 0 0;
+    }
+
+    .report-form-page .intro h1 {
+        font-size: 24px;
+    }
+
+    .report-form-page .intro p {
+        font-size: 12.5px;
+        line-height: 1.45;
+    }
+
+    .report-form-page .input-card {
+        padding: 14px;
+        border-radius: 12px;
+    }
+
+    .report-form-page .input-form {
+        row-gap: 13px;
+        padding: 0 2px 18px;
+    }
+
+    .report-form-page .form-actions {
+        position: static;
+        margin: 4px 0 0;
+        padding: 8px 0 0;
+        background: transparent;
+        border-top: 0;
+    }
+
+    .settings-header h1,
+    .settings-log-header h1 {
+        font-size: 26px;
+        line-height: 1.15;
+    }
+
+    .settings-header p,
+    .settings-log-header p {
+        font-size: 12.5px;
+        line-height: 1.45;
+    }
+
+    .settings-page,
+    .settings-log-page {
+        width: 100%;
+        max-width: 100%;
+        padding-inline: 0;
+        padding-bottom: 96px;
+    }
+
+    .settings-form {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .settings-card {
+        border-color: #e7eef8;
+        border-radius: 10px;
+        box-shadow: none;
+    }
+
+    .settings-grid {
+        padding: 14px;
+        gap: 14px;
+    }
+
+    .settings-field {
+        gap: 7px;
+    }
+
+    .settings-field .form-input {
+        min-height: 48px;
+        padding: 11px 12px;
+        font-size: 14px;
+    }
+
+    .settings-field-help,
+    .settings-field-error {
+        font-size: 10.5px;
+        line-height: 1.45;
+    }
+
+    .settings-actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        margin: 8px -2px 0;
+        padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
+        background: linear-gradient(180deg, rgba(246, 249, 253, 0) 0%, #f6f9fd 22%, #f6f9fd 100%);
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .settings-actions .settings-btn,
+    .settings-actions .settings-dirty-indicator {
+        width: 100%;
+        justify-self: stretch;
+    }
+
+    .settings-log-toolbar {
+        gap: 10px;
+    }
+
+    .settings-log-toolbar-left,
+    .settings-log-toolbar-right {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .settings-log-toolbar .filter-btn,
+    .settings-log-search {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .settings-log-card {
+        overflow: visible;
+    }
+
+    .settings-log-list {
+        display: grid;
+        gap: 10px;
+        padding: 0 12px 12px;
+    }
+
+    .settings-log-item {
+        position: relative;
+        margin: 0;
+        padding: 14px 52px 14px 14px;
+        border: 1px solid #dfe8f4;
+        border-radius: 14px;
+        background: #ffffff;
+        overflow: visible;
+    }
+
+    .settings-log-item.is-unread {
+        background: #f3f8ff;
+        border-color: #cfe0f7;
+    }
+
+    .settings-log-item-actions {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+    }
+
+    .settings-log-item-head {
+        padding-right: 4px;
+    }
+
+    .settings-log-status-badge {
+        white-space: nowrap;
+    }
+
+    .settings-log-summary {
+        gap: 8px;
+    }
+
+    .settings-log-summary article {
+        padding: 11px 12px;
+    }
+}

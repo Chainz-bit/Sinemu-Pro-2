@@ -50,7 +50,7 @@ class ApproveClaimAction
             $klaim->pencocokan->update(['status_pencocokan' => WorkflowStatus::MATCH_CLAIM_APPROVED]);
         }
 
-        $this->notifyUser($klaim, 'klaim_disetujui', 'Klaim Disetujui', 'Admin menyetujui klaim untuk ');
+        $this->notifyUser($klaim, 'klaim_disetujui', 'Klaim Disetujui', ucfirst(\App\Support\RoleLabels::managerLower()) . ' menyetujui klaim untuk ');
 
         return true;
     }

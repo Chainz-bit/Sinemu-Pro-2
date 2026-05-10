@@ -11,7 +11,7 @@ class AdminNotificationController extends Controller
 {
     public function markAllAsRead(): RedirectResponse
     {
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_unless($admin !== null, 403);
 
         $admin->notifications()
@@ -23,7 +23,7 @@ class AdminNotificationController extends Controller
 
     public function markAsRead(AdminNotification $notification): RedirectResponse
     {
-        $adminId = (int) Auth::guard('admin')->id();
+        $adminId = (int) \App\Support\ManagerPortal::id();
         abort_if((int) $notification->admin_id !== $adminId, 403);
 
         if (is_null($notification->read_at)) {
@@ -35,7 +35,7 @@ class AdminNotificationController extends Controller
 
     public function destroy(AdminNotification $notification): RedirectResponse
     {
-        $adminId = (int) Auth::guard('admin')->id();
+        $adminId = (int) \App\Support\ManagerPortal::id();
         abort_if((int) $notification->admin_id !== $adminId, 403);
 
         $notification->delete();
@@ -45,7 +45,7 @@ class AdminNotificationController extends Controller
 
     public function destroyAll(): RedirectResponse
     {
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_unless($admin !== null, 403);
 
         $admin->notifications()->delete();

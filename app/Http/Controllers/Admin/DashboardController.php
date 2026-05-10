@@ -24,14 +24,14 @@ class DashboardController extends Controller
     public function index(DashboardIndexRequest $request)
     {
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         $dashboardData = $this->reportFeedService->buildDashboardData(
             search: $request->search(),
             statusFilter: $request->statusFilter(),
             page: $request->pageNumber()
         );
 
-        return view('admin.pages.dashboard', [
+        return view('manager::pages.dashboard.index', [
             'totalHilang' => $dashboardData['totalHilang'],
             'totalTemuan' => $dashboardData['totalTemuan'],
             'menungguVerifikasi' => $dashboardData['menungguVerifikasi'],
@@ -44,14 +44,14 @@ class DashboardController extends Controller
 
     public function updateReport(DashboardUpdateReportRequest $request, int $id): RedirectResponse
     {
-        abort_if(!Auth::guard('admin')->check(), 403);
+        abort_if(!\App\Support\ManagerPortal::check(), 403);
         $statusMessage = $this->reportCommandService->updateReport(
             type: $request->reportType(),
             id: $id,
             validated: $request->validated(),
             photo: $request->file('foto_barang'),
             imageUploader: $this->imageUploader,
-            adminId: (int) Auth::guard('admin')->id()
+            adminId: (int) \App\Support\ManagerPortal::id()
         );
 
         return back()->with('status', $statusMessage);
@@ -59,7 +59,7 @@ class DashboardController extends Controller
 
     public function publishToHome(DashboardReportTypeRequest $request, int $id): RedirectResponse
     {
-        abort_if(!Auth::guard('admin')->check(), 403);
+        abort_if(!\App\Support\ManagerPortal::check(), 403);
         $result = $this->reportCommandService->publishToHome($request->reportType(), $id);
         $flashType = $result['status'] ? 'status' : 'error';
 

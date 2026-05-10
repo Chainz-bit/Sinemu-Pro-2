@@ -76,13 +76,13 @@ class ClaimHistoryItemPresenter
             return $kecamatan;
         }
 
-        return trim((string) ($claim->admin?->instansi ?? 'Hubungi Admin'));
+        return trim((string) ($claim->admin?->instansi ?? 'Hubungi ' . \App\Support\RoleLabels::manager()));
     }
 
     private function resolveStatusDetail(Klaim $claim, string $statusKey): string
     {
         if ($statusKey === 'menunggu_tinjauan') {
-            return 'Klaim sedang diperiksa admin. Pastikan bukti kepemilikan sudah lengkap.';
+            return 'Klaim sedang diperiksa ' . \App\Support\RoleLabels::managerLower() . '. Pastikan bukti kepemilikan sudah lengkap.';
         }
         if ($statusKey === 'tidak_disetujui') {
             return 'Klaim ditolak. Periksa notifikasi dan lengkapi bukti untuk pengajuan berikutnya.';

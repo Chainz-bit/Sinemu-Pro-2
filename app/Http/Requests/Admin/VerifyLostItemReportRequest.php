@@ -8,7 +8,7 @@ class VerifyLostItemReportRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user('admin') !== null;
+        return $this->user(\App\Support\ManagerPortal::guard()) !== null;
     }
 
     /**

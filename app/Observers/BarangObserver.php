@@ -14,7 +14,7 @@ class BarangObserver
             type: 'barang_temuan_baru',
             title: 'Barang temuan baru',
             message: 'Data barang temuan ditambahkan: '.$barang->nama_barang,
-            actionUrl: route('admin.found-items'),
+            actionUrl: route(\App\Support\ManagerPortal::routeName('found-items')),
             meta: ['barang_id' => $barang->id]
         );
     }

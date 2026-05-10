@@ -12,24 +12,25 @@ use App\Http\Controllers\Admin\LostItemController;
 use App\Http\Controllers\Admin\MatchingController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
+use App\Support\ManagerPortal;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('admin')->name('admin.')->group(function () {
-    Route::middleware('guest:admin')->group(function () {
+Route::prefix(ManagerPortal::urlPrefix())->name(ManagerPortal::routePrefix() . '.')->group(function () {
+    Route::middleware(ManagerPortal::guestMiddleware())->group(function () {
         Route::get('register', [AdminRegisteredUserController::class, 'create'])->name('register');
-        Route::post('register', [AdminRegisteredUserController::class, 'store']);
+        Route::post('register', [AdminRegisteredUserController::class, 'store'])->name('register.store');
 
         Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
-        Route::post('login', [LoginController::class, 'login']);
+        Route::post('login', [LoginController::class, 'login'])->name('login.store');
     });
 
-    Route::middleware('admin')->group(function () {
+    Route::middleware(ManagerPortal::middleware())->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::patch('dashboard/reports/{type}/{id}', [DashboardController::class, 'updateReport'])->name('dashboard.reports.update');
         Route::post('dashboard/reports/{type}/{id}/publish-home', [DashboardController::class, 'publishToHome'])->name('dashboard.reports.publish-home');
 
         Route::get('barang-hilang', [LostItemController::class, 'index'])->name('lost-items');
-        Route::middleware('admin.region.barang')->group(function () {
+        Route::middleware(ManagerPortal::regionMiddleware())->group(function () {
             Route::get('barang-hilang/{laporanBarangHilang}', [LostItemController::class, 'show'])->name('lost-items.show');
             Route::get('barang-hilang/{laporanBarangHilang}/edit', [LostItemController::class, 'edit'])->name('lost-items.edit');
             Route::patch('barang-hilang/{laporanBarangHilang}', [LostItemController::class, 'update'])->name('lost-items.update');
@@ -39,7 +40,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
         Route::get('barang-temuan', [FoundItemController::class, 'index'])->name('found-items');
-        Route::middleware('admin.region.barang')->group(function () {
+        Route::middleware(ManagerPortal::regionMiddleware())->group(function () {
             Route::get('barang-temuan/{barang}', [FoundItemController::class, 'show'])->name('found-items.show');
             Route::get('barang-temuan/{barang}/edit', [FoundItemController::class, 'edit'])->name('found-items.edit');
             Route::patch('barang-temuan/{barang}', [FoundItemController::class, 'update'])->name('found-items.update');
@@ -63,7 +64,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('input-barang', [InputItemController::class, 'store'])->name('input-items.store');
 
         Route::get('barang-wilayah', [BarangWilayahController::class, 'index'])->name('barang-wilayah.index');
-        Route::middleware('admin.region.barang')->group(function () {
+        Route::middleware(ManagerPortal::regionMiddleware())->group(function () {
             Route::get('barang-wilayah/{barang}/edit', [BarangWilayahController::class, 'edit'])->name('barang-wilayah.edit');
             Route::put('barang-wilayah/{barang}', [BarangWilayahController::class, 'update'])->name('barang-wilayah.update');
             Route::delete('barang-wilayah/{barang}', [BarangWilayahController::class, 'destroy'])->name('barang-wilayah.destroy');
@@ -77,7 +78,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('pengaturan/log-aktivitas', [SettingsController::class, 'logs'])->name('settings.logs');
 
         Route::get('notifications', function () {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route(\App\Support\ManagerPortal::dashboardRoute());
         })->name('notifications.index');
         Route::post('notifications/read-all', [AdminNotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
         Route::post('notifications/{notification}/read', [AdminNotificationController::class, 'markAsRead'])->name('notifications.read');
@@ -86,4 +87,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::post('logout', [LoginController::class, 'logout'])->name('logout');
     });
+});
+
+Route::prefix(ManagerPortal::legacyUrlPrefix())->group(function () {
+    Route::get('{path?}', function (?string $path = null) {
+        $query = request()->getQueryString();
+
+        return redirect(ManagerPortal::legacyRedirectTarget($path) . ($query ? '?' . $query : ''));
+    })->where('path', '.*');
 });

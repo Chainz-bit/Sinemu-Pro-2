@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\AdminLoginRequest;
 use App\Models\Admin;
+use App\Support\ManagerPortal;
+use App\Support\RoleLabels;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +17,7 @@ class LoginController extends Controller
 {
     public function showLoginForm(): View
     {
-        return view('admin.auth.login');
+        return view('manager::auth.login');
     }
 
     public function login(AdminLoginRequest $request): RedirectResponse
@@ -34,24 +36,25 @@ class LoginController extends Controller
 
         $status = (string) ($admin->status_verifikasi ?? 'pending');
         if ($status !== 'active') {
+            $managerRoleLabelLower = RoleLabels::managerLower();
             $message = $status === 'rejected'
-                ? 'Akun admin ditolak. Perbarui data pendaftaran Anda dan hubungi super admin.'
-                : 'Akun admin belum aktif. Tunggu verifikasi dari super admin.';
+                ? 'Akun ' . $managerRoleLabelLower . ' ditolak. Perbarui data pendaftaran Anda dan hubungi super admin.'
+                : 'Akun ' . $managerRoleLabelLower . ' belum aktif. Tunggu verifikasi dari super admin.';
 
             return back()
                 ->withInput($request->only('login', 'remember'))
                 ->withErrors(['login' => $message]);
         }
 
-        Auth::guard('admin')->login($admin, (bool) $request->boolean('remember'));
+        Auth::guard(ManagerPortal::guard())->login($admin, (bool) $request->boolean('remember'));
         $request->session()->regenerate();
 
-        return redirect()->intended(route('admin.dashboard'));
+        return redirect()->intended(route(ManagerPortal::dashboardRoute()));
     }
 
     public function logout(Request $request): RedirectResponse
     {
-        Auth::guard('admin')->logout();
+        Auth::guard(ManagerPortal::guard())->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

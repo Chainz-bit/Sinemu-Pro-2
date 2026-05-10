@@ -18,7 +18,7 @@ class DashboardController extends Controller
     {
         $superAdmin = Auth::guard('super_admin')->user();
 
-        return view('super.pages.dashboard', [
+        return view('super.pages.dashboard.index', [
             'superAdmin' => $superAdmin,
             ...$this->dashboardQueryService->buildDashboardData($superAdmin?->id),
         ]);

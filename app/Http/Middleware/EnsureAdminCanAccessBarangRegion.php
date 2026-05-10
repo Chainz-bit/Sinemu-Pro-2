@@ -12,13 +12,13 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureAdminCanAccessBarangRegion
 {
     /**
-     * Pastikan admin wilayah hanya dapat mengakses barang pada region yang sama.
+     * Pastikan pengelola barang wilayah hanya dapat mengakses barang pada region yang sama.
      *
      * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         abort_if(!$admin, 403);
 
         $barang = $this->resolveBarangFromRoute($request);

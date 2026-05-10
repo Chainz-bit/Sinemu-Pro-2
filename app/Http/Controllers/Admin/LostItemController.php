@@ -35,7 +35,7 @@ class LostItemController extends Controller
     public function index(LostItemIndexRequest $request): View|StreamedResponse
     {
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
 
         $query = $this->queryService->buildIndexQuery($request);
         $sort = $request->sort();
@@ -46,17 +46,17 @@ class LostItemController extends Controller
 
         $items = $query->paginate(12)->withQueryString();
 
-        return view('admin.pages.lost-items', compact('items', 'admin', 'sort'));
+        return view('manager::pages.lost-items.index', compact('items', 'admin', 'sort'));
     }
 
     public function show(LaporanBarangHilang $laporanBarangHilang): View|RedirectResponse
     {
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan') && $laporanBarangHilang->sumber_laporan !== 'lapor_hilang') {
-            return redirect()->route('admin.lost-items');
+            return redirect()->route(\App\Support\ManagerPortal::routeName('lost-items'));
         }
 
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
 
         $laporanBarangHilang->loadMissing(['user:id,nama,name,email', 'klaims' => function ($query) {
             $query->latest('created_at');
@@ -68,17 +68,17 @@ class LostItemController extends Controller
             $matchingCandidates = $this->matchingService->findCandidatesForLostReport($laporanBarangHilang);
         }
 
-        return view('admin.pages.lost-item-detail', compact('laporanBarangHilang', 'latestKlaim', 'admin', 'matchingCandidates'));
+        return view('manager::pages.lost-items.show', compact('laporanBarangHilang', 'latestKlaim', 'admin', 'matchingCandidates'));
     }
 
     public function edit(LaporanBarangHilang $laporanBarangHilang): View|RedirectResponse
     {
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan') && $laporanBarangHilang->sumber_laporan !== 'lapor_hilang') {
-            return redirect()->route('admin.lost-items');
+            return redirect()->route(\App\Support\ManagerPortal::routeName('lost-items'));
         }
 
         /** @var \App\Models\Admin $admin */
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
 
         $lostCategoryOptions = Kategori::query()
             ->forForm()
@@ -86,7 +86,7 @@ class LostItemController extends Controller
             ->filter()
             ->values();
 
-        return view('admin.pages.lost-item-edit', compact('laporanBarangHilang', 'admin', 'lostCategoryOptions'));
+        return view('manager::pages.lost-items.edit', compact('laporanBarangHilang', 'admin', 'lostCategoryOptions'));
     }
 
     public function update(UpdateLostItemRequest $request, LaporanBarangHilang $laporanBarangHilang): RedirectResponse
@@ -94,7 +94,7 @@ class LostItemController extends Controller
         $this->commandService->update($laporanBarangHilang, $request->validated(), $request->file('foto_barang'), $this->imageUploader);
 
         return redirect()
-            ->route('admin.lost-items.show', $laporanBarangHilang->id)
+            ->route(\App\Support\ManagerPortal::routeName('lost-items.show'), $laporanBarangHilang->id)
             ->with('status', 'Data barang hilang berhasil diperbarui.');
     }
 
@@ -112,7 +112,7 @@ class LostItemController extends Controller
             return back()->with('error', 'Belum ada klaim aktif untuk laporan ini.');
         }
         return redirect()
-            ->route('admin.claim-verifications.show', $latestKlaim->id)
+            ->route(\App\Support\ManagerPortal::routeName('claim-verifications.show'), $latestKlaim->id)
             ->with('error', 'Perbarui status klaim dari halaman Verifikasi Klaim agar checklist keamanan tetap diterapkan.');
     }
 

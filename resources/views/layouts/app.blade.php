@@ -56,7 +56,7 @@
           <a class="nav-link" href="#">Tutorial</a>  
         </li>
         <li class="nav-item mx-2">
-          <a class="nav-link" href="#">Admin</a>  
+          <a class="nav-link" href="#">{{ \App\Support\RoleLabels::manager() }}</a>  
         </li>
         <li class="nav-item mx-2">
           <a class="nav-link" href="#">Lokasi</a>  
@@ -77,7 +77,7 @@
     <!-- Footer -->
     <footer class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
-            <p class="mb-0">© 2024 SINEMU INDONESIA - BUILD FOR COMMUNITY</p>
+            <p class="mb-0">Â© 2024 SINEMU INDONESIA - BUILD FOR COMMUNITY</p>
         </div>
     </footer>
 </body>

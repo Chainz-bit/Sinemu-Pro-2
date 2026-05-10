@@ -27,7 +27,7 @@ class ClaimController extends Controller
             requestedBarangId: $requestedBarangId > 0 ? $requestedBarangId : null
         );
 
-        return view('user.pages.claim-create', [
+        return view('user.pages.claims.create', [
             'foundItems' => $formData['foundItems'],
             'claimableLostReports' => $formData['claimableLostReports'],
             'selectedBarangId' => old('barang_id', $formData['selectedBarangId']),

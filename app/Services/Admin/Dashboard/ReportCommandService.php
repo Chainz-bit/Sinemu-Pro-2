@@ -161,7 +161,7 @@ class ReportCommandService
         }
         if (Schema::hasColumn('laporan_barang_hilangs', 'status_laporan')
             && (string) $report->status_laporan !== WorkflowStatus::REPORT_APPROVED) {
-            return ['status' => false, 'message' => 'Laporan harus disetujui admin sebelum tampil di Home.'];
+            return ['status' => false, 'message' => 'Laporan harus disetujui ' . \App\Support\RoleLabels::managerLower() . ' sebelum tampil di Home.'];
         }
 
         $report->update(['tampil_di_home' => true]);
@@ -182,7 +182,7 @@ class ReportCommandService
         }
         if (Schema::hasColumn('barangs', 'status_laporan')
             && (string) $report->status_laporan !== WorkflowStatus::REPORT_APPROVED) {
-            return ['status' => false, 'message' => 'Laporan harus disetujui admin sebelum tampil di Home.'];
+            return ['status' => false, 'message' => 'Laporan harus disetujui ' . \App\Support\RoleLabels::managerLower() . ' sebelum tampil di Home.'];
         }
 
         $report->update(['tampil_di_home' => true]);
@@ -233,12 +233,12 @@ class ReportCommandService
 
     private function ensureAdminCanAccessFoundReport(Barang $barang): void
     {
-        $admin = Auth::guard('admin')->user();
+        $admin = \App\Support\ManagerPortal::user();
         if (!Schema::hasColumn('barangs', 'region_id')) {
             return;
         }
 
-        abort_if(!$admin || empty($admin->region_id), 403, 'Admin belum memiliki wilayah akses.');
+        abort_if(!$admin || empty($admin->region_id), 403, ucfirst(\App\Support\RoleLabels::managerLower()) . ' belum memiliki wilayah akses.');
         abort_if((int) $barang->region_id !== (int) $admin->region_id, 403, 'Anda tidak memiliki akses ke barang dari wilayah lain.');
     }
 }

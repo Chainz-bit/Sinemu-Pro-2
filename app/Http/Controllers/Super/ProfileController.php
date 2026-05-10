@@ -24,7 +24,7 @@ class ProfileController extends Controller
         $superAdmin = $this->currentSuperAdmin();
         $data = $this->queryService->buildProfileData($superAdmin);
 
-        return view('super.pages.profile', [
+        return view('super.pages.profile.show', [
             'superAdmin' => $superAdmin,
             ...$data,
         ]);
@@ -35,7 +35,7 @@ class ProfileController extends Controller
         $superAdmin = $this->currentSuperAdmin();
         $data = $this->queryService->buildEditData($superAdmin);
 
-        return view('super.pages.profile-edit', [
+        return view('super.pages.profile.edit', [
             'superAdmin' => $superAdmin,
             ...$data,
         ]);
@@ -60,4 +60,3 @@ class ProfileController extends Controller
         return $superAdmin;
     }
 }
-

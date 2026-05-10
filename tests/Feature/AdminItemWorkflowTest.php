@@ -142,7 +142,7 @@ class AdminItemWorkflowTest extends TestCase
             'admin_id' => $admin->id,
             'status_klaim' => WorkflowStatus::CLAIM_LEGACY_PENDING,
             'status_verifikasi' => WorkflowStatus::CLAIM_UNDER_REVIEW,
-            'catatan' => 'Menunggu verifikasi admin.',
+            'catatan' => 'Menunggu verifikasi pengelola barang.',
             'bukti_foto' => ['verifikasi-klaim/2026/04/bukti-3.jpg'],
             'bukti_ciri_khusus' => 'Ada stiker kecil.',
             'bukti_lokasi_spesifik' => 'Dekat pintu masuk.',

@@ -209,7 +209,7 @@ class UserDashboardTest extends TestCase
             'admin_id' => $admin->id,
             'status_klaim' => 'disetujui',
             'status_verifikasi' => WorkflowStatus::CLAIM_APPROVED,
-            'catatan' => 'Klaim disetujui admin',
+            'catatan' => 'Klaim disetujui pengelola barang',
             'bukti_foto' => ['verifikasi-klaim/2026/04/bukti-2.jpg'],
             'bukti_ciri_khusus' => 'Ada casing abu-abu',
             'bukti_lokasi_spesifik' => 'Meja belakang',

@@ -26,7 +26,7 @@ class AdminProfileUpdateTest extends TestCase
             ]);
 
         $response->assertRedirect(route('admin.profile'));
-        $response->assertSessionHas('status', 'Profil admin berhasil diperbarui.');
+        $response->assertSessionHas('status', 'Profil pengelola barang berhasil diperbarui.');
 
         $admin->refresh();
 
