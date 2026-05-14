@@ -158,7 +158,13 @@ class AdminDirectoryTest extends TestCase
             ->delete(route('super.admins.destroy', $admin))
             ->assertRedirect(route('super.admins.index'));
 
-        $this->assertDatabaseMissing('admins', ['id' => $admin->id]);
+        $this->assertSoftDeleted('admins', ['id' => $admin->id]);
+
+        $this->actingAs($superAdmin, 'super_admin')
+            ->get(route('super.admins.index', ['search' => 'Angga Pengelola Update']))
+            ->assertOk()
+            ->assertSee('Belum ada pengelola barang yang cocok dengan filter.')
+            ->assertDontSee('angga-update@example.com');
     }
 
     public function test_manager_account_create_rejects_role_injection_and_strictly_validates_phone(): void

@@ -32,7 +32,7 @@ class UpdateAdminAccountRequest extends FormRequest
             'kecamatan' => ['required', 'string', 'max:100'],
             'alamat_lengkap' => ['required', 'string', 'max:1200'],
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-            'status_verifikasi' => ['required', Rule::in(['pending', 'active', 'rejected', 'inactive'])],
+            'status_verifikasi' => ['required', Rule::in(Admin::VERIFICATION_STATUSES)],
             'alasan_penolakan' => ['nullable', 'string', 'max:1000', 'required_if:status_verifikasi,rejected'],
         ];
     }

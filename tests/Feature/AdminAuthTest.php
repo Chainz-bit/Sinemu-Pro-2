@@ -146,6 +146,29 @@ class AdminAuthTest extends TestCase
         $this->assertGuest('admin');
     }
 
+    public function test_deleted_admin_cannot_login(): void
+    {
+        $admin = $this->createAdmin([
+            'username' => 'admin-deleted',
+            'email' => 'admin-deleted@example.com',
+            'status_verifikasi' => 'active',
+        ]);
+
+        $admin->delete();
+
+        $response = $this->from(route('admin.login'))
+            ->post(route('admin.login'), [
+                'login' => 'admin-deleted',
+                'password' => 'password123',
+            ]);
+
+        $response->assertRedirect(route('admin.login'));
+        $response->assertSessionHasErrors([
+            'login' => 'Email/username atau kata sandi tidak sesuai.',
+        ]);
+        $this->assertGuest('admin');
+    }
+
     public function test_user_account_cannot_login_through_manager_portal(): void
     {
         User::factory()->create([

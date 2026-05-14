@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Super;
 
+use App\Models\Admin;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
@@ -27,7 +28,7 @@ class StoreAdminAccountRequest extends FormRequest
             'kecamatan' => ['required', 'string', 'max:100'],
             'alamat_lengkap' => ['required', 'string', 'max:1200'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'status_verifikasi' => ['required', Rule::in(['pending', 'active', 'rejected', 'inactive'])],
+            'status_verifikasi' => ['required', Rule::in(Admin::VERIFICATION_STATUSES)],
             'alasan_penolakan' => ['nullable', 'string', 'max:1000', 'required_if:status_verifikasi,rejected'],
         ];
     }

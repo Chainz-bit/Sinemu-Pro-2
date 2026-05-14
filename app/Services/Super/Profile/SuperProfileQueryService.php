@@ -51,11 +51,7 @@ class SuperProfileQueryService
 
         return [
             'total' => (clone $baseQuery)->count(),
-            'pending' => (clone $baseQuery)
-                ->where(function ($query) {
-                    $query->whereNull('status_verifikasi')->orWhere('status_verifikasi', 'pending');
-                })
-                ->count(),
+            'pending' => (clone $baseQuery)->where('status_verifikasi', 'pending')->count(),
             'active' => (clone $baseQuery)->where('status_verifikasi', 'active')->count(),
         ];
     }

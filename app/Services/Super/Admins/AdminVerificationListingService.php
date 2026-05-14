@@ -30,13 +30,7 @@ class AdminVerificationListingService
         if ($status !== '' && $status !== 'semua') {
             $normalizedStatus = AdminVerificationStatusPresenter::key($status);
 
-            if ($normalizedStatus === 'pending') {
-                $query->where(function (Builder $builder) {
-                    $builder->whereNull('status_verifikasi')->orWhere('status_verifikasi', 'pending');
-                });
-            } else {
-                $query->where('status_verifikasi', $normalizedStatus);
-            }
+            $query->where('status_verifikasi', $normalizedStatus);
         }
 
         return $query;

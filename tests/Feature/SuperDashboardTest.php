@@ -28,6 +28,8 @@ class SuperDashboardTest extends TestCase
         $inactiveAdmin = $this->createAdmin($superAdmin, 'Admin Nonaktif', 'inactive', now()->subDays(4));
         $globalAdmin = $this->createAdmin(null, 'Admin Global', 'active', now()->subMinutes(30));
         $oldAdmin = $this->createAdmin($superAdmin, 'Admin Lama', 'active', now()->subDays(8));
+        $deletedAdmin = $this->createAdmin($superAdmin, 'Admin Terhapus', 'active', now()->subMinutes(5));
+        $deletedAdmin->delete();
         $this->createAdmin($otherSuperAdmin, 'Admin Milik Super Lain', 'pending', now());
         User::factory()->create();
 
@@ -54,9 +56,11 @@ class SuperDashboardTest extends TestCase
         );
         $this->assertCount(4, $newestAdmins);
         $this->assertFalse($newestAdmins->pluck('nama')->contains('Admin Milik Super Lain'));
+        $this->assertFalse($newestAdmins->pluck('nama')->contains('Admin Terhapus'));
         $this->assertTrue($latestActivities->pluck('id')->contains($activeAdmin->id));
         $this->assertTrue($latestActivities->pluck('id')->contains($inactiveAdmin->id));
         $this->assertFalse($latestActivities->pluck('id')->contains($pendingAdmin->id));
+        $this->assertFalse($latestActivities->pluck('nama')->contains('Admin Terhapus'));
         $this->assertCount(4, $latestActivities);
 
         $response->assertSee('Admin Pending');

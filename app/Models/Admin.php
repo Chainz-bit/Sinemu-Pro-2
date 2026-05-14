@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -26,6 +27,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $profil
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read SuperAdmin|null $superAdmin
  * @property-read Wilayah|null $region
  * @property-read Collection<int, Barang> $barangs
@@ -35,6 +37,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class Admin extends Authenticatable
 {
     use HasFactory;
+    use SoftDeletes;
+
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_INACTIVE = 'inactive';
+
+    public const VERIFICATION_STATUSES = [
+        self::STATUS_PENDING,
+        self::STATUS_ACTIVE,
+        self::STATUS_REJECTED,
+        self::STATUS_INACTIVE,
+    ];
 
     protected $fillable = [
         'super_admin_id',
@@ -59,6 +74,7 @@ class Admin extends Authenticatable
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'deleted_at' => 'datetime',
         'password' => 'hashed',
     ];
 

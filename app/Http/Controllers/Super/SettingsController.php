@@ -46,13 +46,7 @@ class SettingsController extends Controller
 
         $statusFilter = $request->status();
         if ($statusFilter !== '') {
-            if ($statusFilter === 'pending') {
-                $query->where(function (Builder $builder) {
-                    $builder->whereNull('status_verifikasi')->orWhere('status_verifikasi', 'pending');
-                });
-            } else {
-                $query->where('status_verifikasi', $statusFilter);
-            }
+            $query->where('status_verifikasi', $statusFilter);
         }
 
         $dateFilter = $request->dateFilter();
@@ -84,10 +78,7 @@ class SettingsController extends Controller
 
         $summary = [
             'total' => (clone $baseSummaryQuery)->count(),
-            'pending' => (clone $baseSummaryQuery)
-                ->where(function (Builder $builder) {
-                    $builder->whereNull('status_verifikasi')->orWhere('status_verifikasi', 'pending');
-                })->count(),
+            'pending' => (clone $baseSummaryQuery)->where('status_verifikasi', 'pending')->count(),
             'reviewed' => (clone $baseSummaryQuery)->whereIn('status_verifikasi', ['active', 'rejected'])->count(),
         ];
 
