@@ -90,7 +90,7 @@
                                 $lostCategoryNames = collect($lostCategoryOptions ?? [])->map(fn ($name) => trim((string) $name))->filter()->values();
                                 $hasSelectedLostCategory = $selectedLostCategory !== '' && $lostCategoryNames->contains($selectedLostCategory);
                             @endphp
-                            <select class="form-input edit-form-input" id="kategori_barang" name="kategori_barang">
+                            <select class="form-input edit-form-input" id="kategori_barang" name="kategori_barang" data-custom-select>
                                 <option value="">Pilih kategori</option>
                                 @foreach($lostCategoryNames as $categoryName)
                                     <option value="{{ $categoryName }}" @selected($selectedLostCategory === $categoryName)>{{ $categoryName }}</option>

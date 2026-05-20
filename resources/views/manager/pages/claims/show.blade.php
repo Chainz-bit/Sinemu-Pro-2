@@ -292,7 +292,7 @@
                             @foreach($checklistLabels as $checklistKey => $checklistLabel)
                                 <label class="claim-verification-field">
                                     <span>{{ $checklistLabel }}</span>
-                                    <select name="{{ $checklistKey }}" class="form-select" required>
+                                    <select name="{{ $checklistKey }}" class="form-select" required data-custom-select>
                                         <option value="">Pilih</option>
                                         <option value="1" @selected(old($checklistKey) === '1')>Ya</option>
                                         <option value="0" @selected(old($checklistKey) === '0')>Tidak</option>

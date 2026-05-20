@@ -21,13 +21,13 @@
         <header>
             <form class="lost-toolbar" method="GET" action="{{ manager_route('lost-items') }}">
                 <div class="lost-toolbar-left">
-                    <select name="sort" class="filter-btn">
+                    <select name="sort" class="filter-btn" data-custom-select>
                         <option value="terbaru" @selected($sort === 'terbaru')>Urutkan Berdasarkan...</option>
                         <option value="terlama" @selected($sort === 'terlama')>Urutkan: Terlama</option>
                         <option value="nama_asc" @selected($sort === 'nama_asc')>Nama A-Z</option>
                         <option value="nama_desc" @selected($sort === 'nama_desc')>Nama Z-A</option>
                     </select>
-                    <select name="status" class="filter-btn">
+                    <select name="status" class="filter-btn" data-custom-select>
                         <option value="">Semua Status</option>
                         <option value="submitted" @selected(request('status') === 'submitted')>Menunggu Verifikasi</option>
                         <option value="approved" @selected(request('status') === 'approved')>Disetujui {{ $managerRoleLabel }}</option>

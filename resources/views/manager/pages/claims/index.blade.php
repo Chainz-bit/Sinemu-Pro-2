@@ -21,11 +21,11 @@
         <header>
             <form class="lost-toolbar" method="GET" action="{{ manager_route('claim-verifications') }}">
                 <div class="lost-toolbar-left">
-                    <select name="sort" class="filter-btn">
+                    <select name="sort" class="filter-btn" data-custom-select>
                         <option value="terbaru" @selected($sort === 'terbaru')>Urutkan Berdasarkan...</option>
                         <option value="terlama" @selected($sort === 'terlama')>Urutkan: Terlama</option>
                     </select>
-                    <select name="status" class="filter-btn">
+                    <select name="status" class="filter-btn" data-custom-select>
                         <option value="">Semua Status</option>
                         <option value="menunggu" @selected(in_array(request('status'), ['menunggu','pending'], true))>Menunggu Verifikasi</option>
                         <option value="disetujui" @selected(request('status') === 'disetujui')>Disetujui</option>

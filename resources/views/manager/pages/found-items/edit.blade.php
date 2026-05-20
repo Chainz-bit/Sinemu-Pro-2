@@ -92,7 +92,7 @@
 
                         <div>
                             <label class="edit-form-label" for="kategori_id">Kategori</label>
-                            <select class="form-input edit-form-input" id="kategori_id" name="kategori_id">
+                            <select class="form-input edit-form-input" id="kategori_id" name="kategori_id" data-custom-select>
                                 <option value="">Pilih kategori</option>
                                 @foreach($kategoriOptions as $kategori)
                                     <option value="{{ $kategori->id }}" @selected((string) old('kategori_id', $barang->kategori_id) === (string) $kategori->id)>{{ $kategori->nama_kategori }}</option>

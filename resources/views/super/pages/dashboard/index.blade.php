@@ -86,7 +86,7 @@
                     </div>
                 </header>
 
-                <div class="super-activity-list">
+                <div @class(['super-activity-list', 'is-empty' => $latestActivities->isEmpty()])>
                     @forelse($latestActivities as $admin)
                         @php
                             $statusKey = \App\Support\AdminVerificationStatusPresenter::key($admin->status_verifikasi);
@@ -106,12 +106,14 @@
                             <a class="super-activity-link" href="{{ route('super.admin-verifications.index', ['search' => $admin->nama]) }}">Buka</a>
                         </article>
                     @empty
-                        <x-dashboard.empty-state
-                            class="super-table-empty-state"
-                            icon="mdi:timeline-clock-outline"
-                            title="Belum ada aktivitas verifikasi"
-                            message="Perubahan status pengelola akan muncul di sini."
-                        />
+                        <div class="verification-empty-wrapper">
+                            <x-dashboard.empty-state
+                                class="verification-empty-state"
+                                icon="mdi:timeline-clock-outline"
+                                title="Belum ada aktivitas verifikasi"
+                                message="Perubahan status pengelola akan muncul di sini."
+                            />
+                        </div>
                     @endforelse
                 </div>
             </article>

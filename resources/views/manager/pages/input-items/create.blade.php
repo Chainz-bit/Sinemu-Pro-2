@@ -42,7 +42,7 @@
 
                 <div class="form-group form-col-6">
                     <label class="form-label" for="kategori_id">Kategori</label>
-                    <select id="kategori_id" name="kategori_id" class="form-input">
+                    <select id="kategori_id" name="kategori_id" class="form-input" data-custom-select>
                         <option value="">Pilih kategori</option>
                         @foreach($kategoriOptions as $kategori)
                             <option value="{{ $kategori->id }}" @selected((string) old('kategori_id') === (string) $kategori->id)>{{ $kategori->nama_kategori }}</option>

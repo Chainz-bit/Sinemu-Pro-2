@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Super;
 
 use App\Models\Admin;
+use App\Support\IndramayuDistricts;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
@@ -25,7 +26,7 @@ class StoreAdminAccountRequest extends FormRequest
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:admins,email'],
             'nomor_telepon' => ['required', 'string', 'regex:/^(08[0-9]{8,13}|\\+628[0-9]{8,13})$/'],
             'instansi' => ['required', 'string', 'max:255'],
-            'kecamatan' => ['required', 'string', 'max:100'],
+            'kecamatan' => ['required', 'string', 'max:100', Rule::in(IndramayuDistricts::names())],
             'alamat_lengkap' => ['required', 'string', 'max:1200'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'status_verifikasi' => ['required', Rule::in(Admin::VERIFICATION_STATUSES)],
@@ -55,6 +56,7 @@ class StoreAdminAccountRequest extends FormRequest
     {
         return [
             'nomor_telepon.regex' => 'Nomor telepon harus menggunakan format 08xxxxxxxxxx atau +628xxxxxxxxxx.',
+            'kecamatan.in' => 'Kecamatan yang dipilih tidak valid.',
         ];
     }
 }

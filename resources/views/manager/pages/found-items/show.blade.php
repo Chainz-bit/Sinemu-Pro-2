@@ -230,7 +230,7 @@
                             @csrf
                             @method('PATCH')
                             <label for="status_barang" class="status-form-label">Status Baru</label>
-                            <select name="status_barang" id="status_barang" class="form-input status-form-input">
+                            <select name="status_barang" id="status_barang" class="form-input status-form-input" data-custom-select>
                                 @foreach($statusOptionLabels as $statusValue => $statusText)
                                     <option value="{{ $statusValue }}" @selected(old('status_barang', $barang->status_barang) === $statusValue)>{{ $statusText }}</option>
                                 @endforeach

@@ -27,7 +27,7 @@
 
                 <div class="form-col-6 form-group">
                     <label class="form-label" for="region_id">Wilayah Ditemukan <span>*</span></label>
-                    <select id="region_id" name="region_id" class="form-input" required>
+                    <select id="region_id" name="region_id" class="form-input" required data-custom-select>
                         <option value="">Pilih kecamatan</option>
                         @foreach(($wilayahOptions ?? collect()) as $wilayah)
                             <option value="{{ $wilayah->id }}" @selected((string) old('region_id') === (string) $wilayah->id)>
@@ -40,7 +40,7 @@
 
                 <div class="form-col-6 form-group">
                     <label class="form-label" for="kategori_id">Kategori</label>
-                    <select id="kategori_id" name="kategori_id" class="form-input">
+                    <select id="kategori_id" name="kategori_id" class="form-input" data-custom-select>
                         <option value="">Pilih kategori</option>
                         @foreach($categories as $category)
                             <option value="{{ $category->id }}" @selected((string) old('kategori_id') === (string) $category->id)>

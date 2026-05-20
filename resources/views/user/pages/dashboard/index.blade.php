@@ -62,7 +62,7 @@
                         @if($search !== '')
                             <input type="hidden" name="search" value="{{ $search }}">
                         @endif
-                        <select name="status" class="filter-btn dashboard-filter-select" onchange="this.form.submit()">
+                        <select name="status" class="filter-btn dashboard-filter-select" onchange="this.form.submit()" data-custom-select>
                             <option value="semua" @selected($statusFilter === 'semua')>Semua Status</option>
                             <option value="menunggu_tinjauan" @selected($statusFilter === 'menunggu_tinjauan')>Menunggu Tinjauan</option>
                             <option value="terverifikasi" @selected($statusFilter === 'terverifikasi')>Terverifikasi</option>

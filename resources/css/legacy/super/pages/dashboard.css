@@ -413,6 +413,34 @@ body.super-dashboard-page-mode .super-activity-list {
     grid-auto-rows: minmax(72px, auto);
 }
 
+.super-activity-card .super-activity-list.is-empty,
+body.super-dashboard-page-mode .super-activity-list.is-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    grid-auto-rows: auto;
+}
+
+.verification-empty-wrapper {
+    width: 100%;
+    min-height: 145px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.verification-empty-state {
+    width: min(100%, 280px);
+    text-align: center;
+    justify-items: center;
+}
+
+.verification-empty-state p {
+    max-width: 100%;
+}
+
 body.super-dashboard-page-mode .super-priority-item,
 body.super-dashboard-page-mode .super-newest-item,
 body.super-dashboard-page-mode .super-activity-item {

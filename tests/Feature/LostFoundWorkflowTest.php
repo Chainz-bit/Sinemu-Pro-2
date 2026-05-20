@@ -563,6 +563,153 @@ class LostFoundWorkflowTest extends TestCase
         $this->assertDatabaseCount('pencocokans', 0);
     }
 
+    public function test_admin_cannot_confirm_match_when_lost_report_region_is_null(): void
+    {
+        $user = $this->createUser();
+        $admin = $this->createAdmin();
+        $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+
+        $lostReport = $this->createApprovedLostReportForMatching($user, $admin, null);
+        $foundItem = $this->createApprovedFoundItemForMatching($admin, $user, $kategori, (int) $admin->region_id);
+
+        $this->actingAs($admin, 'admin')
+            ->post(route('admin.matches.store'), [
+                'laporan_hilang_id' => $lostReport->id,
+                'barang_id' => $foundItem->id,
+                'catatan' => 'Region laporan kosong harus ditolak',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('pencocokans', 0);
+    }
+
+    public function test_admin_cannot_confirm_match_when_found_item_region_is_null(): void
+    {
+        $user = $this->createUser();
+        $admin = $this->createAdmin();
+        $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+
+        $lostReport = $this->createApprovedLostReportForMatching($user, $admin, (int) $admin->region_id);
+        $foundItem = $this->createApprovedFoundItemForMatching($admin, $user, $kategori, null);
+
+        $this->actingAs($admin, 'admin')
+            ->post(route('admin.matches.store'), [
+                'laporan_hilang_id' => $lostReport->id,
+                'barang_id' => $foundItem->id,
+                'catatan' => 'Region barang kosong harus ditolak',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('pencocokans', 0);
+    }
+
+    public function test_admin_cannot_confirm_match_when_both_regions_are_null(): void
+    {
+        $user = $this->createUser();
+        $admin = $this->createAdmin();
+        $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+
+        $lostReport = $this->createApprovedLostReportForMatching($user, $admin, null);
+        $foundItem = $this->createApprovedFoundItemForMatching($admin, $user, $kategori, null);
+
+        $this->actingAs($admin, 'admin')
+            ->post(route('admin.matches.store'), [
+                'laporan_hilang_id' => $lostReport->id,
+                'barang_id' => $foundItem->id,
+                'catatan' => 'Kedua region kosong harus ditolak',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('pencocokans', 0);
+    }
+
+    public function test_admin_cannot_confirm_match_when_pair_region_belongs_to_other_region(): void
+    {
+        $user = $this->createUser();
+        $admin = $this->createAdmin();
+        $otherRegion = Wilayah::query()->create([
+            'nama_wilayah' => 'Wilayah Pair Lain',
+            'lat' => -6.41,
+            'lng' => 108.41,
+        ]);
+        $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+
+        $lostReport = $this->createApprovedLostReportForMatching($user, $admin, (int) $otherRegion->id);
+        $foundItem = $this->createApprovedFoundItemForMatching($admin, $user, $kategori, (int) $otherRegion->id);
+
+        $this->actingAs($admin, 'admin')
+            ->post(route('admin.matches.store'), [
+                'laporan_hilang_id' => $lostReport->id,
+                'barang_id' => $foundItem->id,
+                'catatan' => 'Pair wilayah lain harus ditolak',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('pencocokans', 0);
+    }
+
+    public function test_admin_can_confirm_match_when_all_regions_match(): void
+    {
+        $user = $this->createUser();
+        $admin = $this->createAdmin();
+        $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+
+        $lostReport = $this->createApprovedLostReportForMatching($user, $admin, (int) $admin->region_id);
+        $foundItem = $this->createApprovedFoundItemForMatching($admin, $user, $kategori, (int) $admin->region_id);
+
+        $this->actingAs($admin, 'admin')
+            ->post(route('admin.matches.store'), [
+                'laporan_hilang_id' => $lostReport->id,
+                'barang_id' => $foundItem->id,
+                'catatan' => 'Semua region sama',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('status');
+
+        $this->assertDatabaseHas('pencocokans', [
+            'laporan_hilang_id' => $lostReport->id,
+            'barang_id' => $foundItem->id,
+            'admin_id' => $admin->id,
+            'status_pencocokan' => WorkflowStatus::MATCH_CONFIRMED,
+        ]);
+    }
+
+    private function createApprovedLostReportForMatching(User $user, Admin $admin, ?int $regionId): LaporanBarangHilang
+    {
+        return LaporanBarangHilang::query()->create([
+            'user_id' => $user->id,
+            'region_id' => $regionId,
+            'nama_barang' => 'Barang Hilang Scope',
+            'lokasi_hilang' => 'Lokasi Hilang Scope',
+            'tanggal_hilang' => now()->subDay()->toDateString(),
+            'keterangan' => 'Laporan untuk uji scope matching',
+            'sumber_laporan' => 'lapor_hilang',
+            'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'tampil_di_home' => true,
+            'verified_by_admin_id' => $admin->id,
+            'verified_at' => now(),
+        ]);
+    }
+
+    private function createApprovedFoundItemForMatching(Admin $admin, User $user, Kategori $kategori, ?int $regionId): Barang
+    {
+        return Barang::query()->create([
+            'admin_id' => $admin->id,
+            'region_id' => $regionId,
+            'user_id' => $user->id,
+            'kategori_id' => $kategori->id,
+            'nama_barang' => 'Barang Temuan Scope',
+            'deskripsi' => 'Barang temuan untuk uji scope matching',
+            'lokasi_ditemukan' => 'Lokasi Temuan Scope',
+            'tanggal_ditemukan' => now()->toDateString(),
+            'status_barang' => WorkflowStatus::FOUND_AVAILABLE,
+            'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'tampil_di_home' => true,
+            'verified_by_admin_id' => $admin->id,
+            'verified_at' => now(),
+        ]);
+    }
+
     private function createUser(): User
     {
         $user = User::query()->create([

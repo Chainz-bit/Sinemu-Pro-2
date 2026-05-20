@@ -116,7 +116,7 @@
                             <span class="input-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.3 7-11a7 7 0 1 0-14 0c0 5.7 7 11 7 11Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>
                             </span>
-                            <select id="kecamatan" name="kecamatan" required @error('kecamatan') aria-invalid="true" aria-describedby="kecamatan-error" @enderror>
+                            <select id="kecamatan" name="kecamatan" required data-custom-select @error('kecamatan') aria-invalid="true" aria-describedby="kecamatan-error" @enderror>
                                 <option value="" disabled @selected(old('kecamatan') === null)>Pilih kecamatan</option>
                                 @foreach(($kecamatanOptions ?? []) as $kecamatan)
                                     <option value="{{ $kecamatan }}" @selected(old('kecamatan') === $kecamatan)>{{ $kecamatan }}</option>

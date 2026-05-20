@@ -12,6 +12,8 @@ use Illuminate\View\View;
 
 class InputItemController extends Controller
 {
+    private const MISSING_REGION_MESSAGE = 'Pengelola harus memiliki wilayah aktif sebelum membuat data barang.';
+
     public function __construct(private readonly InputItemService $inputItemService)
     {
     }
@@ -35,12 +37,20 @@ class InputItemController extends Controller
             return back()->with('error', 'Sesi ' . \App\Support\RoleLabels::managerLower() . ' tidak ditemukan. Silakan login ulang.');
         }
 
+        if (empty($admin->region_id)) {
+            return back()
+                ->withInput()
+                ->with('error', self::MISSING_REGION_MESSAGE);
+        }
+
         $validated = $request->validated();
         $jenisLaporan = (string) $validated['jenis_laporan'];
         $photo = $request->file('foto_barang');
+        $adminId = (int) $admin->id;
+        $regionId = (int) $admin->region_id;
 
         if ($jenisLaporan === 'hilang') {
-            $stored = $this->inputItemService->storeLostItem($validated, $photo);
+            $stored = $this->inputItemService->storeLostItem($adminId, $regionId, $validated, $photo);
 
             if (!$stored) {
                 return back()
@@ -51,7 +61,7 @@ class InputItemController extends Controller
             return back()->with('status', 'Laporan barang hilang berhasil ditambahkan.');
         }
 
-        $this->inputItemService->storeFoundItem((int) $admin->id, $admin->region_id ? (int) $admin->region_id : null, $validated, $photo);
+        $this->inputItemService->storeFoundItem($adminId, $regionId, $validated, $photo);
 
         return back()->with('status', 'Laporan barang temuan berhasil ditambahkan.');
     }

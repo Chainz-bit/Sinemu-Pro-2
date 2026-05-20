@@ -213,12 +213,20 @@ class MatchingCommandService
         $admin = \App\Support\ManagerPortal::user();
         abort_if(!$admin || empty($admin->region_id), 403, ucfirst(\App\Support\RoleLabels::managerLower()) . ' belum memiliki wilayah akses.');
 
-        if (Schema::hasColumn('laporan_barang_hilangs', 'region_id') && $laporan->region_id) {
-            abort_if((int) $laporan->region_id !== (int) $admin->region_id, 403, 'Anda tidak memiliki akses ke laporan dari wilayah lain.');
-        }
+        abort_unless(
+            Schema::hasColumn('laporan_barang_hilangs', 'region_id') && Schema::hasColumn('barangs', 'region_id'),
+            403,
+            'Data wilayah belum tersedia untuk proses pencocokan.'
+        );
 
-        if (Schema::hasColumn('barangs', 'region_id') && $barang->region_id) {
-            abort_if((int) $barang->region_id !== (int) $admin->region_id, 403, 'Anda tidak memiliki akses ke barang dari wilayah lain.');
-        }
+        $adminRegionId = (int) $admin->region_id;
+        $laporanRegionId = (int) ($laporan->region_id ?? 0);
+        $barangRegionId = (int) ($barang->region_id ?? 0);
+
+        abort_if($laporanRegionId <= 0, 403, 'Laporan belum memiliki wilayah yang dapat diproses.');
+        abort_if($barangRegionId <= 0, 403, 'Barang belum memiliki wilayah yang dapat diproses.');
+        abort_if($laporanRegionId !== $barangRegionId, 403, 'Laporan dan barang temuan harus berasal dari wilayah yang sama.');
+        abort_if($laporanRegionId !== $adminRegionId, 403, 'Anda tidak memiliki akses ke laporan dari wilayah lain.');
+        abort_if($barangRegionId !== $adminRegionId, 403, 'Anda tidak memiliki akses ke barang dari wilayah lain.');
     }
 }

@@ -30,7 +30,7 @@
 
                 <div class="form-col-6 form-group">
                     <label class="form-label" for="region_id">Wilayah Kejadian <span>*</span></label>
-                    <select id="region_id" name="region_id" class="form-input" required>
+                    <select id="region_id" name="region_id" class="form-input" required data-custom-select>
                         <option value="">Pilih kecamatan</option>
                         @foreach(($wilayahOptions ?? collect()) as $wilayah)
                             <option value="{{ $wilayah->id }}" @selected((string) old('region_id', $editingReport?->region_id) === (string) $wilayah->id)>
@@ -48,7 +48,7 @@
                         $lostCategoryNames = collect($lostCategoryOptions ?? [])->map(fn ($name) => trim((string) $name))->filter()->values();
                         $hasSelectedLostCategory = $selectedLostCategory !== '' && $lostCategoryNames->contains($selectedLostCategory);
                     @endphp
-                    <select id="kategori_barang" name="kategori_barang" class="form-input">
+                    <select id="kategori_barang" name="kategori_barang" class="form-input" data-custom-select>
                         <option value="">Pilih kategori</option>
                         @foreach($lostCategoryNames as $categoryName)
                             <option value="{{ $categoryName }}" @selected($selectedLostCategory === $categoryName)>{{ $categoryName }}</option>

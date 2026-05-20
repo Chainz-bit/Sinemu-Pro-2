@@ -25,7 +25,7 @@ class InputItemService
     /**
      * @param array<string, mixed> $validated
      */
-    public function storeLostItem(array $validated, ?UploadedFile $photo): bool
+    public function storeLostItem(int $adminId, int $regionId, array $validated, ?UploadedFile $photo): bool
     {
         $reporterName = trim((string) ($validated['nama_pelapor'] ?? ''));
         $reportDate = Carbon::parse((string) $validated['tanggal_waktu'])->toDateString();
@@ -48,6 +48,9 @@ class InputItemService
             'foto_barang' => $fotoPath,
         ];
 
+        if (Schema::hasColumn('laporan_barang_hilangs', 'region_id')) {
+            $payload['region_id'] = $regionId;
+        }
         if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
             $payload['sumber_laporan'] = 'lapor_hilang';
         }
@@ -56,6 +59,11 @@ class InputItemService
         }
         if (Schema::hasColumn('laporan_barang_hilangs', 'status_laporan')) {
             $payload['status_laporan'] = WorkflowStatus::REPORT_APPROVED;
+        }
+        if (Schema::hasColumn('laporan_barang_hilangs', 'verified_by_admin_id')) {
+            $payload['verified_by_admin_id'] = $adminId;
+        }
+        if (Schema::hasColumn('laporan_barang_hilangs', 'verified_at')) {
             $payload['verified_at'] = now();
         }
 
@@ -75,7 +83,7 @@ class InputItemService
     /**
      * @param array<string, mixed> $validated
      */
-    public function storeFoundItem(int $adminId, ?int $regionId, array $validated, ?UploadedFile $photo): void
+    public function storeFoundItem(int $adminId, int $regionId, array $validated, ?UploadedFile $photo): void
     {
         $kategoriId = $validated['kategori_id'] ?? null;
 
@@ -115,7 +123,7 @@ class InputItemService
         if (Schema::hasColumn('barangs', 'tampil_di_home')) {
             $payload['tampil_di_home'] = true;
         }
-        if ($regionId && Schema::hasColumn('barangs', 'region_id')) {
+        if (Schema::hasColumn('barangs', 'region_id')) {
             $payload['region_id'] = $regionId;
         }
         if (Schema::hasColumn('barangs', 'status_laporan')) {

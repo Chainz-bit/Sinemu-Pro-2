@@ -43,7 +43,7 @@
                         @if($typeFilter !== '' && $typeFilter !== 'semua')
                             <input type="hidden" name="type" value="{{ $typeFilter }}">
                         @endif
-                        <select name="status" class="filter-btn dashboard-filter-select w-100" onchange="this.form.submit()">
+                        <select name="status" class="filter-btn dashboard-filter-select w-100" onchange="this.form.submit()" data-custom-select>
                             <option value="semua" @selected($statusFilter === 'semua')>Semua Status</option>
                             <option value="menunggu_tinjauan" @selected($statusFilter === 'menunggu_tinjauan')>Menunggu Tinjauan</option>
                             <option value="sedang_diproses" @selected($statusFilter === 'sedang_diproses')>Sedang Diproses</option>
@@ -58,7 +58,7 @@
                         @if($statusFilter !== '' && $statusFilter !== 'semua')
                             <input type="hidden" name="status" value="{{ $statusFilter }}">
                         @endif
-                        <select name="type" class="filter-btn dashboard-filter-select w-100" onchange="this.form.submit()">
+                        <select name="type" class="filter-btn dashboard-filter-select w-100" onchange="this.form.submit()" data-custom-select>
                             <option value="semua" @selected($typeFilter === 'semua')>Semua Jenis</option>
                             <option value="temuan" @selected($typeFilter === 'temuan')>Barang Temuan</option>
                             <option value="hilang" @selected($typeFilter === 'hilang')>Laporan Hilang</option>

@@ -658,7 +658,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Kategori</label>
-                                <select name="kategori_id" class="form-select">
+                                <select name="kategori_id" class="form-select" data-custom-select>
                                     <option value="">Pilih Kategori</option>
                                     @foreach(($kategoriOptions ?? collect()) as $kategori)
                                         <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
@@ -667,7 +667,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Wilayah Ditemukan</label>
-                                <select name="region_id" class="form-select" required>
+                                <select name="region_id" class="form-select" required data-custom-select>
                                     <option value="">Pilih Kecamatan</option>
                                     @foreach(($wilayahOptions ?? collect()) as $wilayah)
                                         <option value="{{ $wilayah->id }}">{{ $wilayah->nama_wilayah }}</option>

@@ -106,6 +106,7 @@ class AdminDirectoryTest extends TestCase
 
         $createResponse->assertRedirect(route('super.admins.show', $admin));
         $this->assertSame($superAdmin->id, $admin->super_admin_id);
+        $this->assertSame('Indramayu', $admin->kecamatan);
         $this->assertTrue(Hash::check('password123', (string) $admin->password));
         $this->assertNotSame('password123', $admin->password);
 
@@ -134,6 +135,7 @@ class AdminDirectoryTest extends TestCase
 
         $admin->refresh();
         $this->assertSame('Angga Pengelola Update', $admin->nama);
+        $this->assertSame('Sindang', $admin->kecamatan);
         $this->assertSame('inactive', $admin->status_verifikasi);
         $this->assertSame($oldPassword, $admin->password);
 
@@ -256,6 +258,57 @@ class AdminDirectoryTest extends TestCase
 
         $this->assertDatabaseHas('admins', ['id' => $targetAdmin->id]);
         $this->assertDatabaseHas('pencocokans', ['admin_id' => $targetAdmin->id]);
+    }
+
+    public function test_super_admin_cannot_create_manager_with_invalid_kecamatan(): void
+    {
+        $superAdmin = $this->createSuperAdmin();
+
+        $this->actingAs($superAdmin, 'super_admin')
+            ->from(route('super.admins.create'))
+            ->post(route('super.admins.store'), [
+                'nama' => 'Admin Kecamatan Invalid',
+                'username' => 'admin-kecamatan-invalid',
+                'email' => 'admin-kecamatan-invalid@example.com',
+                'nomor_telepon' => '081234567892',
+                'instansi' => 'Kantor Kecamatan Fiktif',
+                'kecamatan' => 'Kecamatan Fiktif',
+                'alamat_lengkap' => 'Jl. Validasi Kecamatan No. 1',
+                'password' => 'password123',
+                'password_confirmation' => 'password123',
+                'status_verifikasi' => 'pending',
+            ])
+            ->assertRedirect(route('super.admins.create'))
+            ->assertSessionHasErrors('kecamatan');
+
+        $this->assertDatabaseMissing('admins', [
+            'username' => 'admin-kecamatan-invalid',
+        ]);
+    }
+
+    public function test_super_admin_cannot_update_manager_with_invalid_kecamatan(): void
+    {
+        $superAdmin = $this->createSuperAdmin();
+        $admin = $this->createAdmin($superAdmin, 'Admin Update Kecamatan', 'active');
+
+        $this->actingAs($superAdmin, 'super_admin')
+            ->from(route('super.admins.edit', $admin))
+            ->put(route('super.admins.update', $admin), [
+                'nama' => 'Admin Update Kecamatan',
+                'username' => (string) $admin->username,
+                'email' => (string) $admin->email,
+                'nomor_telepon' => '081234567893',
+                'instansi' => 'Kantor Kecamatan Fiktif',
+                'kecamatan' => 'Kecamatan Fiktif',
+                'alamat_lengkap' => 'Jl. Validasi Kecamatan No. 2',
+                'password' => '',
+                'password_confirmation' => '',
+                'status_verifikasi' => 'active',
+            ])
+            ->assertRedirect(route('super.admins.edit', $admin))
+            ->assertSessionHasErrors('kecamatan');
+
+        $this->assertSame('Lohbener', $admin->fresh()?->kecamatan);
     }
 
     public function test_manager_account_validation_rejects_duplicate_identity_and_password_mismatch(): void

@@ -53,7 +53,7 @@
 
             <div class="super-form-field">
                 <label for="kecamatan">Kecamatan <span aria-hidden="true">*</span></label>
-                <select id="kecamatan" name="kecamatan" class="@error('kecamatan') is-invalid @enderror" required>
+                <select id="kecamatan" name="kecamatan" class="@error('kecamatan') is-invalid @enderror" required data-custom-select>
                     <option value="">Pilih kecamatan</option>
                     @foreach($kecamatanOptions as $kecamatan)
                         <option value="{{ $kecamatan }}" @selected(old('kecamatan', $admin->kecamatan ?? '') === $kecamatan)>{{ $kecamatan }}</option>
@@ -111,7 +111,7 @@
         <div class="super-manager-form-grid">
             <div class="super-form-field">
                 <label for="status_verifikasi">Status Akun <span aria-hidden="true">*</span></label>
-                <select id="status_verifikasi" name="status_verifikasi" class="@error('status_verifikasi') is-invalid @enderror" required>
+                <select id="status_verifikasi" name="status_verifikasi" class="@error('status_verifikasi') is-invalid @enderror" required data-custom-select>
                     <option value="" disabled @selected($selectedStatus === '')>Pilih status akun</option>
                     @foreach($statusOptions as $value => $label)
                         <option value="{{ $value }}" @selected($selectedStatus === $value)>{{ $label }}</option>

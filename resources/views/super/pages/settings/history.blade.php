@@ -39,7 +39,7 @@
             <header>
                 <form class="settings-log-toolbar" method="GET" action="{{ route('super.settings.history') }}">
                     <div class="settings-log-toolbar-left">
-                        <select name="status" class="filter-btn">
+                        <select name="status" class="filter-btn" data-custom-select>
                             <option value="" @selected($statusFilter === '')>Semua Status</option>
                             <option value="pending" @selected($statusFilter === 'pending')>Menunggu Verifikasi</option>
                             <option value="active" @selected($statusFilter === 'active')>Aktif</option>

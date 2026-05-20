@@ -32,7 +32,7 @@
 
                     <div class="form-col-12 form-group">
                         <label class="form-label" for="barang_id">Pilih Barang Temuan <span>*</span></label>
-                        <select id="barang_id" name="barang_id" class="form-input" required>
+                        <select id="barang_id" name="barang_id" class="form-input" required data-custom-select>
                             <option value="">Pilih barang</option>
                             @foreach($foundItems as $barang)
                                 @php
@@ -67,7 +67,7 @@
 
                     <div class="form-col-12 form-group">
                         <label class="form-label" for="laporan_hilang_id">Pilih Laporan Barang Hilang Anda <span>*</span></label>
-                        <select name="laporan_hilang_id" id="laporan_hilang_id" class="form-input" required>
+                        <select name="laporan_hilang_id" id="laporan_hilang_id" class="form-input" required data-custom-select>
                             <option value="">Pilih laporan Anda</option>
                             @foreach($claimableLostReports as $report)
                                 @php

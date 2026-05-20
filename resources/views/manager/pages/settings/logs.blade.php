@@ -39,12 +39,12 @@
             <header>
                 <form class="settings-log-toolbar" method="GET" action="{{ manager_route('settings.logs') }}">
                     <div class="settings-log-toolbar-left">
-                        <select name="status" class="filter-btn">
+                        <select name="status" class="filter-btn" data-custom-select>
                             <option value="" @selected($statusFilter === '')>Semua Status</option>
                             <option value="unread" @selected($statusFilter === 'unread')>Belum Dibaca</option>
                             <option value="read" @selected($statusFilter === 'read')>Sudah Dibaca</option>
                         </select>
-                        <select name="type" class="filter-btn">
+                        <select name="type" class="filter-btn" data-custom-select>
                             <option value="" @selected($typeFilter === '')>Semua Tipe</option>
                             @foreach($typeOptions as $typeValue => $typeLabel)
                                 <option value="{{ $typeValue }}" @selected($typeFilter === $typeValue)>{{ $typeLabel }}</option>

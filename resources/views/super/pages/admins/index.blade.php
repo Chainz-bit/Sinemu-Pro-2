@@ -34,7 +34,7 @@
                         @if($search !== '')
                             <input type="hidden" name="search" value="{{ $search }}">
                         @endif
-                        <select name="status" class="filter-btn dashboard-filter-select" onchange="this.form.submit()">
+                        <select name="status" class="filter-btn dashboard-filter-select" onchange="this.form.submit()" data-custom-select>
                             <option value="semua" @selected($statusFilter === 'semua')>Semua Status</option>
                             <option value="pending" @selected($statusFilter === 'pending')>Menunggu</option>
                             <option value="active" @selected($statusFilter === 'active')>Aktif</option>
