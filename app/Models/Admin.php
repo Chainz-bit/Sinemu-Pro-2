@@ -19,6 +19,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property string|null $instansi
  * @property string|null $kecamatan
  * @property string|null $alamat_lengkap
+ * @property string|null $pickup_address
+ * @property float|null $pickup_lat
+ * @property float|null $pickup_lng
  * @property string|null $status_verifikasi
  * @property string|null $alasan_penolakan
  * @property \Illuminate\Support\Carbon|null $verified_at
@@ -62,6 +65,9 @@ class Admin extends Authenticatable
         'instansi',
         'kecamatan',
         'alamat_lengkap',
+        'pickup_address',
+        'pickup_lat',
+        'pickup_lng',
         'status_verifikasi',
         'alasan_penolakan',
         'verified_at',
@@ -76,6 +82,8 @@ class Admin extends Authenticatable
         'verified_at' => 'datetime',
         'deleted_at' => 'datetime',
         'password' => 'hashed',
+        'pickup_lat' => 'float',
+        'pickup_lng' => 'float',
     ];
 
     public function superAdmin()

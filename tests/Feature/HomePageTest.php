@@ -216,6 +216,9 @@ class HomePageTest extends TestCase
                 'email' => 'pending-location-admin@example.com',
                 'kecamatan' => 'Lohbener',
                 'status_verifikasi' => Admin::STATUS_PENDING,
+                'pickup_address' => 'Titik pending tidak boleh tampil',
+                'pickup_lat' => '-6.365800',
+                'pickup_lng' => '108.247100',
             ]))
             ->assertRedirect();
 
@@ -292,12 +295,65 @@ class HomePageTest extends TestCase
 
     public function test_active_manager_without_region_is_not_pickup_location(): void
     {
-        $this->createAdmin();
+        $this->createAdmin(null, [
+            'pickup_address' => 'Titik tanpa region tidak boleh tampil',
+            'pickup_lat' => -6.322,
+            'pickup_lng' => 108.324,
+        ]);
 
         $response = $this->get(route('home'));
 
         $response->assertOk();
         $this->assertSame([], $response->viewData('pickupLocations'));
+    }
+
+    public function test_home_location_uses_admin_pickup_coordinates_when_available(): void
+    {
+        $wilayah = Wilayah::query()->create([
+            'nama_wilayah' => 'Kecamatan Pickup',
+            'lat' => -6.300001,
+            'lng' => 108.300001,
+        ]);
+
+        $this->createAdmin($wilayah->id, [
+            'pickup_address' => 'Loket Pengambilan Barang SiNemu',
+            'pickup_lat' => -6.355555,
+            'pickup_lng' => 108.255555,
+        ]);
+
+        $response = $this->get(route('home'));
+        $pickupLocations = $response->viewData('pickupLocations');
+
+        $response->assertOk();
+        $this->assertCount(1, $pickupLocations);
+        $this->assertSame('Loket Pengambilan Barang SiNemu', $pickupLocations[0]['address']);
+        $this->assertSame(-6.355555, $pickupLocations[0]['lat']);
+        $this->assertSame(108.255555, $pickupLocations[0]['lng']);
+    }
+
+    public function test_home_location_falls_back_to_region_coordinates_when_pickup_is_empty(): void
+    {
+        $wilayah = Wilayah::query()->create([
+            'nama_wilayah' => 'Kecamatan Fallback',
+            'lat' => -6.311111,
+            'lng' => 108.311111,
+        ]);
+
+        $this->createAdmin($wilayah->id, [
+            'alamat_lengkap' => 'Alamat operasional fallback',
+            'pickup_address' => null,
+            'pickup_lat' => null,
+            'pickup_lng' => null,
+        ]);
+
+        $response = $this->get(route('home'));
+        $pickupLocations = $response->viewData('pickupLocations');
+
+        $response->assertOk();
+        $this->assertCount(1, $pickupLocations);
+        $this->assertSame('Alamat operasional fallback', $pickupLocations[0]['address']);
+        $this->assertSame(-6.311111, $pickupLocations[0]['lat']);
+        $this->assertSame(108.311111, $pickupLocations[0]['lng']);
     }
 
     public function test_found_detail_marks_available_item_as_claimable(): void
@@ -416,11 +472,14 @@ class HomePageTest extends TestCase
         return $user;
     }
 
-    private function createAdmin(?int $regionId = null): Admin
+    /**
+     * @param array<string,mixed> $overrides
+     */
+    private function createAdmin(?int $regionId = null, array $overrides = []): Admin
     {
         $superAdmin = $this->createSuperAdmin();
 
-        return Admin::query()->create([
+        return Admin::query()->create(array_merge([
             'super_admin_id' => $superAdmin->id,
             'nama' => 'Admin Home',
             'email' => 'home-admin@example.com',
@@ -433,7 +492,7 @@ class HomePageTest extends TestCase
             'region_id' => $regionId,
             'lat' => -6.322,
             'lng' => 108.324,
-        ]);
+        ], $overrides));
     }
 
     /**

@@ -27,6 +27,9 @@ class AdminRegisterRequest extends FormRequest
             'instansi' => ['required', 'string', 'max:255'],
             'kecamatan' => ['required', 'string', 'max:100', Rule::in(IndramayuDistricts::names())],
             'alamat_lengkap' => ['required', 'string', 'max:1200'],
+            'pickup_address' => ['nullable', 'string', 'max:255'],
+            'pickup_lat' => ['nullable', 'required_with:pickup_lng', 'numeric', 'between:-90,90'],
+            'pickup_lng' => ['nullable', 'required_with:pickup_lat', 'numeric', 'between:-180,180'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
     }
@@ -42,6 +45,10 @@ class AdminRegisterRequest extends FormRequest
             'email.unique' => 'Email sudah digunakan sebagai akun pengelola.',
             'nomor_telepon.regex' => 'Nomor telepon harus menggunakan format 08xxxxxxxxxx atau +628xxxxxxxxxx.',
             'kecamatan.in' => 'Kecamatan yang dipilih tidak valid.',
+            'pickup_lat.required_with' => 'Latitude dan longitude harus diisi bersama.',
+            'pickup_lng.required_with' => 'Latitude dan longitude harus diisi bersama.',
+            'pickup_lat.between' => 'Latitude harus berada antara -90 sampai 90.',
+            'pickup_lng.between' => 'Longitude harus berada antara -180 sampai 180.',
         ];
     }
 
@@ -53,6 +60,9 @@ class AdminRegisterRequest extends FormRequest
             'email' => $this->input('email') !== null ? trim((string) $this->input('email')) : null,
             'nomor_telepon' => $this->input('nomor_telepon') !== null ? trim((string) $this->input('nomor_telepon')) : null,
             'username' => $this->input('username') !== null ? trim((string) $this->input('username')) : null,
+            'pickup_address' => $this->filled('pickup_address') ? trim((string) $this->input('pickup_address')) : null,
+            'pickup_lat' => $this->filled('pickup_lat') ? trim((string) $this->input('pickup_lat')) : null,
+            'pickup_lng' => $this->filled('pickup_lng') ? trim((string) $this->input('pickup_lng')) : null,
         ]);
     }
 }

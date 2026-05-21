@@ -72,6 +72,53 @@
 
     <section class="super-form-section">
         <header class="super-form-section-head">
+            <h3>Lokasi Pengambilan Barang</h3>
+            <p>Opsional. Isi koordinat agar rute ke lokasi pengambilan lebih akurat. Jika dikosongkan, sistem memakai titik default wilayah.</p>
+            <p>Untuk titik yang akurat, buka Google Maps, klik kanan lokasi pengambilan, salin koordinat, lalu masukkan latitude dan longitude. <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Buka Google Maps</a></p>
+        </header>
+
+        <div class="super-manager-form-grid">
+            <div class="super-form-field super-form-field-full">
+                <label for="pickup_address">Alamat Titik Pengambilan</label>
+                <input id="pickup_address" name="pickup_address" type="text" value="{{ old('pickup_address', $admin->pickup_address ?? '') }}" placeholder="Contoh: Kantor Kecamatan Lohbener, dekat ruang pelayanan" class="@error('pickup_address') is-invalid @enderror">
+                @error('pickup_address')<small class="super-form-error">{{ $message }}</small>@enderror
+            </div>
+
+            <div class="super-form-field">
+                <label for="pickup_lat">Latitude</label>
+                <input id="pickup_lat" name="pickup_lat" type="number" step="any" value="{{ old('pickup_lat', $admin->pickup_lat ?? '') }}" placeholder="-6.326400" class="@error('pickup_lat') is-invalid @enderror">
+                @error('pickup_lat')<small class="super-form-error">{{ $message }}</small>@enderror
+            </div>
+
+            <div class="super-form-field">
+                <label for="pickup_lng">Longitude</label>
+                <input id="pickup_lng" name="pickup_lng" type="number" step="any" value="{{ old('pickup_lng', $admin->pickup_lng ?? '') }}" placeholder="108.322700" class="@error('pickup_lng') is-invalid @enderror">
+                @error('pickup_lng')<small class="super-form-error">{{ $message }}</small>@enderror
+            </div>
+
+            <div class="super-form-field super-form-field-full">
+                <div
+                    class="pickup-location-picker"
+                    data-pickup-location-picker
+                    data-regions='@json($pickupRegionOptions ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'
+                    data-default-lat="-6.3264"
+                    data-default-lng="108.3227"
+                >
+                    <div class="pickup-location-picker__map" data-pickup-map aria-label="Peta titik pengambilan barang"></div>
+                    <div class="pickup-location-picker__toolbar">
+                        <button type="button" class="pickup-location-picker__button" data-pickup-use-current-location>
+                            Gunakan Lokasi Saya
+                        </button>
+                        <small class="pickup-location-picker__message super-form-help" data-pickup-location-message aria-live="polite"></small>
+                    </div>
+                    <small class="super-form-help">Klik peta untuk menentukan titik pengambilan.</small>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="super-form-section">
+        <header class="super-form-section-head">
             <h3>Keamanan Akun</h3>
             <p>Gunakan password yang aman untuk melindungi akses akun.</p>
         </header>

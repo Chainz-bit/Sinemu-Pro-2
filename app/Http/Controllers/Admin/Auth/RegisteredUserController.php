@@ -21,8 +21,9 @@ class RegisteredUserController extends Controller
     public function create(): View
     {
         $kecamatanOptions = IndramayuDistricts::names();
+        $pickupRegionOptions = IndramayuDistricts::wilayahItems();
 
-        return view('manager::auth.register', compact('kecamatanOptions'));
+        return view('manager::auth.register', compact('kecamatanOptions', 'pickupRegionOptions'));
     }
 
     public function store(AdminRegisterRequest $request): RedirectResponse
@@ -40,6 +41,9 @@ class RegisteredUserController extends Controller
                 'instansi' => $validated['instansi'],
                 'kecamatan' => $validated['kecamatan'],
                 'alamat_lengkap' => $validated['alamat_lengkap'],
+                'pickup_address' => $validated['pickup_address'] ?? null,
+                'pickup_lat' => $validated['pickup_lat'] ?? null,
+                'pickup_lng' => $validated['pickup_lng'] ?? null,
                 'status_verifikasi' => Admin::STATUS_PENDING,
                 'verified_at' => null,
                 'password' => Hash::make($validated['password']),

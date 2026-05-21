@@ -340,6 +340,55 @@ class AdminAuthTest extends TestCase
         $this->assertArrayNotHasKey('role', $admin->getAttributes());
     }
 
+    public function test_admin_registration_accepts_valid_pickup_location_and_remains_pending(): void
+    {
+        $response = $this->post(route('admin.register'), array_merge(
+            $this->validAdminRegistrationPayload(),
+            [
+                'username' => 'admin-pickup-register',
+                'email' => 'admin-pickup-register@example.com',
+                'pickup_address' => 'Kantor Kecamatan Sindang, ruang pelayanan',
+                'pickup_lat' => '-6.322000',
+                'pickup_lng' => '108.324000',
+            ]
+        ));
+
+        $response->assertRedirect(route('admin.login'));
+
+        $admin = Admin::query()->where('username', 'admin-pickup-register')->firstOrFail();
+
+        $this->assertSame(Admin::STATUS_PENDING, $admin->status_verifikasi);
+        $this->assertSame('Kantor Kecamatan Sindang, ruang pelayanan', $admin->pickup_address);
+        $this->assertSame(-6.322, $admin->pickup_lat);
+        $this->assertSame(108.324, $admin->pickup_lng);
+    }
+
+    public function test_admin_registration_rejects_invalid_pickup_coordinate_payload(): void
+    {
+        $cases = [
+            ['pickup_lat' => '-6.322000', 'pickup_lng' => '', 'error' => 'pickup_lng'],
+            ['pickup_lat' => '', 'pickup_lng' => '108.324000', 'error' => 'pickup_lat'],
+            ['pickup_lat' => '-91', 'pickup_lng' => '108.324000', 'error' => 'pickup_lat'],
+            ['pickup_lat' => '-6.322000', 'pickup_lng' => '181', 'error' => 'pickup_lng'],
+        ];
+
+        foreach ($cases as $index => $case) {
+            $this->from(route('admin.register'))
+                ->post(route('admin.register'), array_merge($this->validAdminRegistrationPayload(), [
+                    'username' => 'admin-invalid-pickup-' . $index,
+                    'email' => 'admin-invalid-pickup-' . $index . '@example.com',
+                    'pickup_lat' => $case['pickup_lat'],
+                    'pickup_lng' => $case['pickup_lng'],
+                ]))
+                ->assertRedirect(route('admin.register'))
+                ->assertSessionHasErrors($case['error']);
+
+            $this->assertDatabaseMissing('admins', [
+                'username' => 'admin-invalid-pickup-' . $index,
+            ]);
+        }
+    }
+
     public function test_admin_registration_rejects_duplicate_username_without_server_error(): void
     {
         $this->createAdmin([

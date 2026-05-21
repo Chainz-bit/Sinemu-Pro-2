@@ -28,6 +28,9 @@ class StoreAdminAccountRequest extends FormRequest
             'instansi' => ['required', 'string', 'max:255'],
             'kecamatan' => ['required', 'string', 'max:100', Rule::in(IndramayuDistricts::names())],
             'alamat_lengkap' => ['required', 'string', 'max:1200'],
+            'pickup_address' => ['nullable', 'string', 'max:255'],
+            'pickup_lat' => ['nullable', 'required_with:pickup_lng', 'numeric', 'between:-90,90'],
+            'pickup_lng' => ['nullable', 'required_with:pickup_lat', 'numeric', 'between:-180,180'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'status_verifikasi' => ['required', Rule::in(Admin::VERIFICATION_STATUSES)],
             'alasan_penolakan' => ['nullable', 'string', 'max:1000', 'required_if:status_verifikasi,rejected'],
@@ -44,6 +47,9 @@ class StoreAdminAccountRequest extends FormRequest
             'instansi' => $this->filled('instansi') ? trim((string) $this->input('instansi')) : null,
             'kecamatan' => $this->filled('kecamatan') ? trim((string) $this->input('kecamatan')) : null,
             'alamat_lengkap' => $this->filled('alamat_lengkap') ? trim((string) $this->input('alamat_lengkap')) : null,
+            'pickup_address' => $this->filled('pickup_address') ? trim((string) $this->input('pickup_address')) : null,
+            'pickup_lat' => $this->filled('pickup_lat') ? trim((string) $this->input('pickup_lat')) : null,
+            'pickup_lng' => $this->filled('pickup_lng') ? trim((string) $this->input('pickup_lng')) : null,
             'password' => $this->input('password') !== null ? (string) $this->input('password') : null,
             'password_confirmation' => $this->input('password_confirmation') !== null ? (string) $this->input('password_confirmation') : null,
         ]);
@@ -57,6 +63,10 @@ class StoreAdminAccountRequest extends FormRequest
         return [
             'nomor_telepon.regex' => 'Nomor telepon harus menggunakan format 08xxxxxxxxxx atau +628xxxxxxxxxx.',
             'kecamatan.in' => 'Kecamatan yang dipilih tidak valid.',
+            'pickup_lat.required_with' => 'Latitude dan longitude harus diisi bersama.',
+            'pickup_lng.required_with' => 'Latitude dan longitude harus diisi bersama.',
+            'pickup_lat.between' => 'Latitude harus berada antara -90 sampai 90.',
+            'pickup_lng.between' => 'Longitude harus berada antara -180 sampai 180.',
         ];
     }
 }

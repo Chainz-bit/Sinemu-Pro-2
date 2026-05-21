@@ -50,6 +50,7 @@ class AdminDirectoryController extends Controller
         return view('super.pages.admins.create', [
             'superAdmin' => Auth::guard('super_admin')->user(),
             'kecamatanOptions' => IndramayuDistricts::names(),
+            'pickupRegionOptions' => IndramayuDistricts::wilayahItems(),
             'statusOptions' => $this->statusOptions(),
         ]);
     }
@@ -70,6 +71,9 @@ class AdminDirectoryController extends Controller
             'instansi' => $validated['instansi'],
             'kecamatan' => $validated['kecamatan'],
             'alamat_lengkap' => $validated['alamat_lengkap'],
+            'pickup_address' => $validated['pickup_address'] ?? null,
+            'pickup_lat' => $validated['pickup_lat'] ?? null,
+            'pickup_lng' => $validated['pickup_lng'] ?? null,
             'status_verifikasi' => $status,
             'alasan_penolakan' => $status === 'rejected' ? ($validated['alasan_penolakan'] ?? null) : null,
             'verified_at' => in_array($status, ['active', 'rejected'], true) ? now() : null,
@@ -99,6 +103,7 @@ class AdminDirectoryController extends Controller
             'superAdmin' => Auth::guard('super_admin')->user(),
             'admin' => $admin,
             'kecamatanOptions' => IndramayuDistricts::names(),
+            'pickupRegionOptions' => IndramayuDistricts::wilayahItems(),
             'statusOptions' => $this->statusOptions(),
         ]);
     }
@@ -119,6 +124,9 @@ class AdminDirectoryController extends Controller
             'instansi' => $validated['instansi'],
             'kecamatan' => $validated['kecamatan'],
             'alamat_lengkap' => $validated['alamat_lengkap'],
+            'pickup_address' => $validated['pickup_address'] ?? null,
+            'pickup_lat' => $validated['pickup_lat'] ?? null,
+            'pickup_lng' => $validated['pickup_lng'] ?? null,
             'status_verifikasi' => $status,
             'alasan_penolakan' => $status === 'rejected' ? ($validated['alasan_penolakan'] ?? null) : null,
             'verified_at' => in_array($status, ['active', 'rejected'], true) ? ($admin->verified_at ?? now()) : null,

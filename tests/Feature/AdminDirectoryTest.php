@@ -107,6 +107,9 @@ class AdminDirectoryTest extends TestCase
         $createResponse->assertRedirect(route('super.admins.show', $admin));
         $this->assertSame($superAdmin->id, $admin->super_admin_id);
         $this->assertSame('Indramayu', $admin->kecamatan);
+        $this->assertNull($admin->pickup_address);
+        $this->assertNull($admin->pickup_lat);
+        $this->assertNull($admin->pickup_lng);
         $this->assertTrue(Hash::check('password123', (string) $admin->password));
         $this->assertNotSame('password123', $admin->password);
 
@@ -167,6 +170,99 @@ class AdminDirectoryTest extends TestCase
             ->assertOk()
             ->assertSee('Belum ada pengelola barang yang cocok dengan filter.')
             ->assertDontSee('angga-update@example.com');
+    }
+
+    public function test_super_admin_can_create_manager_with_valid_pickup_location(): void
+    {
+        $superAdmin = $this->createSuperAdmin();
+
+        $this->actingAs($superAdmin, 'super_admin')
+            ->post(route('super.admins.store'), $this->validManagerPayload([
+                'nama' => 'Admin Pickup Create',
+                'username' => 'admin-pickup-create',
+                'email' => 'admin-pickup-create@example.com',
+                'pickup_address' => 'Kantor Kecamatan Lohbener, dekat ruang pelayanan',
+                'pickup_lat' => '-6.365800',
+                'pickup_lng' => '108.247100',
+                'status_verifikasi' => Admin::STATUS_ACTIVE,
+            ]))
+            ->assertRedirect();
+
+        $admin = Admin::query()->where('username', 'admin-pickup-create')->firstOrFail();
+
+        $this->assertSame('Kantor Kecamatan Lohbener, dekat ruang pelayanan', $admin->pickup_address);
+        $this->assertSame(-6.3658, $admin->pickup_lat);
+        $this->assertSame(108.2471, $admin->pickup_lng);
+    }
+
+    public function test_super_admin_can_update_and_clear_manager_pickup_location(): void
+    {
+        $superAdmin = $this->createSuperAdmin();
+        $admin = $this->createAdmin($superAdmin, 'Admin Pickup Update', Admin::STATUS_ACTIVE);
+
+        $this->actingAs($superAdmin, 'super_admin')
+            ->put(route('super.admins.update', $admin), $this->validManagerPayload([
+                'nama' => $admin->nama,
+                'username' => $admin->username,
+                'email' => $admin->email,
+                'pickup_address' => 'Ruang pelayanan utama',
+                'pickup_lat' => '-6.326400',
+                'pickup_lng' => '108.322700',
+                'password' => '',
+                'password_confirmation' => '',
+                'status_verifikasi' => Admin::STATUS_ACTIVE,
+            ]))
+            ->assertRedirect(route('super.admins.show', $admin));
+
+        $admin->refresh();
+        $this->assertSame('Ruang pelayanan utama', $admin->pickup_address);
+        $this->assertSame(-6.3264, $admin->pickup_lat);
+        $this->assertSame(108.3227, $admin->pickup_lng);
+
+        $this->actingAs($superAdmin, 'super_admin')
+            ->put(route('super.admins.update', $admin), $this->validManagerPayload([
+                'nama' => $admin->nama,
+                'username' => $admin->username,
+                'email' => $admin->email,
+                'pickup_address' => '',
+                'pickup_lat' => '',
+                'pickup_lng' => '',
+                'password' => '',
+                'password_confirmation' => '',
+                'status_verifikasi' => Admin::STATUS_ACTIVE,
+            ]))
+            ->assertRedirect(route('super.admins.show', $admin));
+
+        $admin->refresh();
+        $this->assertNull($admin->pickup_address);
+        $this->assertNull($admin->pickup_lat);
+        $this->assertNull($admin->pickup_lng);
+    }
+
+    public function test_super_admin_pickup_coordinate_validation_requires_pair_and_valid_range(): void
+    {
+        $superAdmin = $this->createSuperAdmin();
+
+        $cases = [
+            ['pickup_lat' => '-6.326400', 'pickup_lng' => '', 'error' => 'pickup_lng'],
+            ['pickup_lat' => '', 'pickup_lng' => '108.322700', 'error' => 'pickup_lat'],
+            ['pickup_lat' => '-91', 'pickup_lng' => '108.322700', 'error' => 'pickup_lat'],
+            ['pickup_lat' => '-6.326400', 'pickup_lng' => '181', 'error' => 'pickup_lng'],
+        ];
+
+        foreach ($cases as $index => $case) {
+            $this->actingAs($superAdmin, 'super_admin')
+                ->from(route('super.admins.create'))
+                ->post(route('super.admins.store'), $this->validManagerPayload([
+                    'nama' => 'Admin Pickup Invalid ' . $index,
+                    'username' => 'admin-pickup-invalid-' . $index,
+                    'email' => 'admin-pickup-invalid-' . $index . '@example.com',
+                    'pickup_lat' => $case['pickup_lat'],
+                    'pickup_lng' => $case['pickup_lng'],
+                ]))
+                ->assertRedirect(route('super.admins.create'))
+                ->assertSessionHasErrors($case['error']);
+        }
     }
 
     public function test_manager_account_create_rejects_role_injection_and_strictly_validates_phone(): void
@@ -402,5 +498,25 @@ class AdminDirectoryTest extends TestCase
             'status_verifikasi' => $status,
             'verified_at' => $status === 'pending' ? null : now(),
         ]);
+    }
+
+    /**
+     * @param array<string,mixed> $overrides
+     * @return array<string,mixed>
+     */
+    private function validManagerPayload(array $overrides = []): array
+    {
+        return array_merge([
+            'nama' => 'Admin Payload',
+            'username' => 'admin-payload',
+            'email' => 'admin-payload@example.com',
+            'nomor_telepon' => '081234567890',
+            'instansi' => 'Kantor Kecamatan Lohbener',
+            'kecamatan' => 'Lohbener',
+            'alamat_lengkap' => 'Jl. Direktori No. 1',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'status_verifikasi' => Admin::STATUS_PENDING,
+        ], $overrides);
     }
 }
