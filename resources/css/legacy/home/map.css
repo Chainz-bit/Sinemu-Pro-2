@@ -85,6 +85,37 @@
     text-decoration: underline;
 }
 
+.home-location-marker {
+    width: 44px !important;
+    height: 44px !important;
+    border: 0;
+    background: transparent;
+}
+
+.home-location-marker__pin {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    color: #2563eb;
+    filter: drop-shadow(0 10px 18px rgba(37, 99, 235, 0.28));
+}
+
+.home-location-marker__pin svg {
+    display: block;
+}
+
+.home-location-marker__pin::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.78);
+}
+
 .lokasi-map-footer {
     display: flex;
     justify-content: space-between;

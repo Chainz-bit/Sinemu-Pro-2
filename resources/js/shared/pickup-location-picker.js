@@ -11,6 +11,22 @@ const DEFAULT_CENTER = {
     lat: -6.3264,
     lng: 108.3227,
 };
+const DEFAULT_PICKUP_STATUS = 'Belum ada titik khusus. Sistem akan memakai titik default wilayah.';
+const SELECTED_PICKUP_STATUS = 'Titik lokasi sudah dipilih. Rute akan diarahkan ke titik ini.';
+
+const pickupMarkerIcon = Leaflet.divIcon({
+    className: 'pickup-location-marker',
+    html: `
+        <div class="pickup-location-marker__pin" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="38" height="38" focusable="false">
+                <path fill="currentColor" d="M12 22q-4.025-3.425-6.012-6.362Q4 12.7 4 10q0-3.75 2.413-5.875Q8.825 2 12 2t5.588 2.125Q20 6.25 20 10q0 2.7-1.987 5.638Q16.025 18.575 12 22Zm0-10q.825 0 1.413-.587Q14 10.825 14 10t-.587-1.413Q12.825 8 12 8t-1.413.587Q10 9.175 10 10t.587 1.413Q11.175 12 12 12Z"></path>
+            </svg>
+        </div>
+    `,
+    iconSize: [44, 44],
+    iconAnchor: [22, 42],
+    popupAnchor: [0, -40],
+});
 
 function parseNumber(value) {
     if (value === null || value === undefined) {
@@ -78,8 +94,12 @@ function initPicker(root) {
     const latInput = form.querySelector('[name="pickup_lat"]');
     const lngInput = form.querySelector('[name="pickup_lng"]');
     const regionInput = form.querySelector('[name="kecamatan"]');
+    const fullAddressInput = form.querySelector('[data-full-address-source]') || form.querySelector('[name="alamat_lengkap"]');
+    const pickupAddressInput = form.querySelector('[data-pickup-address]') || form.querySelector('[name="pickup_address"]');
     const locationButton = root.querySelector('[data-pickup-use-current-location]');
+    const clearButton = root.querySelector('[data-pickup-clear-location]');
     const messageElement = root.querySelector('[data-pickup-location-message]');
+    const statusElement = root.querySelector('[data-pickup-location-status]');
 
     if (!mapElement || !latInput || !lngInput) {
         return;
@@ -95,7 +115,63 @@ function initPicker(root) {
     const initialLat = parseNumber(latInput.value);
     const initialLng = parseNumber(lngInput.value);
     let hasManualPickup = isValidLatLng(initialLat, initialLng);
+    let isSyncingPickupAddress = false;
+    let pickupAddressEdited = hasManuallyEditedPickupAddress();
     let marker = null;
+
+    function normalizedAddressValue(input) {
+        return String(input?.value || '')
+            .trim()
+            .replace(/\s+/g, ' ');
+    }
+
+    function hasManuallyEditedPickupAddress() {
+        const pickupAddress = normalizedAddressValue(pickupAddressInput);
+        const fullAddress = normalizedAddressValue(fullAddressInput);
+
+        return pickupAddress !== '' && pickupAddress !== fullAddress;
+    }
+
+    function dispatchPickupAddressEvents() {
+        if (!pickupAddressInput) {
+            return;
+        }
+
+        pickupAddressInput.dispatchEvent(new Event('input', { bubbles: true }));
+        pickupAddressInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function setPickupAddressFromFullAddress(allowEmpty) {
+        if (!pickupAddressInput || !fullAddressInput) {
+            return;
+        }
+
+        const fullAddress = normalizedAddressValue(fullAddressInput);
+        if (fullAddress === '' && !allowEmpty) {
+            return;
+        }
+
+        isSyncingPickupAddress = true;
+        pickupAddressInput.value = fullAddress;
+        dispatchPickupAddressEvents();
+        isSyncingPickupAddress = false;
+    }
+
+    function syncPickupAddressFromFullAddress() {
+        if (pickupAddressEdited) {
+            return;
+        }
+
+        setPickupAddressFromFullAddress(true);
+    }
+
+    function fillPickupAddressIfEmpty() {
+        if (normalizedAddressValue(pickupAddressInput) !== '') {
+            return;
+        }
+
+        setPickupAddressFromFullAddress(false);
+    }
 
     function getSelectedRegionCenter() {
         if (!regionInput) {
@@ -103,6 +179,10 @@ function initPicker(root) {
         }
 
         return regions.get(normalizeRegionName(regionInput.value)) || null;
+    }
+
+    function fallbackCenter() {
+        return getSelectedRegionCenter() || defaultCenter;
     }
 
     const initialRegionCenter = getSelectedRegionCenter();
@@ -126,7 +206,9 @@ function initPicker(root) {
         }
 
         if (!marker) {
-            marker = Leaflet.marker([lat, lng]).addTo(map);
+            marker = Leaflet.marker([lat, lng], {
+                icon: pickupMarkerIcon,
+            }).addTo(map);
         } else {
             marker.setLatLng([lat, lng]);
         }
@@ -139,6 +221,16 @@ function initPicker(root) {
         }
     }
 
+    function centerOnFallback(shouldAnimate) {
+        const center = fallbackCenter();
+        const isDefaultCenter = center.lat === defaultCenter.lat && center.lng === defaultCenter.lng;
+
+        map.setView([center.lat, center.lng], isDefaultCenter ? 12 : 13, {
+            animate: Boolean(shouldAnimate),
+            duration: 0.25,
+        });
+    }
+
     function clearMarker() {
         if (!marker) {
             return;
@@ -148,13 +240,17 @@ function initPicker(root) {
         marker = null;
     }
 
-    function fillInputs(lat, lng) {
-        latInput.value = lat.toFixed(6);
-        lngInput.value = lng.toFixed(6);
+    function dispatchInputEvents() {
         latInput.dispatchEvent(new Event('input', { bubbles: true }));
         lngInput.dispatchEvent(new Event('input', { bubbles: true }));
         latInput.dispatchEvent(new Event('change', { bubbles: true }));
         lngInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    function fillInputs(lat, lng) {
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+        dispatchInputEvents();
     }
 
     function setMessage(message, type) {
@@ -165,6 +261,26 @@ function initPicker(root) {
         messageElement.textContent = message || '';
         messageElement.classList.toggle('is-success', type === 'success');
         messageElement.classList.toggle('is-error', type === 'error');
+    }
+
+    function setStatus(isSelected) {
+        if (!statusElement) {
+            return;
+        }
+
+        statusElement.textContent = isSelected ? SELECTED_PICKUP_STATUS : DEFAULT_PICKUP_STATUS;
+        statusElement.classList.toggle('is-selected', Boolean(isSelected));
+    }
+
+    function clearPickupLocation() {
+        hasManualPickup = false;
+        latInput.value = '';
+        lngInput.value = '';
+        dispatchInputEvents();
+        clearMarker();
+        centerOnFallback(true);
+        setStatus(false);
+        setMessage('', null);
     }
 
     function useCurrentLocation() {
@@ -193,7 +309,9 @@ function initPicker(root) {
 
                 hasManualPickup = true;
                 fillInputs(lat, lng);
+                fillPickupAddressIfEmpty();
                 setMarker(lat, lng, true);
+                setStatus(true);
 
                 const accuracy = parseNumber(position.coords.accuracy);
                 const accuracyText = Number.isFinite(accuracy)
@@ -222,6 +340,8 @@ function initPicker(root) {
         if (latInput.value.trim() === '' && lngInput.value.trim() === '') {
             hasManualPickup = false;
             clearMarker();
+            centerOnFallback(true);
+            setStatus(false);
             return;
         }
 
@@ -231,11 +351,15 @@ function initPicker(root) {
 
         hasManualPickup = true;
         setMarker(lat, lng, true);
+        fillPickupAddressIfEmpty();
+        setStatus(true);
     }
 
     if (hasManualPickup) {
         setMarker(initialLat, initialLng, false);
     }
+
+    setStatus(hasManualPickup);
 
     map.on('click', function (event) {
         const lat = event.latlng.lat;
@@ -243,13 +367,27 @@ function initPicker(root) {
 
         hasManualPickup = true;
         fillInputs(lat, lng);
+        fillPickupAddressIfEmpty();
         setMarker(lat, lng, true);
+        setStatus(true);
+        setMessage('', null);
     });
 
     latInput.addEventListener('input', syncFromInputs);
     lngInput.addEventListener('input', syncFromInputs);
     latInput.addEventListener('change', syncFromInputs);
     lngInput.addEventListener('change', syncFromInputs);
+
+    if (fullAddressInput && pickupAddressInput) {
+        fullAddressInput.addEventListener('input', syncPickupAddressFromFullAddress);
+        fullAddressInput.addEventListener('change', syncPickupAddressFromFullAddress);
+        pickupAddressInput.addEventListener('input', function () {
+            if (!isSyncingPickupAddress) {
+                pickupAddressEdited = true;
+            }
+        });
+        syncPickupAddressFromFullAddress();
+    }
 
     if (regionInput) {
         regionInput.addEventListener('change', function () {
@@ -260,6 +398,7 @@ function initPicker(root) {
             const center = getSelectedRegionCenter();
             if (!center) {
                 map.setView([defaultCenter.lat, defaultCenter.lng], 12);
+                setStatus(false);
                 return;
             }
 
@@ -267,11 +406,16 @@ function initPicker(root) {
                 animate: true,
                 duration: 0.25,
             });
+            setStatus(false);
         });
     }
 
     if (locationButton) {
         locationButton.addEventListener('click', useCurrentLocation);
+    }
+
+    if (clearButton) {
+        clearButton.addEventListener('click', clearPickupLocation);
     }
 
     setTimeout(function () {

@@ -110,6 +110,22 @@ function escapeHtml(value) {
         .replace(/'/g, '&#039;');
 }
 
+function createPickupMarkerIcon(leaflet) {
+    return leaflet.divIcon({
+        className: 'home-location-marker',
+        html: [
+            '<div class="home-location-marker__pin" aria-hidden="true">',
+            '<svg viewBox="0 0 24 24" width="38" height="38" focusable="false">',
+            '<path fill="currentColor" d="M12 22q-4.025-3.425-6.012-6.362Q4 12.7 4 10q0-3.75 2.413-5.875Q8.825 2 12 2t5.588 2.125Q20 6.25 20 10q0 2.7-1.987 5.638Q16.025 18.575 12 22Zm0-10q.825 0 1.413-.587Q14 10.825 14 10t-.587-1.413Q12.825 8 12 8t-1.413.587Q10 9.175 10 10t.587 1.413Q11.175 12 12 12Z"></path>',
+            '</svg>',
+            '</div>'
+        ].join(''),
+        iconSize: [44, 44],
+        iconAnchor: [22, 42],
+        popupAnchor: [0, -40]
+    });
+}
+
 export function initMap() {
     const locations = parsePickupLocations();
 
@@ -140,6 +156,7 @@ export function initMap() {
         keyboard: false,
         tap: false
     }).setView([-6.3265, 108.3205], 12);
+    const pickupMarkerIcon = createPickupMarkerIcon(window.L);
 
     window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
@@ -454,7 +471,9 @@ export function initMap() {
                 continue;
             }
 
-            const marker = window.L.marker([location.lat, location.lng]).addTo(map);
+            const marker = window.L.marker([location.lat, location.lng], {
+                icon: pickupMarkerIcon
+            }).addTo(map);
             marker.bindPopup(buildPopupHtml(location));
 
             marker.on('click', function () {

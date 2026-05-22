@@ -287,6 +287,25 @@ body {
     line-height: 1.4;
 }
 
+.pickup-location-section {
+    margin-top: 1.15rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--auth-border);
+}
+
+.pickup-location-section__header {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.pickup-location-section__header h3 {
+    margin: 0;
+    color: #1b365d;
+    font-size: 1rem;
+    line-height: 1.25;
+    font-weight: 800;
+}
+
 .input-icon {
     position: absolute;
     left: 0.68rem;

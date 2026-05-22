@@ -86,24 +86,28 @@
                     </div>
                 </header>
 
-                <div @class(['super-activity-list', 'is-empty' => $latestActivities->isEmpty()])>
+                <div @class(['super-activity-list super-dashboard-list', 'is-empty' => $latestActivities->isEmpty()])>
                     @forelse($latestActivities as $admin)
                         @php
                             $statusKey = \App\Support\AdminVerificationStatusPresenter::key($admin->status_verifikasi);
                         @endphp
-                        <article class="super-activity-item">
-                            <span class="status-chip {{ \App\Support\AdminVerificationStatusPresenter::badgeClass($statusKey) }}">
-                                {{ \App\Support\AdminVerificationStatusPresenter::label($statusKey) }}
-                            </span>
+                        <article class="super-activity-item super-dashboard-list-item">
+                            <div class="item-avatar avatar-claim">
+                                <span class="item-avatar-fallback">{{ strtoupper(substr((string) $admin->nama, 0, 1)) }}</span>
+                            </div>
                             <div class="super-activity-meta">
                                 <strong>{{ $admin->nama }}</strong>
+                                <small>{{ $admin->instansi ?: 'Instansi belum diisi' }} | {{ $admin->kecamatan ?: 'Kecamatan belum diisi' }}</small>
                                 <small>
-                                    {{ $admin->instansi ?: 'Instansi belum diisi' }}
-                                    |
                                     {{ $admin->verified_at?->format('d M Y H:i') ?? optional($admin->updated_at)->format('d M Y H:i') ?? '-' }}
                                 </small>
                             </div>
-                            <a class="super-activity-link" href="{{ route('super.admin-verifications.index', ['search' => $admin->nama]) }}">Buka</a>
+                            <div class="super-activity-side">
+                                <span class="status-chip {{ \App\Support\AdminVerificationStatusPresenter::badgeClass($statusKey) }}">
+                                    {{ \App\Support\AdminVerificationStatusPresenter::label($statusKey) }}
+                                </span>
+                                <a class="super-activity-link" href="{{ route('super.admin-verifications.index', ['search' => $admin->nama]) }}">Buka</a>
+                            </div>
                         </article>
                     @empty
                         <div class="verification-empty-wrapper">

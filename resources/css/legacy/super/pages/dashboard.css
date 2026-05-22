@@ -376,6 +376,14 @@
     border-color: #b8cff0;
 }
 
+.super-activity-side {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    min-width: 0;
+}
+
 /* Override mode dashboard lama: dashboard berfungsi sebagai preview ringkas, bukan daftar penuh. */
 body.super-dashboard-page-mode .super-dashboard-focus .super-focus-card {
     height: auto;
@@ -406,11 +414,13 @@ body.super-dashboard-page-mode .super-newest-list {
     display: grid;
     gap: 10px;
     padding: 12px;
+    width: 100%;
 }
 
 body.super-dashboard-page-mode .super-activity-list {
     align-content: start;
     grid-auto-rows: minmax(72px, auto);
+    justify-items: stretch;
 }
 
 .super-activity-card .super-activity-list.is-empty,
@@ -467,6 +477,9 @@ body.super-dashboard-page-mode .super-activity-item {
     grid-template-columns: auto minmax(0, 1fr) auto;
     min-height: 72px;
     padding: 11px 12px;
+    width: 100%;
+    box-sizing: border-box;
+    justify-self: stretch;
 }
 
 body.super-dashboard-page-mode .super-priority-meta,
@@ -501,7 +514,7 @@ body.super-dashboard-page-mode .super-activity-meta small {
     white-space: nowrap;
 }
 
-body.super-dashboard-page-mode .super-activity-item > .status-chip,
+body.super-dashboard-page-mode .super-activity-side .status-chip,
 body.super-dashboard-page-mode .super-activity-link {
     flex-shrink: 0;
 }
@@ -556,8 +569,15 @@ body.super-dashboard-page-mode .super-newest-item .row-menu-trigger {
         justify-self: start;
     }
 
-    body.super-dashboard-page-mode .super-activity-item > .status-chip {
-        align-self: start;
+    body.super-dashboard-page-mode .super-activity-item {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    body.super-dashboard-page-mode .super-activity-side {
+        grid-column: 2 / 3;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        margin-top: 2px;
     }
 
     body.super-dashboard-page-mode .super-priority-actions {
@@ -577,5 +597,56 @@ body.super-dashboard-page-mode .super-newest-item .row-menu-trigger {
 
     body.super-dashboard-page-mode .super-newest-item .super-newest-meta {
         padding-right: 4px;
+    }
+}
+
+/* Final stretch lock: aktivitas verifikasi harus mengikuti lebar panel seperti list pengelola baru. */
+body.super-dashboard-page-mode .super-dashboard-focus .super-activity-card,
+body.super-dashboard-page-mode .super-dashboard-focus .super-activity-card > .super-activity-list {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+body.super-dashboard-page-mode .super-dashboard-focus .super-activity-card > .super-activity-list:not(.is-empty) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    align-self: stretch;
+}
+
+body.super-dashboard-page-mode .super-dashboard-focus .super-activity-card > .super-activity-list:not(.is-empty) > .super-activity-item {
+    display: flex !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0;
+    box-sizing: border-box;
+    align-items: center;
+    justify-self: stretch !important;
+    align-self: stretch;
+    gap: 12px;
+}
+
+body.super-dashboard-page-mode .super-dashboard-focus .super-activity-card .super-activity-meta {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body.super-dashboard-page-mode .super-dashboard-focus .super-activity-card .super-activity-side {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+@media (max-width: 768px) {
+    body.super-dashboard-page-mode .super-dashboard-focus .super-activity-card > .super-activity-list:not(.is-empty) > .super-activity-item {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    body.super-dashboard-page-mode .super-dashboard-focus .super-activity-card .super-activity-side {
+        flex: 1 1 100%;
+        justify-content: flex-start;
+        margin-left: 46px;
     }
 }

@@ -64,6 +64,34 @@
     opacity: 0.72;
 }
 
+.pickup-location-picker__button--muted {
+    border-color: #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+}
+
+.pickup-location-picker__button--muted:hover,
+.pickup-location-picker__button--muted:focus-visible {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.pickup-location-picker__status {
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #f8fbff;
+    color: #475569;
+}
+
+.pickup-location-picker__status.is-selected {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+    color: #15803d;
+}
+
 .pickup-location-picker__message {
     margin: 0;
     min-width: 0;
@@ -80,6 +108,37 @@
 
 .pickup-location-picker__message.is-error {
     color: #dc2626;
+}
+
+.pickup-location-marker {
+    width: 44px !important;
+    height: 44px !important;
+    border: 0;
+    background: transparent;
+}
+
+.pickup-location-marker__pin {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    color: #2563eb;
+    filter: drop-shadow(0 10px 18px rgba(37, 99, 235, 0.28));
+}
+
+.pickup-location-marker__pin svg {
+    display: block;
+}
+
+.pickup-location-marker__pin::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.78);
 }
 
 @media (max-width: 768px) {

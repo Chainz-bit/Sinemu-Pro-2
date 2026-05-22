@@ -595,7 +595,9 @@
 
 /* Compact spacing agar daftar verifikasi terlihat lebih cepat seperti halaman daftar pengelola. */
 .super-verification-page {
+    align-content: start;
     gap: 10px;
+    grid-auto-rows: max-content;
     padding-top: 6px;
     padding-bottom: 24px;
 }

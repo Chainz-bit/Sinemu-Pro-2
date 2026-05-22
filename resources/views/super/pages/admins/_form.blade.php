@@ -64,7 +64,7 @@
 
             <div class="super-form-field super-form-field-full">
                 <label for="alamat_lengkap">Alamat atau Wilayah Tugas <span aria-hidden="true">*</span></label>
-                <textarea id="alamat_lengkap" name="alamat_lengkap" rows="4" placeholder="Masukkan alamat atau wilayah tugas pengelola" class="@error('alamat_lengkap') is-invalid @enderror" required>{{ old('alamat_lengkap', $admin->alamat_lengkap ?? '') }}</textarea>
+                <textarea id="alamat_lengkap" name="alamat_lengkap" rows="4" placeholder="Masukkan alamat atau wilayah tugas pengelola" class="@error('alamat_lengkap') is-invalid @enderror" required data-full-address-source>{{ old('alamat_lengkap', $admin->alamat_lengkap ?? '') }}</textarea>
                 @error('alamat_lengkap')<small class="super-form-error">{{ $message }}</small>@enderror
             </div>
         </div>
@@ -80,7 +80,8 @@
         <div class="super-manager-form-grid">
             <div class="super-form-field super-form-field-full">
                 <label for="pickup_address">Alamat Titik Pengambilan</label>
-                <input id="pickup_address" name="pickup_address" type="text" value="{{ old('pickup_address', $admin->pickup_address ?? '') }}" placeholder="Contoh: Kantor Kecamatan Lohbener, dekat ruang pelayanan" class="@error('pickup_address') is-invalid @enderror">
+                <input id="pickup_address" name="pickup_address" type="text" value="{{ old('pickup_address', $admin->pickup_address ?? '') }}" placeholder="Contoh: Kantor Kecamatan Lohbener, dekat ruang pelayanan" class="@error('pickup_address') is-invalid @enderror" data-pickup-address>
+                <small class="super-form-help">Jika kosong, alamat titik pengambilan mengikuti alamat atau wilayah tugas. Peta hanya menentukan koordinat rute.</small>
                 @error('pickup_address')<small class="super-form-error">{{ $message }}</small>@enderror
             </div>
 
@@ -104,10 +105,14 @@
                     data-default-lat="-6.3264"
                     data-default-lng="108.3227"
                 >
+                    <small class="pickup-location-picker__status super-form-help" data-pickup-location-status aria-live="polite"></small>
                     <div class="pickup-location-picker__map" data-pickup-map aria-label="Peta titik pengambilan barang"></div>
                     <div class="pickup-location-picker__toolbar">
                         <button type="button" class="pickup-location-picker__button" data-pickup-use-current-location>
                             Gunakan Lokasi Saya
+                        </button>
+                        <button type="button" class="pickup-location-picker__button pickup-location-picker__button--muted" data-pickup-clear-location>
+                            Hapus Titik
                         </button>
                         <small class="pickup-location-picker__message super-form-help" data-pickup-location-message aria-live="polite"></small>
                     </div>

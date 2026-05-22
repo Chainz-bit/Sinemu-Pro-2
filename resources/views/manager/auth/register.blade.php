@@ -134,53 +134,36 @@
                             <span class="input-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
-                            <textarea id="alamat_lengkap" name="alamat_lengkap" placeholder="Jl..., RT/RW..., No..., Desa/Kelurahan..." rows="3" required @error('alamat_lengkap') aria-invalid="true" aria-describedby="alamat-lengkap-error" @enderror>{{ old('alamat_lengkap') }}</textarea>
+                            <textarea id="alamat_lengkap" name="alamat_lengkap" placeholder="Jl..., RT/RW..., No..., Desa/Kelurahan..." rows="3" required data-full-address-source @error('alamat_lengkap') aria-invalid="true" aria-describedby="alamat-lengkap-error" @enderror>{{ old('alamat_lengkap') }}</textarea>
                         </div>
                         @error('alamat_lengkap')
                             <p class="field-error" id="alamat-lengkap-error">{{ $message }}</p>
                         @enderror
                     </div>
 
+                    <div class="field-group pickup-location-section">
+                        <div class="pickup-location-section__header">
+                            <h3>Lokasi Pengambilan Barang</h3>
+                            <p class="field-note">Secara default, lokasi pengambilan mengikuti alamat lengkap. Untuk rute yang lebih akurat, pilih titik pada peta atau gunakan lokasi perangkat.</p>
+                        </div>
+                    </div>
+
                     <div class="field-group">
-                        <label for="pickup_address">Alamat Titik Pengambilan Barang</label>
+                        <label for="pickup_address">Keterangan Lokasi Pengambilan</label>
                         <div class="input-wrap {{ $errors->has('pickup_address') ? 'is-invalid' : '' }}">
                             <span class="input-icon" aria-hidden="true">
                                 <svg viewBox="0 0 24 24" fill="none"><path d="M4 20h16M6 20V8l6-4 6 4v12M9 20v-6h6v6M9 10h.01M12 10h.01M15 10h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
                             </span>
-                            <input id="pickup_address" type="text" name="pickup_address" value="{{ old('pickup_address') }}" placeholder="Contoh: Kantor Kecamatan Lohbener, dekat ruang pelayanan" @error('pickup_address') aria-invalid="true" aria-describedby="pickup-address-error" @enderror>
+                            <input id="pickup_address" type="text" name="pickup_address" value="{{ old('pickup_address') }}" placeholder="Opsional, contoh: Ruang pelayanan depan / Pos keamanan / Lobi utama" data-pickup-address @error('pickup_address') aria-invalid="true" aria-describedby="pickup-address-error" @enderror>
                         </div>
-                        <p class="field-note">Opsional. Isi titik lokasi pengambilan barang jika sudah ada. Data ini akan ditinjau oleh Super Admin.</p>
-                        <p class="field-note">Untuk titik yang akurat, buka Google Maps, klik kanan lokasi pengambilan, salin koordinat, lalu masukkan latitude dan longitude. <a href="https://www.google.com/maps" target="_blank" rel="noopener noreferrer">Buka Google Maps</a></p>
+                        <p class="field-note">Kosongkan jika sama dengan alamat lengkap.</p>
                         @error('pickup_address')
                             <p class="field-error" id="pickup-address-error">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="field-group">
-                        <label for="pickup_lat">Latitude Titik Pengambilan</label>
-                        <div class="input-wrap {{ $errors->has('pickup_lat') ? 'is-invalid' : '' }}">
-                            <span class="input-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.3 7-11a7 7 0 1 0-14 0c0 5.7 7 11 7 11Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>
-                            </span>
-                            <input id="pickup_lat" type="number" step="any" name="pickup_lat" value="{{ old('pickup_lat') }}" placeholder="-6.326400" @error('pickup_lat') aria-invalid="true" aria-describedby="pickup-lat-error" @enderror>
-                        </div>
-                        @error('pickup_lat')
-                            <p class="field-error" id="pickup-lat-error">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div class="field-group">
-                        <label for="pickup_lng">Longitude Titik Pengambilan</label>
-                        <div class="input-wrap {{ $errors->has('pickup_lng') ? 'is-invalid' : '' }}">
-                            <span class="input-icon" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.3 7-11a7 7 0 1 0-14 0c0 5.7 7 11 7 11Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.7"/></svg>
-                            </span>
-                            <input id="pickup_lng" type="number" step="any" name="pickup_lng" value="{{ old('pickup_lng') }}" placeholder="108.322700" @error('pickup_lng') aria-invalid="true" aria-describedby="pickup-lng-error" @enderror>
-                        </div>
-                        @error('pickup_lng')
-                            <p class="field-error" id="pickup-lng-error">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <input id="pickup_lat" type="hidden" name="pickup_lat" value="{{ old('pickup_lat') }}">
+                    <input id="pickup_lng" type="hidden" name="pickup_lng" value="{{ old('pickup_lng') }}">
 
                     <div class="field-group">
                         <div
@@ -190,14 +173,24 @@
                             data-default-lat="-6.3264"
                             data-default-lng="108.3227"
                         >
+                            <p class="pickup-location-picker__status field-note" data-pickup-location-status aria-live="polite"></p>
                             <div class="pickup-location-picker__map" data-pickup-map aria-label="Peta titik pengambilan barang"></div>
                             <div class="pickup-location-picker__toolbar">
                                 <button type="button" class="pickup-location-picker__button" data-pickup-use-current-location>
                                     Gunakan Lokasi Saya
                                 </button>
+                                <button type="button" class="pickup-location-picker__button pickup-location-picker__button--muted" data-pickup-clear-location>
+                                    Hapus Titik
+                                </button>
                                 <p class="pickup-location-picker__message field-note" data-pickup-location-message aria-live="polite"></p>
                             </div>
                             <p class="field-note">Klik peta untuk menentukan titik pengambilan.</p>
+                            @error('pickup_lat')
+                                <p class="field-error" id="pickup-lat-error">{{ $message }}</p>
+                            @enderror
+                            @error('pickup_lng')
+                                <p class="field-error" id="pickup-lng-error">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
 
