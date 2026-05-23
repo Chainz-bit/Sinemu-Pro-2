@@ -9,102 +9,100 @@ export function initContactForm() {
     const phoneInput = document.getElementById('contactPhone');
     const messageInput = document.getElementById('contactMessage');
     const feedback = document.getElementById('contactFormFeedback');
-    const supportWhatsappNumber = '6285174386642';
+    const fallbackLink = document.getElementById('contactWhatsappFallback');
+    const submitButton = contactForm.querySelector('.contact-submit-btn');
+    const whatsappNumber = '6285174386642';
+    const successMessage = 'WhatsApp akan terbuka. Silakan tekan kirim untuk mengirim pesan.';
 
     function setFeedback(type, message) {
         if (!feedback) return;
+
         feedback.classList.remove('is-success', 'is-error');
         feedback.textContent = message;
 
-        if (!message) {
-            return;
+        if (message) {
+            feedback.classList.add(type === 'error' ? 'is-error' : 'is-success');
         }
+    }
 
-        feedback.classList.add(type === 'success' ? 'is-success' : 'is-error');
+    function clearInvalidState() {
+        [nameInput, emailInput, phoneInput, messageInput].forEach(function (field) {
+            field?.classList.remove('is-invalid');
+        });
     }
 
     function validateForm() {
-        const phonePattern = /^(\+62|0)[0-9\s-]{8,}$/;
-        const fields = [nameInput, emailInput, phoneInput, messageInput];
-
-        fields.forEach(function (field) {
-            if (!field) return;
-            field.classList.remove('is-invalid');
-        });
+        clearInvalidState();
 
         const name = (nameInput?.value || '').trim();
         const email = (emailInput?.value || '').trim();
         const phone = (phoneInput?.value || '').trim();
         const message = (messageInput?.value || '').trim();
+        const phonePattern = /^(08[0-9]{8,13}|\+628[0-9]{8,13})$/;
 
         if (!name) {
             nameInput?.classList.add('is-invalid');
             setFeedback('error', 'Nama lengkap wajib diisi.');
-            return false;
+            return null;
         }
 
-        if (!email || !(emailInput && emailInput.checkValidity())) {
-            emailInput?.classList.add('is-invalid');
+        if (email && emailInput && !emailInput.checkValidity()) {
+            emailInput.classList.add('is-invalid');
             setFeedback('error', 'Alamat email tidak valid.');
-            return false;
+            return null;
         }
 
-        if (!phone || !phonePattern.test(phone)) {
+        if (phone && !phonePattern.test(phone)) {
             phoneInput?.classList.add('is-invalid');
-            setFeedback('error', 'Nomor telepon tidak valid. Gunakan format 08... atau +62...');
-            return false;
+            setFeedback('error', 'Nomor telepon harus memakai format 08... atau +628...');
+            return null;
         }
 
         if (!message) {
             messageInput?.classList.add('is-invalid');
             setFeedback('error', 'Pesan wajib diisi.');
-            return false;
+            return null;
         }
 
-        return {
-            name: name,
-            email: email,
-            phone: phone,
-            message: message
-        };
+        return { name, email, phone, message };
     }
 
     function buildWhatsappUrl(data) {
         const text = [
-            'Halo Sinemu Support, saya ingin menghubungi tim support.',
+            'Halo Tim SiNemu, saya ingin bertanya.',
             '',
             'Nama: ' + data.name,
-            'Email: ' + data.email,
-            'Telepon: ' + data.phone,
-            '',
-            'Pesan:',
-            data.message
+            'Email: ' + (data.email || '-'),
+            'Telepon: ' + (data.phone || '-'),
+            'Pesan: ' + data.message,
         ].join('\n');
 
-        return 'https://wa.me/' + supportWhatsappNumber + '?text=' + encodeURIComponent(text);
+        return 'https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(text);
+    }
+
+    function openWhatsapp(url) {
+        if (fallbackLink) {
+            fallbackLink.href = url;
+        }
+
+        setFeedback('success', successMessage);
+
+        const openedWindow = window.open(url, '_blank', 'noopener,noreferrer');
+        if (!openedWindow) {
+            window.location.href = url;
+        }
     }
 
     contactForm.addEventListener('submit', function (event) {
         event.preventDefault();
 
-        const formData = validateForm();
-        if (!formData) {
-            return;
-        }
+        const data = validateForm();
+        if (!data) return;
 
-        const whatsappUrl = buildWhatsappUrl(formData);
-        const openedWindow = window.open(whatsappUrl, '_blank', 'noopener');
+        openWhatsapp(buildWhatsappUrl(data));
+    });
 
-        if (!openedWindow) {
-            window.location.href = whatsappUrl;
-            return;
-        }
-
-        setFeedback('success', 'WhatsApp dibuka dengan pesan yang sudah terisi. Silakan tekan kirim di WhatsApp.');
-        contactForm.reset();
-        [nameInput, emailInput, phoneInput, messageInput].forEach(function (field) {
-            if (!field) return;
-            field.classList.remove('is-invalid');
-        });
+    submitButton?.addEventListener('click', function () {
+        submitButton.blur();
     });
 }

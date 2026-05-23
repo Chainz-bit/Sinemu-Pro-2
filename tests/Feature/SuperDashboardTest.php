@@ -84,6 +84,26 @@ class SuperDashboardTest extends TestCase
             ->assertRedirect(route('super.login'));
     }
 
+    public function test_super_sidebar_does_not_show_contact_messages_menu(): void
+    {
+        $superAdmin = $this->createSuperAdmin(
+            email: 'super-sidebar@example.com',
+            username: 'super-sidebar'
+        );
+
+        $response = $this->actingAs($superAdmin, 'super_admin')->get(route('super.dashboard'));
+
+        $response->assertOk();
+        $response->assertSee('Dashboard', false);
+        $response->assertSee('Tambah Akun Pengelola', false);
+        $response->assertDontSee('Pesan Kontak', false);
+        $this->assertNull(app('router')->getRoutes()->getByName('super.contact-messages.index'));
+
+        $this->actingAs($superAdmin, 'super_admin')
+            ->get('/super/contact-messages')
+            ->assertNotFound();
+    }
+
     public function test_super_dashboard_summary_changes_after_status_actions(): void
     {
         $superAdmin = $this->createSuperAdmin();

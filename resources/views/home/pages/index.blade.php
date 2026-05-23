@@ -543,6 +543,9 @@
                                         <p class="contact-info-label">ALAMAT KANTOR</p>
                                         <p class="contact-info-text mb-0">Jl. Jenderal Sudirman No. 88, Indramayu</p>
                                         <p class="contact-info-note mb-0">Kunjungan terkait barang hanya sesuai arahan {{ $managerRoleLabelLower }}.</p>
+                                        <p class="contact-info-note mb-0">
+                                            <a href="https://www.google.com/maps/search/?api=1&amp;query=Jl.%20Jenderal%20Sudirman%20No.%2088%2C%20Indramayu" target="_blank" rel="noopener noreferrer" class="contact-info-link">Buka di Maps</a>
+                                        </p>
                                     </div>
                                 </article>
                             </div>
@@ -551,8 +554,8 @@
                                     <span class="contact-info-icon bg-clock"><i class="fa-regular fa-clock"></i></span>
                                     <div class="contact-info-body">
                                         <p class="contact-info-label">JAM OPERASIONAL</p>
-                                        <p class="contact-info-text mb-0">Senin - Jumat<br>08.00 - 16.00</p>
-                                        <p class="contact-info-note mb-0">Pesan di luar jam kerja diproses hari berikutnya.</p>
+                                        <p class="contact-info-text mb-0">Jam Kantor<br>Senin - Jumat, 08.00 - 16.00</p>
+                                        <p class="contact-info-note mb-0">Support WhatsApp: 08.00 - 20.00 WIB.</p>
                                     </div>
                                 </article>
                             </div>
@@ -579,31 +582,35 @@
                     </div>
 
                     <div class="col-lg-5">
-                        <form id="contactForm" class="contact-form-card h-100" novalidate>
+                        <form id="contactForm" class="contact-form-card h-100" action="https://wa.me/6285174386642" target="_blank" novalidate>
                             <div class="contact-form-head">
                                 <h3 class="contact-form-title mb-1">Kirim Pesan</h3>
                                 <p class="contact-form-subtitle mb-0">Isi detail singkat agar tim support dapat membantu lebih tepat.</p>
                             </div>
+                            <div id="contactFormFeedback" class="contact-form-feedback" aria-live="polite"></div>
                             <div class="mb-3">
                                 <label for="contactName" class="form-label">Nama Lengkap</label>
-                                <input id="contactName" name="name" type="text" class="form-control" placeholder="Nama lengkap" required>
+                                <input id="contactName" type="text" class="form-control" placeholder="Nama lengkap" maxlength="100" required>
                             </div>
                             <div class="mb-3">
                                 <label for="contactEmail" class="form-label">Alamat Email</label>
-                                <input id="contactEmail" name="email" type="email" class="form-control" placeholder="Email aktif" required>
+                                <input id="contactEmail" type="email" class="form-control" placeholder="Email aktif" maxlength="255">
                             </div>
                             <div class="mb-3">
                                 <label for="contactPhone" class="form-label">Telepon</label>
-                                <input id="contactPhone" name="phone" type="text" class="form-control" placeholder="Nomor telepon" required>
+                                <input id="contactPhone" type="text" class="form-control" placeholder="Contoh: 085174386642" inputmode="tel">
                             </div>
                             <div class="mb-3">
                                 <label for="contactMessage" class="form-label">Pesan</label>
-                                <textarea id="contactMessage" name="message" class="form-control contact-textarea" rows="5" placeholder="Tuliskan pesan Anda" required></textarea>
+                                <textarea id="contactMessage" class="form-control contact-textarea" rows="5" placeholder="Tuliskan pesan Anda" maxlength="1000" required></textarea>
                             </div>
-                            <div id="contactFormFeedback" class="contact-form-feedback" aria-live="polite"></div>
+                            <p class="contact-form-subtitle mb-3">Pesan akan dibuka di WhatsApp agar Anda dapat meninjau sebelum mengirim.</p>
                             <button type="submit" class="btn btn-sinemu btn-sinemu-primary w-100 contact-submit-btn">
-                                <i class="fa-solid fa-paper-plane me-2"></i>Kirim Pesan
+                                <i class="fa-brands fa-whatsapp me-2"></i>Kirim via WhatsApp
                             </button>
+                            <p class="contact-form-subtitle mb-0 mt-3">
+                                <a id="contactWhatsappFallback" href="https://wa.me/6285174386642" target="_blank" rel="noopener noreferrer" class="contact-info-link">Buka WhatsApp langsung</a>
+                            </p>
                         </form>
                     </div>
                 </div>

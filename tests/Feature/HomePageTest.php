@@ -31,6 +31,18 @@ class HomePageTest extends TestCase
         $response->assertDontSee(route('user.lost-reports.create'), false);
     }
 
+    public function test_contact_section_is_whatsapp_only(): void
+    {
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertSee('Kontak Kami', false);
+        $response->assertSee('Kirim via WhatsApp', false);
+        $response->assertSee('https://wa.me/6285174386642', false);
+        $response->assertDontSee('contact.store', false);
+        $this->assertNull(app('router')->getRoutes()->getByName('contact.store'));
+    }
+
     public function test_regular_user_can_open_landing_page_with_user_menu(): void
     {
         $user = User::factory()->create([

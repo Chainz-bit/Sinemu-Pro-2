@@ -275,6 +275,7 @@
     font-size: 0.8rem;
     font-weight: 600;
     display: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .contact-form-feedback.is-success {
