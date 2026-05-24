@@ -10,6 +10,7 @@ use App\Models\Klaim;
 use App\Models\LaporanBarangHilang;
 use App\Models\SuperAdmin;
 use App\Models\User;
+use App\Models\UserNotification;
 use App\Models\Wilayah;
 use App\Support\WorkflowStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -65,6 +66,36 @@ class AdminItemWorkflowTest extends TestCase
         $response->assertRedirect(route('admin.found-items.show', $barang));
         $response->assertSessionHasErrors('status_laporan');
         $this->assertSame(WorkflowStatus::REPORT_SUBMITTED, $barang->fresh()?->status_laporan);
+    }
+
+    public function test_found_item_verify_with_same_status_does_not_duplicate_user_notification(): void
+    {
+        $admin = $this->createAdmin();
+        $user = $this->createUser();
+        $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+        $verifiedAt = now()->subDay()->startOfSecond();
+        $barang = $this->createFoundItem($admin, $user, $kategori, [
+            'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'verified_by_admin_id' => $admin->id,
+            'verified_at' => $verifiedAt,
+        ]);
+
+        UserNotification::query()->create([
+            'user_id' => $user->id,
+            'type' => 'verifikasi_laporan_temuan',
+            'title' => 'Verifikasi Laporan Temuan',
+            'message' => 'Notifikasi verifikasi awal.',
+        ]);
+
+        $this->from(route('admin.found-items.show', $barang))
+            ->actingAs($admin, 'admin')
+            ->patch(route('admin.found-items.verify', $barang), [
+                'status_laporan' => 'approved',
+            ])
+            ->assertRedirect(route('admin.found-items.show', $barang));
+
+        $this->assertSame(1, UserNotification::query()->where('user_id', $user->id)->count());
+        $this->assertSame($verifiedAt->toDateTimeString(), \Illuminate\Support\Carbon::parse($barang->fresh()?->verified_at)->toDateTimeString());
     }
 
     public function test_admin_can_update_found_item_status_and_record_history(): void
@@ -200,6 +231,36 @@ class AdminItemWorkflowTest extends TestCase
         $response->assertRedirect(route('admin.lost-items.show', $laporanBarangHilang));
         $response->assertSessionHasErrors('status_laporan');
         $this->assertSame(WorkflowStatus::REPORT_SUBMITTED, $laporanBarangHilang->fresh()?->status_laporan);
+    }
+
+    public function test_lost_item_verify_with_same_status_does_not_duplicate_user_notification(): void
+    {
+        $admin = $this->createAdmin();
+        $user = $this->createUser();
+        $verifiedAt = now()->subDay()->startOfSecond();
+        $laporanBarangHilang = $this->createLostItem($user, [
+            'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'verified_by_admin_id' => $admin->id,
+            'verified_at' => $verifiedAt,
+        ]);
+
+        UserNotification::query()->create([
+            'user_id' => $user->id,
+            'type' => 'verifikasi_laporan_hilang',
+            'title' => 'Verifikasi Laporan Hilang',
+            'message' => 'Notifikasi verifikasi awal.',
+        ]);
+
+        $this->from(route('admin.lost-items.show', $laporanBarangHilang))
+            ->actingAs($admin, 'admin')
+            ->patch(route('admin.lost-items.verify', $laporanBarangHilang), [
+                'status_laporan' => 'approved',
+            ])
+            ->assertRedirect(route('admin.lost-items.show', $laporanBarangHilang))
+            ->assertSessionHas('status', 'Status laporan tidak berubah.');
+
+        $this->assertSame(1, UserNotification::query()->where('user_id', $user->id)->count());
+        $this->assertSame($verifiedAt->toDateTimeString(), \Illuminate\Support\Carbon::parse($laporanBarangHilang->fresh()?->verified_at)->toDateTimeString());
     }
 
     /**

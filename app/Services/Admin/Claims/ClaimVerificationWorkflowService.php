@@ -51,14 +51,26 @@ class ClaimVerificationWorkflowService
     /**
      * @param array<string,mixed> $validated
      */
-    public function reject(Klaim $klaim, array $validated, int $adminId): void
+    public function reject(Klaim $klaim, array $validated, int $adminId): bool
     {
+        if (!$this->canReject($klaim)) {
+            return false;
+        }
+
         $this->rejectClaimAction->execute($klaim, $validated, $adminId);
+
+        return true;
     }
 
-    public function complete(Klaim $klaim, int $adminId): void
+    public function complete(Klaim $klaim, int $adminId): bool
     {
+        if (!$this->canComplete($klaim)) {
+            return false;
+        }
+
         $this->completeClaimAction->execute($klaim, $adminId);
+
+        return true;
     }
 
     public function canApprove(Klaim $klaim): bool

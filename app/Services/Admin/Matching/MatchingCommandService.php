@@ -33,6 +33,16 @@ class MatchingCommandService
 
             $this->ensureAdminCanAccessPair($laporan, $barang);
 
+            $existingPair = Pencocokan::query()
+                ->where('laporan_hilang_id', $laporanId)
+                ->where('barang_id', $barangId)
+                ->lockForUpdate()
+                ->first();
+
+            if ((string) ($existingPair?->status_pencocokan ?? '') === WorkflowStatus::MATCH_CONFIRMED) {
+                return ['ok' => true, 'already_confirmed' => true, 'message' => 'Pencocokan sudah dikonfirmasi.'];
+            }
+
             if (Schema::hasColumn('laporan_barang_hilangs', 'status_laporan') && (string) $laporan->status_laporan !== WorkflowStatus::REPORT_APPROVED) {
                 return ['ok' => false, 'message' => 'Laporan barang hilang harus disetujui sebelum dicocokkan.'];
             }
@@ -62,11 +72,6 @@ class MatchingCommandService
                 return ['ok' => false, 'message' => 'Barang temuan ini masih terikat pada pencocokan aktif lain.'];
             }
 
-            $existingPair = Pencocokan::query()
-                ->where('laporan_hilang_id', $laporanId)
-                ->where('barang_id', $barangId)
-                ->lockForUpdate()
-                ->first();
             if (!$this->matchStateResolver->resolve($existingPair)->canConfirm()) {
                 return ['ok' => false, 'message' => 'Pasangan ini tidak berada pada state yang dapat dikonfirmasi.'];
             }
@@ -101,6 +106,10 @@ class MatchingCommandService
 
         if (($result['ok'] ?? false) !== true) {
             return ['ok' => false, 'message' => (string) ($result['message'] ?? 'Pencocokan gagal diproses.')];
+        }
+
+        if (($result['already_confirmed'] ?? false) === true) {
+            return ['ok' => true, 'message' => (string) $result['message']];
         }
 
         /** @var \App\Models\LaporanBarangHilang $laporan */

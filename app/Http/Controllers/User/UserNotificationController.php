@@ -11,8 +11,8 @@ class UserNotificationController extends Controller
 {
     public function markAllAsRead(): RedirectResponse
     {
-        abort_unless(Auth::check(), 403);
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
+        abort_unless($user !== null, 403);
 
         $user->notifications()
             ->whereNull('read_at')
@@ -23,7 +23,7 @@ class UserNotificationController extends Controller
 
     public function markAsRead(UserNotification $notification): RedirectResponse
     {
-        $userId = (int) Auth::id();
+        $userId = (int) Auth::guard('web')->id();
         abort_if((int) $notification->user_id !== $userId, 403);
 
         if (is_null($notification->read_at)) {
@@ -35,7 +35,7 @@ class UserNotificationController extends Controller
 
     public function markAsUnread(UserNotification $notification): RedirectResponse
     {
-        $userId = (int) Auth::id();
+        $userId = (int) Auth::guard('web')->id();
         abort_if((int) $notification->user_id !== $userId, 403);
 
         if (!is_null($notification->read_at)) {
@@ -47,7 +47,7 @@ class UserNotificationController extends Controller
 
     public function destroy(UserNotification $notification): RedirectResponse
     {
-        $userId = (int) Auth::id();
+        $userId = (int) Auth::guard('web')->id();
         abort_if((int) $notification->user_id !== $userId, 403);
 
         $notification->delete();
@@ -57,8 +57,8 @@ class UserNotificationController extends Controller
 
     public function destroyAll(): RedirectResponse
     {
-        abort_unless(Auth::check(), 403);
-        $user = Auth::user();
+        $user = Auth::guard('web')->user();
+        abort_unless($user !== null, 403);
 
         $user->notifications()->delete();
 

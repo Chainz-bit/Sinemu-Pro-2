@@ -1,4 +1,11 @@
 <header class="topbar">
+    @php
+        $superNotificationItems = $superNotifications ?? collect();
+        $hasDismissibleSuperNotifications = $superNotificationItems->contains(
+            fn ($notification) => ($notification['is_dismissible'] ?? false) === true
+        );
+    @endphp
+
     @if(!empty($topbarBackUrl))
         <a href="{{ $topbarBackUrl }}" class="topbar-back-link" aria-label="{{ $topbarBackLabel ?? 'Kembali' }}">
             <iconify-icon icon="mdi:arrow-left"></iconify-icon>
@@ -47,6 +54,13 @@
             <div class="notification-head">
                 <strong>Notifikasi Super Admin</strong>
                 <div class="notification-head-actions">
+                    <a href="{{ route('super.notifications.dismissed') }}" class="notification-link-btn">Pulihkan riwayat</a>
+                    @if($hasDismissibleSuperNotifications)
+                        <form method="POST" action="{{ route('super.notifications.dismiss-activities') }}">
+                            @csrf
+                            <button type="submit" class="notification-link-btn">Bersihkan Riwayat</button>
+                        </form>
+                    @endif
                     <a href="{{ route('super.admin-verifications.index') }}" class="notification-link-btn">Buka Verifikasi</a>
                 </div>
             </div>
@@ -70,6 +84,13 @@
                                 </small>
                             </div>
                         </a>
+                        @if(($notification['is_dismissible'] ?? false) === true && !empty($notification['item_key']))
+                            <form method="POST" action="{{ route('super.notifications.dismiss') }}">
+                                @csrf
+                                <input type="hidden" name="item_key" value="{{ $notification['item_key'] }}">
+                                <button type="submit" class="notification-link-btn">Sembunyikan</button>
+                            </form>
+                        @endif
                     </div>
                 @empty
                     <div class="notification-empty">Belum ada notifikasi untuk super admin.</div>

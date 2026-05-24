@@ -9,6 +9,7 @@ use App\Models\LaporanBarangHilang;
 use App\Models\Pencocokan;
 use App\Models\SuperAdmin;
 use App\Models\User;
+use App\Models\UserNotification;
 use App\Models\Wilayah;
 use App\Services\Admin\Matching\MatchingService;
 use App\Support\WorkflowStatus;
@@ -672,6 +673,50 @@ class LostFoundWorkflowTest extends TestCase
             'admin_id' => $admin->id,
             'status_pencocokan' => WorkflowStatus::MATCH_CONFIRMED,
         ]);
+    }
+
+    public function test_confirming_same_match_twice_does_not_duplicate_notifications(): void
+    {
+        $user = $this->createUser();
+        $admin = $this->createAdmin();
+        $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+
+        $lostReport = $this->createApprovedLostReportForMatching($user, $admin, (int) $admin->region_id);
+        $foundItem = $this->createApprovedFoundItemForMatching($admin, $user, $kategori, (int) $admin->region_id);
+
+        $this->actingAs($admin, 'admin')
+            ->post(route('admin.matches.store'), [
+                'laporan_hilang_id' => $lostReport->id,
+                'barang_id' => $foundItem->id,
+                'catatan' => 'Konfirmasi pertama',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('status', 'Pencocokan berhasil ditandai dan notifikasi telah dikirim.');
+
+        $this->assertSame(
+            1,
+            UserNotification::query()
+                ->where('user_id', $user->id)
+                ->where('type', 'pencocokan_ditemukan')
+                ->count()
+        );
+
+        $this->actingAs($admin, 'admin')
+            ->post(route('admin.matches.store'), [
+                'laporan_hilang_id' => $lostReport->id,
+                'barang_id' => $foundItem->id,
+                'catatan' => 'Konfirmasi ulang pasangan yang sama',
+            ])
+            ->assertRedirect()
+            ->assertSessionHas('status', 'Pencocokan sudah dikonfirmasi.');
+
+        $this->assertSame(
+            1,
+            UserNotification::query()
+                ->where('user_id', $user->id)
+                ->where('type', 'pencocokan_ditemukan')
+                ->count()
+        );
     }
 
     private function createApprovedLostReportForMatching(User $user, Admin $admin, ?int $regionId): LaporanBarangHilang

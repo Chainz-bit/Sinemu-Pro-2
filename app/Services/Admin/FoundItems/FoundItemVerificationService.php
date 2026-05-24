@@ -14,6 +14,11 @@ class FoundItemVerificationService
         $newStatus = $validated['status_laporan'] === 'approved'
             ? WorkflowStatus::REPORT_APPROVED
             : WorkflowStatus::REPORT_REJECTED;
+        $oldStatus = (string) ($barang->status_laporan ?? '');
+
+        if ($oldStatus === $newStatus) {
+            return;
+        }
 
         $barang->update([
             'status_laporan' => $newStatus,

@@ -14,7 +14,9 @@ class SuperTopbarNotificationPresenter
      *   action_url: string,
      *   created_at: mixed,
      *   is_urgent: bool,
-     *   tag: string
+     *   tag: string,
+     *   item_key: string,
+     *   is_dismissible: bool
      * }
      */
     public function pending(Admin $admin): array
@@ -32,6 +34,12 @@ class SuperTopbarNotificationPresenter
             'created_at' => $admin->created_at,
             'is_urgent' => true,
             'tag' => 'Perlu tindakan',
+            'item_key' => sprintf(
+                'admin_pending:%d:%d',
+                (int) $admin->id,
+                (int) ($admin->created_at?->getTimestamp() ?? 0)
+            ),
+            'is_dismissible' => false,
         ];
     }
 
@@ -42,7 +50,9 @@ class SuperTopbarNotificationPresenter
      *   action_url: string,
      *   created_at: mixed,
      *   is_urgent: bool,
-     *   tag: string
+     *   tag: string,
+     *   item_key: string,
+     *   is_dismissible: bool
      * }
      */
     public function activity(Admin $admin): array
@@ -63,6 +73,13 @@ class SuperTopbarNotificationPresenter
             'created_at' => $activityTime,
             'is_urgent' => false,
             'tag' => 'Aktivitas',
+            'item_key' => sprintf(
+                'admin_status:%d:%s:%d',
+                (int) $admin->id,
+                $statusKey,
+                (int) ($admin->updated_at?->getTimestamp() ?? 0)
+            ),
+            'is_dismissible' => true,
         ];
     }
 }

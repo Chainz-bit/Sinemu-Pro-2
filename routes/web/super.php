@@ -6,6 +6,7 @@ use App\Http\Controllers\Super\Auth\LoginController;
 use App\Http\Controllers\Super\DashboardController;
 use App\Http\Controllers\Super\ProfileController;
 use App\Http\Controllers\Super\SettingsController;
+use App\Http\Controllers\Super\SuperNotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('super')->name('super.')->group(function () {
@@ -39,6 +40,11 @@ Route::prefix('super')->name('super.')->group(function () {
         Route::get('admin-verifications', [AdminVerificationController::class, 'index'])->name('admin-verifications.index');
         Route::post('admin-verifications/{admin}/accept', [AdminVerificationController::class, 'accept'])->name('admin-verifications.accept');
         Route::post('admin-verifications/{admin}/reject', [AdminVerificationController::class, 'reject'])->name('admin-verifications.reject');
+        Route::get('notifications/dismissed', [SuperNotificationController::class, 'dismissed'])->name('notifications.dismissed');
+        Route::delete('notifications/dismissed', [SuperNotificationController::class, 'restoreAll'])->name('notifications.dismissed.clear');
+        Route::delete('notifications/dismissed/{dismissal}', [SuperNotificationController::class, 'restore'])->name('notifications.dismissed.destroy');
+        Route::post('notifications/dismiss', [SuperNotificationController::class, 'dismiss'])->name('notifications.dismiss');
+        Route::post('notifications/dismiss-activities', [SuperNotificationController::class, 'dismissActivities'])->name('notifications.dismiss-activities');
         Route::post('logout', [LoginController::class, 'destroy'])->name('logout');
     });
 });

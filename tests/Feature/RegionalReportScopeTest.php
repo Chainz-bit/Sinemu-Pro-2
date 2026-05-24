@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Admin;
+use App\Models\AdminNotification;
 use App\Models\Barang;
 use App\Models\Kategori;
 use App\Models\LaporanBarangHilang;
@@ -61,6 +62,73 @@ class RegionalReportScopeTest extends TestCase
             'region_id' => $region->id,
             'nama_barang' => 'Laptop Wilayah',
         ]);
+    }
+
+    public function test_lost_report_notification_is_sent_only_to_active_admins_in_same_region(): void
+    {
+        $user = $this->createUser();
+        $regionA = $this->createRegion('Wilayah Notifikasi A');
+        $regionB = $this->createRegion('Wilayah Notifikasi B');
+
+        $activeRegionA = $this->createAdmin(region: $regionA, status: Admin::STATUS_ACTIVE, username: 'notif-active-a');
+        $activeRegionB = $this->createAdmin(region: $regionB, status: Admin::STATUS_ACTIVE, username: 'notif-active-b');
+        $pendingRegionA = $this->createAdmin(region: $regionA, status: Admin::STATUS_PENDING, username: 'notif-pending-a');
+        $rejectedRegionA = $this->createAdmin(region: $regionA, status: Admin::STATUS_REJECTED, username: 'notif-rejected-a');
+        $inactiveRegionA = $this->createAdmin(region: $regionA, status: Admin::STATUS_INACTIVE, username: 'notif-inactive-a');
+        $softDeletedRegionA = $this->createAdmin(region: $regionA, status: Admin::STATUS_ACTIVE, username: 'notif-soft-a');
+        $softDeletedRegionA->delete();
+        $adminWithoutRegion = $this->createAdminWithoutRegion('notif-without-region');
+
+        LaporanBarangHilang::query()->create([
+            'user_id' => $user->id,
+            'region_id' => $regionA->id,
+            'nama_barang' => 'Laptop Notifikasi Wilayah',
+            'kategori_barang' => 'Elektronik',
+            'lokasi_hilang' => 'Kantor wilayah A',
+            'tanggal_hilang' => now()->toDateString(),
+            'keterangan' => 'Laporan untuk menguji notifikasi wilayah',
+            'sumber_laporan' => 'lapor_hilang',
+            'status_laporan' => WorkflowStatus::REPORT_SUBMITTED,
+        ]);
+
+        $this->assertDatabaseHas('admin_notifications', [
+            'admin_id' => $activeRegionA->id,
+            'type' => 'laporan_hilang_baru',
+            'title' => 'Laporan baru',
+        ]);
+
+        foreach ([$activeRegionB, $pendingRegionA, $rejectedRegionA, $inactiveRegionA, $softDeletedRegionA, $adminWithoutRegion] as $admin) {
+            $this->assertDatabaseMissing('admin_notifications', [
+                'admin_id' => $admin->id,
+                'type' => 'laporan_hilang_baru',
+            ]);
+        }
+
+        $this->assertSame(1, AdminNotification::query()->where('type', 'laporan_hilang_baru')->count());
+    }
+
+    public function test_lost_report_without_region_does_not_create_global_admin_notification(): void
+    {
+        $user = $this->createUser();
+        $region = $this->createRegion('Wilayah Tidak Boleh Broadcast');
+
+        $this->createAdmin(region: $region, status: Admin::STATUS_ACTIVE, username: 'no-global-active');
+        $this->createAdmin(region: $region, status: Admin::STATUS_PENDING, username: 'no-global-pending');
+        $this->createAdminWithoutRegion('no-global-without-region');
+
+        LaporanBarangHilang::query()->create([
+            'user_id' => $user->id,
+            'region_id' => null,
+            'nama_barang' => 'Laptop Tanpa Wilayah',
+            'kategori_barang' => 'Elektronik',
+            'lokasi_hilang' => 'Lokasi belum diketahui',
+            'tanggal_hilang' => now()->toDateString(),
+            'keterangan' => 'Laporan tanpa wilayah tidak boleh broadcast',
+            'sumber_laporan' => 'lapor_hilang',
+            'status_laporan' => WorkflowStatus::REPORT_SUBMITTED,
+        ]);
+
+        $this->assertDatabaseCount('admin_notifications', 0);
     }
 
     public function test_user_can_create_found_report_when_region_has_active_admin(): void
@@ -240,6 +308,32 @@ class RegionalReportScopeTest extends TestCase
             'alamat_lengkap' => 'Jl. Wilayah No. 1',
             'status_verifikasi' => $status,
             'verified_at' => $status === Admin::STATUS_ACTIVE ? now() : null,
+        ]);
+    }
+
+    private function createAdminWithoutRegion(string $username): Admin
+    {
+        $superAdmin = SuperAdmin::query()->firstOrCreate(
+            ['email' => 'regional-super@example.com'],
+            [
+                'nama' => 'Super Admin Wilayah',
+                'username' => 'regional-super',
+                'password' => Hash::make('password123'),
+            ]
+        );
+
+        return Admin::query()->create([
+            'super_admin_id' => $superAdmin->id,
+            'region_id' => null,
+            'nama' => 'Admin Tanpa Wilayah ' . $username,
+            'email' => $username . '@example.com',
+            'username' => $username,
+            'password' => Hash::make('password123'),
+            'instansi' => 'Instansi Tanpa Wilayah',
+            'kecamatan' => 'Sindang',
+            'alamat_lengkap' => 'Jl. Tanpa Wilayah No. 1',
+            'status_verifikasi' => Admin::STATUS_ACTIVE,
+            'verified_at' => now(),
         ]);
     }
 

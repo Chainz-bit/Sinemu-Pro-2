@@ -28,7 +28,14 @@ class SuperTopbarComposer
             return;
         }
 
-        $notificationData = $this->superTopbarNotificationService->build();
+        $superAdminId = Auth::guard('super_admin')->id();
+
+        if ($superAdminId === null) {
+            $this->bindEmptyState($view);
+            return;
+        }
+
+        $notificationData = $this->superTopbarNotificationService->build((int) $superAdminId);
 
         $view->with('superNotifications', $notificationData['notifications'])
             ->with('superUnreadNotificationsCount', $notificationData['unreadCount']);

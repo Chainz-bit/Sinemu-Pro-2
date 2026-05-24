@@ -93,6 +93,11 @@ class LostItemCommandService
         $newStatus = $validated['status_laporan'] === 'approved'
             ? WorkflowStatus::REPORT_APPROVED
             : WorkflowStatus::REPORT_REJECTED;
+        $oldStatus = (string) ($item->status_laporan ?? '');
+
+        if ($oldStatus === $newStatus) {
+            return ['ok' => true, 'message' => 'Status laporan tidak berubah.'];
+        }
 
         $item->update([
             'status_laporan' => $newStatus,

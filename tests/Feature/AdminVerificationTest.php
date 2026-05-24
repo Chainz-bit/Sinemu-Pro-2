@@ -188,6 +188,8 @@ class AdminVerificationTest extends TestCase
         $superAdmin = $this->createSuperAdmin();
         $activeAdmin = $this->createAdmin($superAdmin, 'Admin Aktif Tidak Ditolak', 'active');
         $pendingAdmin = $this->createAdmin($superAdmin, 'Admin Pending Tidak Dinonaktifkan', 'pending');
+        $rejectedAdmin = $this->createAdmin($superAdmin, 'Admin Ditolak Tidak Ditolak Ulang', 'rejected');
+        $inactiveAdmin = $this->createAdmin($superAdmin, 'Admin Nonaktif Tidak Dinonaktifkan Ulang', 'inactive');
 
         $this->actingAs($superAdmin, 'super_admin')
             ->from(route('super.admin-verifications.index', ['status' => 'active']))
@@ -201,12 +203,30 @@ class AdminVerificationTest extends TestCase
         $this->assertNull($activeAdmin->fresh()?->alasan_penolakan);
 
         $this->actingAs($superAdmin, 'super_admin')
+            ->from(route('super.admin-verifications.index', ['status' => 'rejected']))
+            ->patch(route('super.admins.reject', $rejectedAdmin), [
+                'alasan_penolakan' => 'Tidak boleh menolak ulang akun ditolak',
+            ])
+            ->assertRedirect(route('super.admin-verifications.index', ['status' => 'rejected']))
+            ->assertSessionHas('error', 'Hanya akun pengelola barang yang masih menunggu verifikasi yang dapat ditolak.');
+
+        $this->assertSame('rejected', $rejectedAdmin->fresh()?->status_verifikasi);
+
+        $this->actingAs($superAdmin, 'super_admin')
             ->from(route('super.admin-verifications.index', ['status' => 'pending']))
             ->patch(route('super.admins.deactivate', $pendingAdmin))
             ->assertRedirect(route('super.admin-verifications.index', ['status' => 'pending']))
             ->assertSessionHas('error', 'Hanya akun pengelola barang aktif yang dapat dinonaktifkan.');
 
         $this->assertSame('pending', $pendingAdmin->fresh()?->status_verifikasi);
+
+        $this->actingAs($superAdmin, 'super_admin')
+            ->from(route('super.admin-verifications.index', ['status' => 'inactive']))
+            ->patch(route('super.admins.deactivate', $inactiveAdmin))
+            ->assertRedirect(route('super.admin-verifications.index', ['status' => 'inactive']))
+            ->assertSessionHas('error', 'Hanya akun pengelola barang aktif yang dapat dinonaktifkan.');
+
+        $this->assertSame('inactive', $inactiveAdmin->fresh()?->status_verifikasi);
     }
 
     public function test_super_admin_can_deactivate_admin_in_scope(): void
