@@ -646,12 +646,22 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Wilayah Ditemukan</label>
+                                @php
+                                    $wilayahOptions = $wilayahOptions ?? collect();
+                                @endphp
                                 <select name="region_id" class="form-select" required data-custom-select>
-                                    <option value="">Pilih Kecamatan</option>
-                                    @foreach(($wilayahOptions ?? collect()) as $wilayah)
-                                        <option value="{{ $wilayah->id }}">{{ $wilayah->nama_wilayah }}</option>
-                                    @endforeach
+                                    @if($wilayahOptions->isEmpty())
+                                        <option value="" disabled selected>Belum ada wilayah yang tersedia</option>
+                                    @else
+                                        <option value="">Pilih Kecamatan</option>
+                                        @foreach($wilayahOptions as $wilayah)
+                                            <option value="{{ $wilayah->id }}">{{ $wilayah->nama_wilayah }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
+                                @if($wilayahOptions->isEmpty())
+                                    <div class="form-text">Saat ini belum ada wilayah dengan pengelola aktif. Silakan hubungi Support SiNemu.</div>
+                                @endif
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Lokasi Ditemukan</label>

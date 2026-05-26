@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 
 class RegionHasActiveAdmin implements ValidationRule
 {
-    public const MESSAGE = 'Wilayah ini belum memiliki pengelola aktif. Silakan pilih wilayah lain atau hubungi admin.';
+    public const MESSAGE = 'Wilayah ini belum memiliki pengelola aktif. Silakan pilih wilayah lain atau hubungi Support SiNemu.';
 
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {

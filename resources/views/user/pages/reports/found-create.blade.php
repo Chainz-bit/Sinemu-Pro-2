@@ -27,15 +27,28 @@
 
                 <div class="form-col-6 form-group">
                     <label class="form-label" for="region_id">Wilayah Ditemukan <span>*</span></label>
+                    @php
+                        $wilayahOptions = $wilayahOptions ?? collect();
+                    @endphp
                     <select id="region_id" name="region_id" class="form-input" required data-custom-select>
-                        <option value="">Pilih kecamatan</option>
-                        @foreach(($wilayahOptions ?? collect()) as $wilayah)
-                            <option value="{{ $wilayah->id }}" @selected((string) old('region_id') === (string) $wilayah->id)>
-                                {{ $wilayah->nama_wilayah }}
-                            </option>
-                        @endforeach
+                        @if($wilayahOptions->isEmpty())
+                            <option value="" disabled selected>Belum ada wilayah yang tersedia</option>
+                        @else
+                            <option value="">Pilih kecamatan</option>
+                            @foreach($wilayahOptions as $wilayah)
+                                <option value="{{ $wilayah->id }}" @selected((string) old('region_id') === (string) $wilayah->id)>
+                                    {{ $wilayah->nama_wilayah }}
+                                </option>
+                            @endforeach
+                        @endif
                     </select>
-                    <small class="form-note">Barang temuan akan diteruskan ke pengelola barang wilayah ini.</small>
+                    <small class="form-note">
+                        @if($wilayahOptions->isEmpty())
+                            Saat ini belum ada wilayah dengan pengelola aktif. Silakan hubungi Support SiNemu.
+                        @else
+                            Barang temuan akan diteruskan ke pengelola barang wilayah ini.
+                        @endif
+                    </small>
                 </div>
 
                 <div class="form-col-6 form-group">

@@ -12,7 +12,6 @@ use App\Support\WorkflowStatus;
 use App\Rules\RegionHasActiveAdmin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -32,9 +31,11 @@ class FoundReportController extends Controller
         return view('user.pages.reports.found-create', [
             'user' => Auth::user(),
             'categories' => $categories,
-            'wilayahOptions' => Cache::remember('indramayu:wilayah-options', 600, static fn () => Wilayah::query()
+            'wilayahOptions' => Wilayah::query()
+                ->whereHas('admins', static fn ($query) => $query
+                    ->where('status_verifikasi', Admin::STATUS_ACTIVE))
                 ->orderBy('nama_wilayah')
-                ->get(['id', 'nama_wilayah'])),
+                ->get(['id', 'nama_wilayah']),
         ]);
     }
 

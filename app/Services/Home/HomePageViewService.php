@@ -2,6 +2,7 @@
 
 namespace App\Services\Home;
 
+use App\Models\Admin;
 use App\Models\Wilayah;
 use App\Services\Support\DatabaseHealthService;
 use App\Support\WorkflowStatus;
@@ -169,12 +170,16 @@ class HomePageViewService
 
     private function getWilayahOptions(): Collection
     {
-        if (!$this->hasDatabaseTable('wilayahs')) {
+        if (!$this->hasDatabaseTable('wilayahs') || !$this->hasDatabaseTable('admins')) {
             return collect();
         }
 
         return $this->safeDatabaseCall(
-            fn () => Wilayah::query()->orderBy('nama_wilayah')->get(['id', 'nama_wilayah']),
+            fn () => Wilayah::query()
+                ->whereHas('admins', static fn ($query) => $query
+                    ->where('status_verifikasi', Admin::STATUS_ACTIVE))
+                ->orderBy('nama_wilayah')
+                ->get(['id', 'nama_wilayah']),
             collect()
         );
     }

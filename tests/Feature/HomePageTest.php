@@ -57,6 +57,53 @@ class HomePageTest extends TestCase
         $response->assertSee(route('user.lost-reports.create'), false);
     }
 
+    public function test_landing_found_report_modal_lists_only_regions_with_active_admins(): void
+    {
+        $user = $this->createUser('landing-modal-user@example.com', 'landing-modal-user', '081111111119');
+        $superAdmin = $this->createSuperAdmin('landing-modal-super@example.com', 'landing-modal-super');
+        $activeRegion = $this->createDistrictRegion('Sindang', -6.322, 108.324);
+        $noAdminRegion = $this->createDistrictRegion('Anjatan', -6.3367, 107.9769);
+        $pendingRegion = $this->createDistrictRegion('Arahan', -6.382, 108.251);
+        $rejectedRegion = $this->createDistrictRegion('Balongan', -6.3426, 108.3798);
+        $inactiveRegion = $this->createDistrictRegion('Bangodua', -6.4806, 108.2366);
+        $softDeletedRegion = $this->createDistrictRegion('Bongas', -6.366, 108.0462);
+
+        $this->createManagerForRegion($superAdmin, $activeRegion, Admin::STATUS_ACTIVE, 'landing-modal-active');
+        $this->createManagerForRegion($superAdmin, $pendingRegion, Admin::STATUS_PENDING, 'landing-modal-pending');
+        $this->createManagerForRegion($superAdmin, $rejectedRegion, Admin::STATUS_REJECTED, 'landing-modal-rejected');
+        $this->createManagerForRegion($superAdmin, $inactiveRegion, Admin::STATUS_INACTIVE, 'landing-modal-inactive');
+        $softDeletedAdmin = $this->createManagerForRegion($superAdmin, $softDeletedRegion, Admin::STATUS_ACTIVE, 'landing-modal-soft');
+        $softDeletedAdmin->delete();
+        $this->createManagerForRegion($superAdmin, null, Admin::STATUS_ACTIVE, 'landing-modal-without-region');
+
+        $response = $this->actingAs($user, 'web')
+            ->get(route('home'))
+            ->assertOk()
+            ->assertSee('Lapor Barang Temuan', false)
+            ->assertSee('value="'.$activeRegion->id.'">'.$activeRegion->nama_wilayah, false)
+            ->assertDontSee('value="'.$noAdminRegion->id.'">'.$noAdminRegion->nama_wilayah, false)
+            ->assertDontSee('value="'.$pendingRegion->id.'">'.$pendingRegion->nama_wilayah, false)
+            ->assertDontSee('value="'.$rejectedRegion->id.'">'.$rejectedRegion->nama_wilayah, false)
+            ->assertDontSee('value="'.$inactiveRegion->id.'">'.$inactiveRegion->nama_wilayah, false)
+            ->assertDontSee('value="'.$softDeletedRegion->id.'">'.$softDeletedRegion->nama_wilayah, false);
+
+        $this->assertSame([$activeRegion->id], $response->viewData('wilayahOptions')->pluck('id')->all());
+    }
+
+    public function test_landing_found_report_modal_shows_empty_state_when_no_region_is_available(): void
+    {
+        $user = $this->createUser('landing-empty-user@example.com', 'landing-empty-user', '081111111120');
+        $this->createDistrictRegion('Patrol', -6.314, 108.0241);
+
+        $response = $this->actingAs($user, 'web')
+            ->get(route('home'))
+            ->assertOk()
+            ->assertSee('Belum ada wilayah yang tersedia', false)
+            ->assertSee('Saat ini belum ada wilayah dengan pengelola aktif. Silakan hubungi Support SiNemu.', false);
+
+        $this->assertTrue($response->viewData('wilayahOptions')->isEmpty());
+    }
+
     public function test_authenticated_admin_is_redirected_from_landing_to_admin_dashboard(): void
     {
         $admin = $this->createAdmin();
@@ -533,6 +580,27 @@ class HomePageTest extends TestCase
             'nama_wilayah' => IndramayuDistricts::wilayahName($district),
             'lat' => $lat,
             'lng' => $lng,
+        ]);
+    }
+
+    private function createManagerForRegion(
+        SuperAdmin $superAdmin,
+        ?Wilayah $region,
+        string $status,
+        string $username
+    ): Admin {
+        return Admin::query()->create([
+            'super_admin_id' => $superAdmin->id,
+            'region_id' => $region?->id,
+            'nama' => 'Admin ' . $username,
+            'email' => $username . '@example.com',
+            'username' => $username,
+            'password' => Hash::make('password123'),
+            'instansi' => 'Kampus SINEMU',
+            'kecamatan' => 'Sindang',
+            'alamat_lengkap' => 'Jl. Landing Modal No. 1',
+            'status_verifikasi' => $status,
+            'verified_at' => $status === Admin::STATUS_ACTIVE ? now() : null,
         ]);
     }
 

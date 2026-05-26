@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\SubmitLostReportRequest;
+use App\Models\Admin;
 use App\Models\Kategori;
 use App\Models\LaporanBarangHilang;
 use App\Models\Wilayah;
@@ -32,9 +33,11 @@ class LostReportController extends Controller
                 ->pluck('nama_kategori')
                 ->filter()
                 ->values()),
-            'wilayahOptions' => Cache::remember('indramayu:wilayah-options', 600, static fn () => Wilayah::query()
+            'wilayahOptions' => Wilayah::query()
+                ->whereHas('admins', static fn ($query) => $query
+                    ->where('status_verifikasi', Admin::STATUS_ACTIVE))
                 ->orderBy('nama_wilayah')
-                ->get(['id', 'nama_wilayah'])),
+                ->get(['id', 'nama_wilayah']),
             'editingReport' => $editingReport,
         ]);
     }
