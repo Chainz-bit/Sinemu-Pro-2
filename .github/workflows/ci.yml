@@ -1,4 +1,4 @@
-name: Laravel CI Pipeline
+name: Laravel Web Automated Testing CI
 
 on:
   push:
@@ -10,9 +10,12 @@ on:
       - main
       - develop
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
-  test:
-    name: Build and Test Laravel App
+  laravel-test:
+    name: Build and Test Laravel Web
     runs-on: ubuntu-latest
 
     steps:
@@ -43,7 +46,7 @@ jobs:
       - name: Copy environment file
         run: cp .env.example .env
 
-      - name: Generate application key
+      - name: Generate Laravel app key
         run: php artisan key:generate
 
       - name: Prepare SQLite database
@@ -55,12 +58,15 @@ jobs:
         run: |
           echo "APP_ENV=testing" >> .env
           echo "APP_DEBUG=true" >> .env
+          echo "APP_URL=http://127.0.0.1:8000" >> .env
           echo "DB_CONNECTION=sqlite" >> .env
           echo "DB_DATABASE=${{ github.workspace }}/database/database.sqlite" >> .env
           echo "CACHE_STORE=array" >> .env
           echo "SESSION_DRIVER=array" >> .env
           echo "QUEUE_CONNECTION=sync" >> .env
           echo "MAIL_MAILER=array" >> .env
+          echo "FILESYSTEM_DISK=local" >> .env
+          echo "GOOGLE_CLIENT_ID=dummy-google-client-id.apps.googleusercontent.com" >> .env
 
       - name: Clear Laravel cache
         run: |
@@ -68,7 +74,7 @@ jobs:
           php artisan route:clear
           php artisan view:clear
 
-      - name: Run migrations
+      - name: Run database migrations
         run: php artisan migrate --force
 
       - name: Run Laravel automated tests
