@@ -16,6 +16,9 @@ Route::post('/login', [AuthController::class, 'login'])
 Route::post('/login/google', [AuthController::class, 'loginWithGoogle'])
     ->middleware('throttle:5,1');
 
+Route::post('/register', [AuthController::class, 'register'])
+    ->middleware('throttle:5,1');
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 

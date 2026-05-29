@@ -47,6 +47,108 @@ class MobileApiTest extends TestCase
         ]);
     }
 
+    public function test_mobile_user_can_register_and_receives_token(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Register Mobile',
+            'email' => 'register-mobile@example.test',
+            'username' => 'registermobile',
+            'password' => 'secret-password',
+            'password_confirmation' => 'secret-password',
+            'phone' => '081234567890',
+            'alamat' => 'Indramayu',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('message', 'Registrasi berhasil')
+            ->assertJsonPath('user.name', 'Register Mobile')
+            ->assertJsonPath('user.email', 'register-mobile@example.test')
+            ->assertJsonPath('user.username', 'registermobile')
+            ->assertJsonPath('user.phone', '081234567890')
+            ->assertJsonPath('user.alamat', 'Indramayu')
+            ->assertJsonMissingPath('user.password')
+            ->assertJsonMissingPath('user.remember_token')
+            ->assertJsonStructure(['token']);
+
+        $user = User::query()->where('email', 'register-mobile@example.test')->firstOrFail();
+
+        $this->assertSame('Register Mobile', $user->name);
+        $this->assertSame('registermobile', $user->username);
+        $this->assertSame('081234567890', $user->nomor_telepon);
+        $this->assertSame('Indramayu', $user->alamat);
+        $this->assertNotSame('secret-password', $user->password);
+        $this->assertTrue(Hash::check('secret-password', $user->password));
+        $this->assertNotNull($user->email_verified_at);
+
+        $this->assertDatabaseHas('personal_access_tokens', [
+            'tokenable_type' => User::class,
+            'tokenable_id' => $user->id,
+            'name' => 'mobile',
+        ]);
+
+        $this->assertDatabaseMissing('admins', [
+            'email' => 'register-mobile@example.test',
+        ]);
+    }
+
+    public function test_mobile_register_rejects_duplicate_email(): void
+    {
+        User::factory()->create([
+            'email' => 'duplicate-email@example.test',
+            'username' => 'existingemailuser',
+        ]);
+
+        $this->postJson('/api/register', [
+            'name' => 'Duplicate Email',
+            'email' => 'duplicate-email@example.test',
+            'username' => 'newduplicateemailuser',
+            'password' => 'secret-password',
+            'password_confirmation' => 'secret-password',
+            'phone' => '081234567890',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Validasi gagal.')
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_mobile_register_rejects_duplicate_username(): void
+    {
+        User::factory()->create([
+            'email' => 'existing-username@example.test',
+            'username' => 'duplicateusername',
+        ]);
+
+        $this->postJson('/api/register', [
+            'name' => 'Duplicate Username',
+            'email' => 'new-username@example.test',
+            'username' => 'duplicateusername',
+            'password' => 'secret-password',
+            'password_confirmation' => 'secret-password',
+            'phone' => '081234567890',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Validasi gagal.')
+            ->assertJsonValidationErrors(['username']);
+    }
+
+    public function test_mobile_register_rejects_wrong_password_confirmation(): void
+    {
+        $this->postJson('/api/register', [
+            'name' => 'Wrong Confirmation',
+            'email' => 'wrong-confirmation@example.test',
+            'username' => 'wrongconfirmation',
+            'password' => 'secret-password',
+            'password_confirmation' => 'different-password',
+            'phone' => '081234567890',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Validasi gagal.')
+            ->assertJsonValidationErrors(['password']);
+
+        $this->assertDatabaseMissing('users', [
+            'email' => 'wrong-confirmation@example.test',
+        ]);
+    }
+
     public function test_google_login_auto_registers_new_mobile_user_and_returns_token(): void
     {
         $this->fakeGoogleToken([

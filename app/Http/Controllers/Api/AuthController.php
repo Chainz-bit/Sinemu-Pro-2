@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\GoogleLoginRequest;
 use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\RegisterRequest;
 use App\Models\User;
 use App\Services\Google\GoogleIdTokenConfigurationException;
 use App\Services\Google\GoogleIdTokenVerifier;
@@ -19,6 +20,39 @@ use Throwable;
 
 class AuthController extends Controller
 {
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+
+        $payload = [
+            'name' => $validated['name'],
+            'email' => strtolower((string) $validated['email']),
+            'nomor_telepon' => $validated['phone'],
+            'password' => Hash::make((string) $validated['password']),
+        ];
+
+        if ($this->userHasColumn('nama')) {
+            $payload['nama'] = $validated['name'];
+        }
+
+        if ($this->userHasColumn('username')) {
+            $payload['username'] = $validated['username'];
+        }
+
+        if ($this->userHasColumn('alamat')) {
+            $payload['alamat'] = $validated['alamat'] ?? null;
+        }
+
+        if ($this->userHasColumn('email_verified_at')) {
+            $payload['email_verified_at'] = now();
+        }
+
+        $user = User::query()->create($payload);
+        $token = $user->createToken('mobile')->plainTextToken;
+
+        return $this->mobileRegisterResponse($user, $token);
+    }
+
     public function login(LoginRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -233,6 +267,22 @@ class AuthController extends Controller
                 'username' => $user->username,
             ],
         ]);
+    }
+
+    private function mobileRegisterResponse(User $user, string $token): JsonResponse
+    {
+        return response()->json([
+            'message' => 'Registrasi berhasil',
+            'token' => $token,
+            'user' => [
+                'id' => (int) $user->id,
+                'name' => (string) ($user->name ?? $user->nama ?? ''),
+                'email' => (string) $user->email,
+                'username' => $user->username,
+                'phone' => $user->nomor_telepon,
+                'alamat' => $user->alamat,
+            ],
+        ], 201);
     }
 
     private function userHasColumn(string $column): bool
