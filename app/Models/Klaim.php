@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $status_klaim
  * @property string|null $status_verifikasi
  * @property string|null $catatan
+ * @property string|null $kontak
  * @property array|null $bukti_foto
  * @property string|null $bukti_ciri_khusus
  * @property string|null $bukti_detail_isi
@@ -24,8 +26,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $catatan_verifikasi_admin
  * @property string|null $alasan_penolakan
  * @property string|null $diverifikasi_at
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property-read LaporanBarangHilang|null $laporanHilang
  * @property-read Barang|null $barang
  * @property-read Pencocokan|null $pencocokan
@@ -43,6 +45,7 @@ class Klaim extends Model
         'status_klaim',
         'status_verifikasi',
         'catatan',
+        'kontak',
         'bukti_foto',
         'bukti_ciri_khusus',
         'bukti_detail_isi',

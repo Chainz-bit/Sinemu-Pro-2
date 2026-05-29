@@ -183,6 +183,8 @@ class HomePageTest extends TestCase
             'keterangan' => 'Tertinggal di perpustakaan',
             'sumber_laporan' => 'lapor_hilang',
             'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'verified_by_admin_id' => $admin->id,
+            'verified_at' => now()->subHours(2),
             'tampil_di_home' => true,
             'updated_at' => now()->subHours(2),
         ]);
@@ -197,6 +199,8 @@ class HomePageTest extends TestCase
             'tanggal_ditemukan' => now()->subDay()->toDateString(),
             'status_barang' => 'tersedia',
             'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'verified_by_admin_id' => $admin->id,
+            'verified_at' => now()->subHour(),
             'tampil_di_home' => true,
             'updated_at' => now()->subHour(),
         ]);
@@ -262,6 +266,128 @@ class HomePageTest extends TestCase
         $this->assertTrue($mapRegions->contains(function (array $region) {
             return $region['name'] === 'Kecamatan Sindang' && $region['active_points'] >= 2;
         }));
+    }
+
+    public function test_landing_page_never_shows_unverified_reports_even_if_home_flag_is_true(): void
+    {
+        $wilayah = Wilayah::query()->create([
+            'nama_wilayah' => 'Kecamatan Terisi',
+            'lat' => -6.322,
+            'lng' => 108.324,
+        ]);
+
+        $admin = $this->createAdmin($wilayah->id);
+        $user = $this->createUser('home-pending-user@example.com', 'home-pending-user', '081111111121');
+        $kategori = Kategori::query()->create(['nama_kategori' => 'Elektronik']);
+
+        $pendingLost = LaporanBarangHilang::query()->create([
+            'user_id' => $user->id,
+            'region_id' => $wilayah->id,
+            'nama_barang' => 'Pending Hilang Rahasia',
+            'kategori_barang' => 'Elektronik',
+            'lokasi_hilang' => 'Kecamatan Terisi',
+            'tanggal_hilang' => now()->subDay()->toDateString(),
+            'keterangan' => 'Belum diverifikasi',
+            'sumber_laporan' => 'lapor_hilang',
+            'status_laporan' => WorkflowStatus::REPORT_SUBMITTED,
+            'tampil_di_home' => true,
+        ]);
+
+        $rejectedLost = LaporanBarangHilang::query()->create([
+            'user_id' => $user->id,
+            'region_id' => $wilayah->id,
+            'nama_barang' => 'Rejected Hilang Rahasia',
+            'kategori_barang' => 'Elektronik',
+            'lokasi_hilang' => 'Kecamatan Terisi',
+            'tanggal_hilang' => now()->subDays(2)->toDateString(),
+            'keterangan' => 'Ditolak pengelola',
+            'sumber_laporan' => 'lapor_hilang',
+            'status_laporan' => WorkflowStatus::REPORT_REJECTED,
+            'tampil_di_home' => true,
+        ]);
+
+        $approvedUnverifiedLost = LaporanBarangHilang::query()->create([
+            'user_id' => $user->id,
+            'region_id' => $wilayah->id,
+            'nama_barang' => 'Approved Hilang Tanpa Verifikasi',
+            'kategori_barang' => 'Elektronik',
+            'lokasi_hilang' => 'Kecamatan Terisi',
+            'tanggal_hilang' => now()->subDays(3)->toDateString(),
+            'keterangan' => 'Status approved tetapi metadata verifikasi kosong',
+            'sumber_laporan' => 'lapor_hilang',
+            'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'verified_by_admin_id' => null,
+            'verified_at' => null,
+            'tampil_di_home' => true,
+        ]);
+
+        $pendingFound = Barang::query()->create([
+            'admin_id' => $admin->id,
+            'region_id' => $wilayah->id,
+            'user_id' => $user->id,
+            'kategori_id' => $kategori->id,
+            'nama_barang' => 'Pending Temuan Rahasia',
+            'deskripsi' => 'Belum diverifikasi',
+            'lokasi_ditemukan' => 'Kecamatan Terisi',
+            'tanggal_ditemukan' => now()->toDateString(),
+            'status_barang' => WorkflowStatus::FOUND_AVAILABLE,
+            'status_laporan' => WorkflowStatus::REPORT_SUBMITTED,
+            'tampil_di_home' => true,
+        ]);
+
+        $rejectedFound = Barang::query()->create([
+            'admin_id' => $admin->id,
+            'region_id' => $wilayah->id,
+            'user_id' => $user->id,
+            'kategori_id' => $kategori->id,
+            'nama_barang' => 'Rejected Temuan Rahasia',
+            'deskripsi' => 'Ditolak pengelola',
+            'lokasi_ditemukan' => 'Kecamatan Terisi',
+            'tanggal_ditemukan' => now()->toDateString(),
+            'status_barang' => WorkflowStatus::FOUND_AVAILABLE,
+            'status_laporan' => WorkflowStatus::REPORT_REJECTED,
+            'tampil_di_home' => true,
+        ]);
+
+        $approvedUnverifiedFound = Barang::query()->create([
+            'admin_id' => $admin->id,
+            'region_id' => $wilayah->id,
+            'user_id' => $user->id,
+            'kategori_id' => $kategori->id,
+            'nama_barang' => 'Approved Temuan Tanpa Verifikasi',
+            'deskripsi' => 'Status approved tetapi metadata verifikasi kosong',
+            'lokasi_ditemukan' => 'Kecamatan Terisi',
+            'tanggal_ditemukan' => now()->toDateString(),
+            'status_barang' => WorkflowStatus::FOUND_AVAILABLE,
+            'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'verified_by_admin_id' => null,
+            'verified_at' => null,
+            'tampil_di_home' => true,
+        ]);
+
+        $response = $this->get(route('home'));
+
+        $response->assertOk()
+            ->assertDontSee('Pending Hilang Rahasia', false)
+            ->assertDontSee('Rejected Hilang Rahasia', false)
+            ->assertDontSee('Approved Hilang Tanpa Verifikasi', false)
+            ->assertDontSee('Pending Temuan Rahasia', false)
+            ->assertDontSee('Rejected Temuan Rahasia', false)
+            ->assertDontSee('Approved Temuan Tanpa Verifikasi', false);
+
+        $this->assertFalse(collect($response->viewData('lostItems'))->contains('name', 'Pending Hilang Rahasia'));
+        $this->assertFalse(collect($response->viewData('lostItems'))->contains('name', 'Rejected Hilang Rahasia'));
+        $this->assertFalse(collect($response->viewData('lostItems'))->contains('name', 'Approved Hilang Tanpa Verifikasi'));
+        $this->assertFalse(collect($response->viewData('foundItems'))->contains('name', 'Pending Temuan Rahasia'));
+        $this->assertFalse(collect($response->viewData('foundItems'))->contains('name', 'Rejected Temuan Rahasia'));
+        $this->assertFalse(collect($response->viewData('foundItems'))->contains('name', 'Approved Temuan Tanpa Verifikasi'));
+
+        $this->get(route('home.lost-detail', $pendingLost))->assertNotFound();
+        $this->get(route('home.lost-detail', $rejectedLost))->assertNotFound();
+        $this->get(route('home.lost-detail', $approvedUnverifiedLost))->assertNotFound();
+        $this->get(route('home.found-detail', $pendingFound))->assertNotFound();
+        $this->get(route('home.found-detail', $rejectedFound))->assertNotFound();
+        $this->get(route('home.found-detail', $approvedUnverifiedFound))->assertNotFound();
     }
 
     public function test_pending_manager_created_by_super_admin_is_not_pickup_location(): void
@@ -431,6 +557,8 @@ class HomePageTest extends TestCase
             'tanggal_ditemukan' => now()->subDay()->toDateString(),
             'status_barang' => 'tersedia',
             'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+            'verified_by_admin_id' => $admin->id,
+            'verified_at' => now(),
             'tampil_di_home' => true,
         ]);
 
@@ -462,6 +590,8 @@ class HomePageTest extends TestCase
             'tanggal_ditemukan' => now()->subDay()->toDateString(),
             'status_barang' => 'dalam_proses_klaim',
             'status_laporan' => WorkflowStatus::REPORT_MATCHED,
+            'verified_by_admin_id' => $admin->id,
+            'verified_at' => now(),
             'tampil_di_home' => true,
         ]);
 

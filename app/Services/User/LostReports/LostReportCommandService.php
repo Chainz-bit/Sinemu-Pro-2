@@ -96,6 +96,12 @@ class LostReportCommandService
             $payload['status_laporan'] = WorkflowStatus::REPORT_SUBMITTED;
             $payload['tampil_di_home'] = false;
         }
+        if (Schema::hasColumn('laporan_barang_hilangs', 'verified_by_admin_id')) {
+            $payload['verified_by_admin_id'] = null;
+        }
+        if (Schema::hasColumn('laporan_barang_hilangs', 'verified_at')) {
+            $payload['verified_at'] = null;
+        }
 
         $photo = $request->file('foto_barang');
         $newPhotoPath = null;

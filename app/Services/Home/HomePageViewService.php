@@ -262,6 +262,14 @@ class HomePageViewService
             $baseQuery->where('tampil_di_home', true);
         }
 
+        if ($tableName === 'laporan_barang_hilangs' && $this->hasDatabaseColumn('laporan_barang_hilangs', 'verified_by_admin_id')) {
+            $baseQuery->whereNotNull('verified_by_admin_id');
+        }
+
+        if ($tableName === 'laporan_barang_hilangs' && $this->hasDatabaseColumn('laporan_barang_hilangs', 'verified_at')) {
+            $baseQuery->whereNotNull('verified_at');
+        }
+
         if ($tableName === 'barangs' && $this->hasDatabaseColumn('barangs', 'status_laporan')) {
             $baseQuery->whereIn('status_laporan', [
                 WorkflowStatus::REPORT_APPROVED,
@@ -272,6 +280,14 @@ class HomePageViewService
 
         if ($tableName === 'barangs' && $this->hasDatabaseColumn('barangs', 'tampil_di_home')) {
             $baseQuery->where('tampil_di_home', true);
+        }
+
+        if ($tableName === 'barangs' && $this->hasDatabaseColumn('barangs', 'verified_by_admin_id')) {
+            $baseQuery->whereNotNull('verified_by_admin_id');
+        }
+
+        if ($tableName === 'barangs' && $this->hasDatabaseColumn('barangs', 'verified_at')) {
+            $baseQuery->whereNotNull('verified_at');
         }
 
         if ($tableName === 'barangs' && $this->hasDatabaseColumn('barangs', 'status_barang')) {

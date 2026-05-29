@@ -8,6 +8,8 @@ use App\Models\LaporanBarangHilang;
 use App\Observers\BarangObserver;
 use App\Observers\KlaimObserver;
 use App\Observers\LaporanBarangHilangObserver;
+use App\Services\Google\GoogleApiClientIdTokenVerifier;
+use App\Services\Google\GoogleIdTokenVerifier;
 use App\View\Composers\AdminTopbarComposer;
 use App\View\Composers\SuperTopbarComposer;
 use App\View\Composers\UserTopbarComposer;
@@ -22,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(GoogleIdTokenVerifier::class, GoogleApiClientIdTokenVerifier::class);
     }
 
     /**

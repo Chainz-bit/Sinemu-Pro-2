@@ -30,7 +30,13 @@ class RegionalReportScopeTest extends TestCase
 
         $this->actingAs($user)
             ->from(route('user.lost-reports.create'))
-            ->post(route('user.lost-reports.store'), $this->validLostReportPayload($admin->region_id))
+            ->post(route('user.lost-reports.store'), $this->validLostReportPayload($admin->region_id) + [
+                'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+                'status_barang' => WorkflowStatus::FOUND_CLAIMED,
+                'admin_id' => $admin->id,
+                'verified_by_admin_id' => $admin->id,
+                'tampil_di_home' => true,
+            ])
             ->assertRedirect(route('user.lost-reports.create'));
 
         $this->assertDatabaseHas('laporan_barang_hilangs', [
@@ -38,6 +44,9 @@ class RegionalReportScopeTest extends TestCase
             'region_id' => $admin->region_id,
             'nama_barang' => 'Laptop Wilayah',
             'status_laporan' => WorkflowStatus::REPORT_SUBMITTED,
+            'tampil_di_home' => false,
+            'verified_by_admin_id' => null,
+            'verified_at' => null,
         ]);
     }
 
@@ -229,7 +238,13 @@ class RegionalReportScopeTest extends TestCase
 
         $this->actingAs($user)
             ->from(route('user.found-reports.create'))
-            ->post(route('user.found-reports.store'), $this->validFoundReportPayload($admin->region_id, $kategori->id))
+            ->post(route('user.found-reports.store'), $this->validFoundReportPayload($admin->region_id, $kategori->id) + [
+                'status_laporan' => WorkflowStatus::REPORT_APPROVED,
+                'status_barang' => WorkflowStatus::FOUND_CLAIMED,
+                'admin_id' => 999999,
+                'verified_by_admin_id' => 999999,
+                'tampil_di_home' => true,
+            ])
             ->assertRedirect(route('user.found-reports.create'));
 
         $this->assertDatabaseHas('barangs', [
@@ -237,7 +252,11 @@ class RegionalReportScopeTest extends TestCase
             'admin_id' => $admin->id,
             'region_id' => $admin->region_id,
             'nama_barang' => 'Dompet Wilayah',
+            'status_barang' => WorkflowStatus::FOUND_AVAILABLE,
             'status_laporan' => WorkflowStatus::REPORT_SUBMITTED,
+            'tampil_di_home' => false,
+            'verified_by_admin_id' => null,
+            'verified_at' => null,
         ]);
     }
 

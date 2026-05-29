@@ -26,7 +26,8 @@ class HomeFoundDetailService
         ];
         $hasValidStatus = in_array((string) ($barang->status_laporan ?? ''), $validStatuses, true);
         $isPublished = (bool) ($barang->tampil_di_home ?? false);
-        abort_unless($hasValidStatus && $isPublished, 404);
+        $isVerified = $barang->verified_by_admin_id !== null && $barang->verified_at !== null;
+        abort_unless($hasValidStatus && $isPublished && $isVerified, 404);
 
         $statusBarang = (string) ($barang->status_barang ?? '');
         $statusMeta = match ($statusBarang) {

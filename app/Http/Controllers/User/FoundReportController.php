@@ -85,6 +85,12 @@ class FoundReportController extends Controller
         if (Schema::hasColumn('barangs', 'tampil_di_home')) {
             $payload['tampil_di_home'] = false;
         }
+        if (Schema::hasColumn('barangs', 'verified_by_admin_id')) {
+            $payload['verified_by_admin_id'] = null;
+        }
+        if (Schema::hasColumn('barangs', 'verified_at')) {
+            $payload['verified_at'] = null;
+        }
         if (Schema::hasColumn('barangs', 'region_id')) {
             $payload['region_id'] = $regionId;
         }

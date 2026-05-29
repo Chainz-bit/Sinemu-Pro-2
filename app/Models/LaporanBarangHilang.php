@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * @property int $id
  * @property int $user_id
  * @property int|null $region_id
+ * @property int|null $kategori_id
  * @property string $nama_barang
  * @property string|null $kategori_barang
  * @property string|null $warna_barang
@@ -27,18 +30,20 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $status_laporan
  * @property int|null $verified_by_admin_id
  * @property string|null $verified_at
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property-read User $user
  * @property-read Wilayah|null $region
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Klaim> $klaims
- * @property-read \Illuminate\Database\Eloquent\Collection<int, Pencocokan> $pencocokans
+ * @property-read Kategori|null $kategori
+ * @property-read Collection<int, Klaim> $klaims
+ * @property-read Collection<int, Pencocokan> $pencocokans
  */
 class LaporanBarangHilang extends Model
 {
     protected $fillable = [
         'user_id',
         'region_id',
+        'kategori_id',
         'nama_barang',
         'kategori_barang',
         'warna_barang',
@@ -68,6 +73,11 @@ class LaporanBarangHilang extends Model
     public function region()
     {
         return $this->belongsTo(Wilayah::class, 'region_id');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(Kategori::class);
     }
 
     public function klaims()
