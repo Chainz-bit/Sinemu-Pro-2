@@ -1,0 +1,8 @@
+parameters:
+    level: 5
+    paths:
+        - app
+    ignoreErrors:
+        - message: 'Internal limitation: function.*index.*utilizes too many types'
+          paths:
+              - app/Http/Controllers/HomeController.php

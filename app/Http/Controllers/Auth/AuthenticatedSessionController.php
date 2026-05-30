@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Support\ManagerPortal;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,11 +18,15 @@ class AuthenticatedSessionController extends Controller
     public function create(Request $request): View|RedirectResponse
     {
         if ($request->query('portal') === 'admin') {
-            return redirect()->route('admin.login');
+            return redirect()->route(ManagerPortal::loginRoute());
         }
 
-        if (Auth::guard('admin')->check()) {
-            return redirect()->route('admin.dashboard');
+        if (Auth::guard(ManagerPortal::guard())->check()) {
+            return redirect()->route(ManagerPortal::dashboardRoute());
+        }
+
+        if ($request->hasSession()) {
+            $request->session()->regenerateToken();
         }
 
         return view('auth.login');
@@ -33,14 +38,14 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         if ($request->input('portal') === 'admin') {
-            return redirect()->route('admin.login');
+            return redirect()->route(ManagerPortal::loginRoute());
         }
 
         $request->authenticate();
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
@@ -55,5 +60,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    public function redirectAfterLogoutGet(Request $request): RedirectResponse
+    {
+        return redirect()->route('home');
     }
 }

@@ -9,6 +9,7 @@ use App\Models\LaporanBarangHilang;
 use App\Models\SuperAdmin;
 use App\Models\User;
 use App\Models\Wilayah;
+use App\Support\IndramayuDistricts;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -27,19 +28,36 @@ class HomeDataSeeder extends Seeder
                 ['username' => 'superadmin'],
                 [
                     'nama' => 'Super Admin',
-                    'password' => Hash::make('password'),
+                    'email' => 'superadmin@sinemu.com',
+                    'password' => Hash::make('super123'),
                 ]
             );
+
+            if (empty($superAdmin->email)) {
+                $superAdmin->update(['email' => 'superadmin@sinemu.com']);
+            }
 
             $admin = Admin::firstOrCreate(
                 ['username' => 'admin'],
                 [
                     'super_admin_id' => $superAdmin->id,
-                    'nama' => 'Admin Kecamatan',
+                    'nama' => 'Pengelola Barang Kecamatan',
+                    'email' => 'admin@sinemu.local',
                     'password' => Hash::make('password'),
                     'instansi' => 'Kecamatan Indramayu',
+                    'kecamatan' => 'Indramayu Kota',
+                    'alamat_lengkap' => 'Jl. Jenderal Sudirman No. 88, Indramayu',
+                    'status_verifikasi' => 'active',
+                    'verified_at' => now(),
                 ]
             );
+
+            if (($admin->status_verifikasi ?? null) !== 'active') {
+                $admin->update([
+                    'status_verifikasi' => 'active',
+                    'verified_at' => now(),
+                ]);
+            }
         }
 
         $user = null;
@@ -96,21 +114,8 @@ class HomeDataSeeder extends Seeder
         }
 
         if (Schema::hasTable('wilayahs')) {
-            $wilayahItems = [
-                ['nama_wilayah' => 'Kecamatan Indramayu', 'lat' => -6.3275000, 'lng' => 108.3207000],
-                ['nama_wilayah' => 'Kecamatan Lohbener', 'lat' => -6.3852000, 'lng' => 108.2793000],
-                ['nama_wilayah' => 'Kecamatan Pasekan', 'lat' => -6.3201000, 'lng' => 108.3388000],
-                ['nama_wilayah' => 'Kecamatan Balongan', 'lat' => -6.3502000, 'lng' => 108.4108000],
-                ['nama_wilayah' => 'Kecamatan Jatibarang', 'lat' => -6.4741000, 'lng' => 108.3061000],
-                ['nama_wilayah' => 'Kecamatan Haurgeulis', 'lat' => -6.4477000, 'lng' => 107.9398000],
-                ['nama_wilayah' => 'Kecamatan Bangodua', 'lat' => -6.4941000, 'lng' => 108.1455000],
-                ['nama_wilayah' => 'Kecamatan Sliyeg', 'lat' => -6.4406000, 'lng' => 108.3693000],
-                ['nama_wilayah' => 'Kecamatan Kandanghaur', 'lat' => -6.3433000, 'lng' => 107.9816000],
-                ['nama_wilayah' => 'Kecamatan Krangkeng', 'lat' => -6.4415000, 'lng' => 108.4841000],
-            ];
-
-            foreach ($wilayahItems as $wilayah) {
-                Wilayah::updateOrCreate(
+            foreach (IndramayuDistricts::wilayahItems() as $wilayah) {
+                Wilayah::firstOrCreate(
                     ['nama_wilayah' => $wilayah['nama_wilayah']],
                     ['lat' => $wilayah['lat'], 'lng' => $wilayah['lng']]
                 );
@@ -208,16 +213,22 @@ class HomeDataSeeder extends Seeder
 
         if (Schema::hasTable('laporan_barang_hilangs') && $user) {
             foreach ($lostItems as $item) {
+                $payload = [
+                    'user_id' => $user->id,
+                    'tanggal_hilang' => $item['tanggal_hilang'],
+                    'keterangan' => $item['keterangan'],
+                ];
+
+                if (Schema::hasColumn('laporan_barang_hilangs', 'sumber_laporan')) {
+                    $payload['sumber_laporan'] = 'lapor_hilang';
+                }
+
                 LaporanBarangHilang::updateOrCreate(
                     [
                         'nama_barang' => $item['nama_barang'],
                         'lokasi_hilang' => $item['lokasi_hilang'],
                     ],
-                    [
-                        'user_id' => $user->id,
-                        'tanggal_hilang' => $item['tanggal_hilang'],
-                        'keterangan' => $item['keterangan'],
-                    ]
+                    $payload
                 );
             }
         }

@@ -5,15 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Sinemu') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('img/logo.png') }}">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link href="{{ asset('css/app.css') }}?v={{ @filemtime(public_path('css/app.css')) }}" rel="stylesheet">
-    <link href="{{ asset('css/page-transition.css') }}?v={{ @filemtime(public_path('css/page-transition.css')) }}" rel="stylesheet">
-
-    <!-- Bootstrap Icons (optional) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    @vite('resources/js/entries/app-layout.js')
 </head>
 <body>
+    @php
+        $sinemuFlashMessages = [];
+        $statusMessage = session('status');
+        if (!empty($statusMessage)) {
+            $sinemuFlashMessages[] = [
+                'type' => 'success',
+                'message' => (string) $statusMessage,
+            ];
+        }
+        $errorMessage = session('error');
+        if (!empty($errorMessage)) {
+            $sinemuFlashMessages[] = ['type' => 'error', 'message' => (string) $errorMessage];
+        }
+        if ($errors->any()) {
+            $sinemuFlashMessages[] = ['type' => 'error', 'message' => (string) $errors->first()];
+        }
+    @endphp
+    <script>window.__SINEMU_FLASH_MESSAGES = @json($sinemuFlashMessages);</script>
 
     <!-- Navbar Bootstrap -->
   <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm py-3 mb-4">
@@ -39,7 +54,7 @@
           <a class="nav-link" href="#">Tutorial</a>  
         </li>
         <li class="nav-item mx-2">
-          <a class="nav-link" href="#">Admin</a>  
+          <a class="nav-link" href="#">{{ \App\Support\RoleLabels::manager() }}</a>  
         </li>
         <li class="nav-item mx-2">
           <a class="nav-link" href="#">Lokasi</a>  
@@ -60,12 +75,8 @@
     <!-- Footer -->
     <footer class="bg-dark text-white py-4 mt-5">
         <div class="container text-center">
-            <p class="mb-0">© 2024 SINEMU INDONESIA - BUILD FOR COMMUNITY</p>
+            <p class="mb-0">Â© 2024 SINEMU INDONESIA - BUILD FOR COMMUNITY</p>
         </div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/app.js') }}?v={{ @filemtime(public_path('js/app.js')) }}" defer></script>
-    <script src="{{ asset('js/page-transition.js') }}?v={{ @filemtime(public_path('js/page-transition.js')) }}" defer></script>
-
 </body>
 </html>

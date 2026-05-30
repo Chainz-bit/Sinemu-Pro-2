@@ -1,0 +1,14 @@
+/* Base khusus area user. */
+
+html {
+    min-height: 100%;
+    height: auto;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+body {
+    min-height: 100%;
+    height: auto;
+    overflow-x: hidden;
+}

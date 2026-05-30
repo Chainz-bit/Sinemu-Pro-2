@@ -1,0 +1,199 @@
+.claim-card {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 255, 0.96));
+    padding-top: 2.2rem !important;
+    padding-bottom: 2.35rem !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.claim-card .section-title {
+    font-size: clamp(1.5rem, 2.8vw, 1.75rem);
+    letter-spacing: -0.035em;
+    line-height: 1.08;
+}
+
+.klaim-title-icon {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    margin-right: 8px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    transform: translateY(-1px);
+}
+
+.claim-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 0.45rem;
+    row-gap: 0.85rem;
+    column-gap: 0.85rem;
+    position: relative;
+}
+
+.claim-grid > [class*="col-"] {
+    width: auto;
+    max-width: none;
+    padding: 0;
+}
+
+.claim-grid .text-muted {
+    font-size: 0.93rem;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    max-width: 100%;
+}
+
+.claim-item {
+    display: flex;
+    gap: 0.95rem;
+    align-items: flex-start;
+    height: 100%;
+    border: 1px solid rgba(226, 232, 240, 0.86);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.82);
+    padding: 1rem 1.05rem;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.035);
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.claim-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(90, 63, 246, 0.22);
+    box-shadow: 0 14px 28px rgba(90, 63, 246, 0.08);
+}
+
+.claim-item h3 {
+    font-size: 1rem;
+    line-height: 1.22;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem !important;
+}
+
+.step-number {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(90, 63, 246, 0.14), rgba(20, 184, 166, 0.12));
+    color: var(--sinemu-primary);
+    margin-bottom: 0;
+    flex: 0 0 34px;
+    font-size: 1rem;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(90, 63, 246, 0.16);
+}
+
+.claim-help {
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    padding: 0;
+}
+
+.claim-outcome-note {
+    width: fit-content;
+    max-width: min(100%, 760px);
+    margin-inline: auto;
+    border: 1px solid rgba(90, 63, 246, 0.16);
+    border-radius: 999px;
+    background: rgba(245, 243, 255, 0.72);
+    color: #475569;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    padding: 0.62rem 1.05rem;
+}
+
+.claim-help-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0.58rem 1.18rem;
+    border-radius: 999px;
+    border: 1px solid rgba(90, 63, 246, 0.25);
+    background: linear-gradient(135deg, var(--sinemu-primary) 0%, var(--sinemu-primary-mid) 100%);
+    color: #ffffff;
+    font-size: 0.94rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+}
+
+.claim-help-link:hover {
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--sinemu-primary-mid) 0%, var(--sinemu-primary) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(90, 63, 246, 0.24);
+}
+
+.admin-register-card {
+    border: 1px solid var(--sinemu-border);
+    border-radius: 28px;
+    background: var(--sinemu-surface-soft);
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.03);
+}
+
+.register-form {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.register-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    color: var(--sinemu-muted-soft);
+    margin-bottom: 0.45rem;
+}
+
+.register-input,
+.register-textarea {
+    border-radius: 16px;
+    border: 1px solid var(--sinemu-border-soft);
+    background: #ffffff;
+    min-height: 46px;
+}
+
+.register-textarea {
+    min-height: 72px;
+    resize: none;
+}
+
+.btn-register-submit {
+    border: none;
+    border-radius: 999px;
+    background: var(--sinemu-primary);
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    min-height: 54px;
+    box-shadow: 0 8px 18px rgba(10, 23, 53, 0.22);
+}
+
+.register-note {
+    border: 1px solid var(--sinemu-warning-border);
+    border-radius: 16px;
+    background: var(--sinemu-surface-warning);
+    color: var(--sinemu-warning);
+    padding: 0.85rem 1rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.register-note-icon {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    margin-top: 0;
+    transform: translateY(2px);
+    flex: 0 0 14px;
+}

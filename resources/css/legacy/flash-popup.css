@@ -1,0 +1,126 @@
+.feedback-alert,
+.alert-box,
+.alert.alert-success,
+.alert.alert-danger,
+.alert.alert-warning,
+.alert.alert-info {
+    display: none !important;
+}
+
+.sinemu-toast-container {
+    position: fixed;
+    top: 70px;
+    right: 16px;
+    width: min(92vw, 380px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.sinemu-toast {
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
+    gap: 10px;
+    align-items: start;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.16);
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.sinemu-toast.is-hiding {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.sinemu-toast__icon {
+    font-size: 18px;
+    line-height: 1;
+    margin-top: 1px;
+}
+
+.sinemu-toast__body {
+    min-width: 0;
+}
+
+.sinemu-toast__title {
+    display: block;
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.sinemu-toast__message {
+    display: block;
+    color: #334155;
+    font-size: 12px;
+    line-height: 1.45;
+    word-break: break-word;
+}
+
+.sinemu-toast__close {
+    border: 0;
+    background: transparent;
+    color: #64748b;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0;
+}
+
+.sinemu-toast__close:hover {
+    background: #eef2ff;
+    color: #1e293b;
+}
+
+.sinemu-toast--success {
+    border-left: 4px solid #16a34a;
+}
+
+.sinemu-toast--success .sinemu-toast__icon {
+    color: #16a34a;
+}
+
+.sinemu-toast--error {
+    border-left: 4px solid #dc2626;
+}
+
+.sinemu-toast--error .sinemu-toast__icon {
+    color: #dc2626;
+}
+
+.sinemu-toast--warning {
+    border-left: 4px solid #d97706;
+}
+
+.sinemu-toast--warning .sinemu-toast__icon {
+    color: #d97706;
+}
+
+.sinemu-toast--info {
+    border-left: 4px solid #2563eb;
+}
+
+.sinemu-toast--info .sinemu-toast__icon {
+    color: #2563eb;
+}
+
+@media (max-width: 640px) {
+    .sinemu-toast-container {
+        top: 64px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+    }
+}

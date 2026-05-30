@@ -6,18 +6,6 @@
             <h1 style="margin:0 0 .5rem;font-size:1.25rem;">Lupa Kata Sandi</h1>
             <p style="margin:0 0 1rem;color:#6b7280;">Masukkan email Anda untuk menerima link reset password.</p>
 
-            @if (session('status'))
-                <div style="margin-bottom:1rem;padding:.75rem;border-radius:10px;background:#ecfeff;border:1px solid #a5f3fc;color:#0f766e;">
-                    {{ session('status') }}
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div style="margin-bottom:1rem;padding:.75rem;border-radius:10px;background:#fee2e2;border:1px solid #fecaca;color:#991b1b;">
-                    {{ $errors->first() }}
-                </div>
-            @endif
-
             <form method="POST" action="{{ route('password.email') }}">
                 @csrf
                 <label for="email" style="display:block;margin-bottom:.45rem;font-weight:600;">Email</label>

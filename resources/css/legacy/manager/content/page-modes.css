@@ -1,0 +1,164 @@
+/* Bagian ini mengunci layout dashboard agar area tabel bisa scroll internal. */
+body.dashboard-fixed-mode {
+    overflow: hidden;
+}
+
+body.dashboard-fixed-mode .admin-shell {
+    height: 100vh;
+    overflow: hidden;
+}
+
+body.dashboard-fixed-mode .main-content {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+body.dashboard-fixed-mode .main-content-scroll {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-page-content {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.dashboard-report-card {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-report-card .report-table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.dashboard-report-card .pagination {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 1024px) {
+    body.dashboard-fixed-mode {
+        overflow-y: auto;
+    }
+
+    body.dashboard-fixed-mode .admin-shell,
+    body.dashboard-fixed-mode .main-content,
+    body.dashboard-fixed-mode .main-content-scroll {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    body.dashboard-fixed-mode .dashboard-page-content,
+    body.dashboard-fixed-mode .dashboard-report-card,
+    body.dashboard-fixed-mode .dashboard-report-card .report-table-wrap {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
+}
+
+/* Super dashboard scrolls only inside the right content pane. */
+body.super-dashboard-page-mode {
+    overflow: hidden;
+}
+
+body.super-dashboard-page-mode .admin-shell {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+body.super-dashboard-page-mode .main-content {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+}
+
+body.super-dashboard-page-mode .main-content-scroll {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+body.super-dashboard-page-mode .dashboard-page-content {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+}
+
+body.super-dashboard-page-mode .dashboard-report-card,
+body.super-dashboard-page-mode .dashboard-report-card .report-table-wrap {
+    min-height: 0;
+    height: auto;
+    overflow: visible;
+}
+
+/* Bagian ini mengunci layout halaman input agar form scroll di dalam card. */
+body.input-page-mode {
+    overflow: hidden;
+}
+
+body.input-page-mode .admin-shell {
+    height: 100vh;
+    overflow: hidden;
+}
+
+body.input-page-mode .main-content {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-page-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+    body.input-page-mode {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    body.input-page-mode .admin-shell,
+    body.input-page-mode .main-content,
+    body.input-page-mode .main-content-scroll,
+    body.input-page-mode .input-page-content {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+    }
+
+    body.input-page-mode .main-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    body.input-page-mode .input-card {
+        flex: 0 0 auto;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    body.input-page-mode .input-form {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
+}

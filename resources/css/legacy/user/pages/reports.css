@@ -1,0 +1,107 @@
+/* Halaman laporan kehilangan/temuan user. */
+.lost-report-page-mode,
+body.lost-report-page-mode {
+    height: 100%;
+    overflow: hidden;
+}
+
+body.lost-report-page-mode .admin-shell,
+body.lost-report-page-mode .main-content {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+}
+
+body.lost-report-page-mode .main-content-scroll {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.report-form-page,
+.lost-report-page {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+    gap: 14px;
+    overflow: hidden;
+    padding-bottom: 22px;
+}
+
+.report-form-page .intro,
+.lost-report-page .intro {
+    margin: 14px 2px 0;
+}
+
+.report-form-page .intro h1,
+.lost-report-page .intro h1 {
+    font-size: clamp(24px, 2vw, 28px);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+}
+
+.report-form-page .intro p,
+.lost-report-page .intro p {
+    margin-top: 6px;
+    max-width: 720px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.report-form-page .input-card,
+.lost-report-page .input-card {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    max-height: calc(100dvh - 210px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px 20px 24px 18px;
+    scrollbar-width: thin;
+    scrollbar-color: #b5c5db #eef3fa;
+}
+
+.report-form-page .input-card::-webkit-scrollbar,
+.lost-report-page .input-card::-webkit-scrollbar {
+    width: 8px;
+}
+
+.report-form-page .input-card::-webkit-scrollbar-track,
+.lost-report-page .input-card::-webkit-scrollbar-track {
+    background: #eef3fa;
+    border-radius: 999px;
+}
+
+.report-form-page .input-card::-webkit-scrollbar-thumb,
+.lost-report-page .input-card::-webkit-scrollbar-thumb {
+    background: #b5c5db;
+    border-radius: 999px;
+    border: 2px solid #eef3fa;
+}
+
+.report-form-page .input-card::-webkit-scrollbar-thumb:hover,
+.lost-report-page .input-card::-webkit-scrollbar-thumb:hover {
+    background: #95a8c2;
+}
+
+.report-form-page .input-form,
+.lost-report-page .input-form {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    padding: 2px 10px 4px 2px;
+    column-gap: 18px;
+    row-gap: 16px;
+}
+
+.report-form-page .form-actions,
+.lost-report-page .form-actions {
+    position: sticky;
+    bottom: -24px;
+    z-index: 2;
+    margin: 12px -20px -24px -18px;
+    padding: 14px 20px 16px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, #ffffff 38%);
+    border-top: 1px solid #e8eef6;
+}

@@ -1,0 +1,155 @@
+/* Bagian ini untuk menu aksi pada setiap baris tabel (lihat, hapus, dll). */
+.menu-cell {
+    width: 72px;
+    position: relative;
+    overflow: visible;
+}
+
+.row-menu-trigger {
+    border: 1px solid #d8e3f0;
+    background: #f9fbff;
+    color: #68809a;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    box-shadow: 0 8px 18px rgba(43, 86, 146, 0.05);
+}
+
+.row-menu-trigger svg {
+    width: 16px;
+    height: 16px;
+}
+
+.row-menu-trigger:hover {
+    background: #eef5ff;
+    border-color: #c5d7ed;
+    color: #35597f;
+}
+
+.row-menu {
+    display: none;
+    position: absolute;
+    top: 34px;
+    bottom: auto;
+    right: 10px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    min-width: 176px;
+    box-shadow: 0 18px 34px rgba(26, 56, 106, 0.16);
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.row-menu.is-floating {
+    position: fixed;
+    z-index: 9999;
+}
+
+.row-menu.open-down:not(.is-floating) {
+    top: 34px;
+    bottom: auto;
+}
+
+.row-menu.open-up:not(.is-floating) {
+    top: auto;
+    bottom: 34px;
+}
+
+.row-menu.open {
+    display: block;
+}
+
+.row-menu a {
+    display: block;
+    text-decoration: none;
+    color: #425a74;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 10px 14px;
+}
+
+.row-menu a:hover {
+    background: #f7f9fd;
+}
+
+.row-menu a.danger {
+    color: #cf1e1e;
+}
+
+.row-menu .row-menu-action {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    display: block;
+    text-decoration: none;
+    text-align: left;
+    color: #425366;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.row-menu .row-menu-action:hover {
+    background: #f7f9fd;
+}
+
+.menu-submit {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    color: #425366;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.menu-submit:hover {
+    background: #f7f9fd;
+}
+
+.menu-submit.danger {
+    color: #cf1e1e;
+}
+
+.row-menu-note {
+    display: block;
+    padding: 10px 12px;
+    font-size: 12px;
+    color: #16a34a;
+}
+
+/* Bagian ini untuk kontrol pagination di bawah tabel. */
+.pagination {
+    display: none !important;
+    justify-content: flex-end;
+    gap: 6px;
+    padding: 11px 14px;
+    position: relative;
+    z-index: 0;
+}
+
+.report-card-scrollable .pagination {
+    border-top: 1px solid #edf1f6;
+    background: #fff;
+}
+
+.pagination button {
+    border: 1px solid var(--line);
+    background: #fff;
+    color: #5f6f84;
+    border-radius: 6px;
+    font-size: 11px;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+.pagination .active {
+    background: #1c8ce6;
+    border-color: #1c8ce6;
+    color: #fff;
+}

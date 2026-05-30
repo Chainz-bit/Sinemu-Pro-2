@@ -32,16 +32,24 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy file project
+# Copy package.json dulu (Docker layer cache optimization)
+COPY package*.json ./
+RUN npm ci --no-audit --no-fund
+
+# Copy composer dulu (Docker layer cache optimization)
+COPY composer*.json composer.lock ./
+
+# Install composer tanpa scripts (artisan belum ada)
+RUN composer install --optimize-autoloader --no-dev --no-scripts
+
+# Copy semua file project
 COPY . .
 
-# ========== TAMBAHKAN BLOK INI ==========
-# Install NPM dependencies dan build Vite assets
-RUN npm ci --no-audit --no-fund && npm run build
-# ========================================
+# Jalankan composer scripts setelah semua file ada
+RUN composer dump-autoload --optimize && php artisan package:discover --ansi
 
-# Install dependencies Laravel (optimize untuk production)
-RUN composer install --optimize-autoloader --no-dev
+# Build Vite assets & hapus node_modules
+RUN npm run build && rm -rf node_modules
 
 # Set permission
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache

@@ -1,0 +1,33 @@
+/* section: theme */
+@import url('../password-input.css');
+
+:root {
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --line: #e6eaf0;
+    --text: #1f2937;
+    --muted: #7a8799;
+    --brand: #2b6cb0;
+    --brand-soft: #e8f1ff;
+    --success: #16a34a;
+    --warn: #b7791f;
+    --danger: #dc2626;
+}
+
+/* section: reset */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}

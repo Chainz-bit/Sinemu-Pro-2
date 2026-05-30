@@ -1,0 +1,47 @@
+<?php
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\User\ClaimController;
+use App\Http\Controllers\User\DashboardController;
+use App\Http\Controllers\User\FoundReportController;
+use App\Http\Controllers\User\LostReportController;
+use App\Http\Controllers\User\ProfileController as UserProfileController;
+use App\Http\Controllers\User\RiwayatKlaimController;
+use App\Http\Controllers\User\SettingsController;
+use App\Http\Controllers\User\UserNotificationController;
+use Illuminate\Support\Facades\Route;
+
+Route::middleware('auth')->group(function () {
+    // BAGIAN: Kompatibilitas URL lama dashboard user.
+    Route::get('/dashboard', function () {
+        return redirect()->route('user.dashboard');
+    })->name('dashboard');
+
+    // BAGIAN: Halaman dashboard dan form pelaporan user.
+    Route::prefix('user')->name('user.')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/profil', [UserProfileController::class, 'index'])->name('profile');
+        Route::get('/pengaturan', [SettingsController::class, 'index'])->name('settings');
+        Route::put('/pengaturan', [SettingsController::class, 'update'])->name('settings.update');
+        Route::get('/pengaturan/riwayat', [SettingsController::class, 'history'])->name('settings.history');
+        Route::get('/klaim', [ClaimController::class, 'create'])->name('claims.create');
+        Route::get('/riwayat-klaim', [RiwayatKlaimController::class, 'index'])->name('claim-history');
+        Route::delete('/riwayat-klaim/{klaim}', [RiwayatKlaimController::class, 'destroy'])->name('claim-history.destroy');
+        Route::get('/lapor-barang-hilang', [LostReportController::class, 'create'])->name('lost-reports.create');
+        Route::get('/lapor-barang-temuan', [FoundReportController::class, 'create'])->name('found-reports.create');
+        Route::post('/notifications/read-all', [UserNotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+        Route::post('/notifications/{notification}/read', [UserNotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/notifications/{notification}/unread', [UserNotificationController::class, 'markAsUnread'])->name('notifications.unread');
+        Route::delete('/notifications/{notification}', [UserNotificationController::class, 'destroy'])->name('notifications.destroy');
+        Route::delete('/notifications', [UserNotificationController::class, 'destroyAll'])->name('notifications.destroy-all');
+    });
+
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/laporan/hilang', [LostReportController::class, 'store'])->name('user.lost-reports.store');
+    Route::delete('/laporan/hilang/{laporanBarangHilang}', [LostReportController::class, 'destroy'])->name('user.lost-reports.destroy');
+    Route::post('/laporan/temuan', [FoundReportController::class, 'store'])->name('user.found-reports.store');
+    Route::post('/klaim', [ClaimController::class, 'store'])->name('user.claims.store');
+});

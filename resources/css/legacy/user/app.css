@@ -1,0 +1,20 @@
+/*
+|--------------------------------------------------------------------------
+| User Styles (Aggregator)
+|--------------------------------------------------------------------------
+| File ini hanya mengatur urutan import CSS user.
+| Edit detail halaman di folder user/pages supaya mudah dicari.
+*/
+
+@import url('../manager/base.css');
+@import url('../manager/layout.css');
+@import url('../manager/topbar.css');
+@import url('../manager/content.css');
+@import url('../manager/responsive.css');
+@import url('./sidebar.css');
+@import url('./foundation.css');
+@import url('./pages/dashboard.css');
+@import url('./pages/reports.css');
+@import url('./pages/settings-history.css');
+@import url('./pages/claims.css');
+@import url('./responsive.css');

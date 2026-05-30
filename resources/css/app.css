@@ -1,2 +1,53 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
+/* Hide default password reveal icon from Microsoft Edge / Internet Explorer. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+/* Hide browser-specific password/autofill icons if they appear. */
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-caps-lock-indicator {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+}
+
+.app-password-field {
+    position: relative;
+}
+
+.app-password-field input {
+    padding-right: 2.75rem !important;
+}
+
+.app-password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    width: 2rem;
+    height: 2rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #6b7280;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.app-password-toggle:hover,
+.app-password-toggle:focus-visible {
+    background: rgba(79, 70, 229, 0.08);
+    color: #4f46e5;
+    outline: none;
+}
+
+.app-password-toggle svg {
+    width: 1rem;
+    height: 1rem;
+}
+

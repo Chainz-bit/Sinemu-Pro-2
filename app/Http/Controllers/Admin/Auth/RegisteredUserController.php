@@ -3,74 +3,105 @@
 namespace App\Http\Controllers\Admin\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AdminRegisterRequest;
 use App\Models\Admin;
-use App\Models\SuperAdmin;
+use App\Models\Wilayah;
+use App\Support\IndramayuDistricts;
+use App\Support\ManagerPortal;
+use App\Support\RoleLabels;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
     public function create(): View
     {
-        return view('admin.auth.register');
+        $kecamatanOptions = IndramayuDistricts::names();
+        $pickupRegionOptions = IndramayuDistricts::wilayahItems();
+
+        return view('manager::auth.register', compact('kecamatanOptions', 'pickupRegionOptions'));
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(AdminRegisterRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'nama' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255'],
-            'instansi' => ['required', 'string', 'max:255'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+        $validated = $request->validated();
 
-        $username = $this->buildUniqueAdminUsername($validated['username']);
+        try {
+            Admin::query()->create([
+                'super_admin_id' => null,
+                'region_id' => $this->resolveRegionId($validated['kecamatan']),
+                'nama' => $validated['nama'],
+                'email' => $validated['email'],
+                'nomor_telepon' => $validated['nomor_telepon'],
+                'username' => $validated['username'],
+                'instansi' => $validated['instansi'],
+                'kecamatan' => $validated['kecamatan'],
+                'alamat_lengkap' => $validated['alamat_lengkap'],
+                'pickup_address' => $validated['pickup_address'] ?? null,
+                'pickup_lat' => $validated['pickup_lat'] ?? null,
+                'pickup_lng' => $validated['pickup_lng'] ?? null,
+                'status_verifikasi' => Admin::STATUS_PENDING,
+                'verified_at' => null,
+                'password' => Hash::make($validated['password']),
+            ]);
+        } catch (QueryException $exception) {
+            $this->throwValidationExceptionForDuplicateAccount($exception);
+        }
 
-        $superAdmin = SuperAdmin::query()->first();
-        if (!$superAdmin) {
-            $superAdmin = SuperAdmin::query()->create([
-                'nama' => 'Super Admin',
-                'username' => 'superadmin',
-                'password' => Hash::make('password'),
+        return redirect()
+            ->route(ManagerPortal::loginRoute())
+            ->with('status', 'Pendaftaran ' . RoleLabels::managerLower() . ' berhasil. Akun Anda akan aktif setelah diverifikasi super admin.');
+    }
+
+    private function resolveRegionId(string $kecamatan): ?int
+    {
+        if (!Schema::hasTable('wilayahs') || !Schema::hasColumn('admins', 'region_id')) {
+            return null;
+        }
+
+        $wilayah = IndramayuDistricts::wilayahItem($kecamatan);
+
+        return (int) Wilayah::query()->firstOrCreate(
+            ['nama_wilayah' => $wilayah['nama_wilayah']],
+            ['lat' => $wilayah['lat'], 'lng' => $wilayah['lng']]
+        )->id;
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    private function throwValidationExceptionForDuplicateAccount(QueryException $exception): never
+    {
+        if ((string) $exception->getCode() !== '23000') {
+            throw $exception;
+        }
+
+        $message = strtolower($exception->getMessage());
+
+        if (str_contains($message, 'admins_username_unique')) {
+            throw ValidationException::withMessages([
+                'username' => 'Username sudah digunakan.',
             ]);
         }
 
-        $admin = Admin::query()->create([
-            'super_admin_id' => $superAdmin->id,
-            'nama' => $validated['nama'],
-            'username' => $username,
-            'instansi' => $validated['instansi'],
-            'password' => Hash::make($validated['password']),
+        if (str_contains($message, 'admins_email_unique')) {
+            throw ValidationException::withMessages([
+                'email' => 'Email sudah digunakan sebagai akun pengelola.',
+            ]);
+        }
+
+        if (str_contains($message, 'admins_nomor_telepon_unique')) {
+            throw ValidationException::withMessages([
+                'nomor_telepon' => 'Nomor telepon sudah digunakan.',
+            ]);
+        }
+
+        throw ValidationException::withMessages([
+            'email' => 'Data akun sudah digunakan.',
         ]);
-
-        Auth::guard('admin')->login($admin);
-        $request->session()->regenerate();
-
-        return redirect()->route('admin.dashboard');
-    }
-
-    private function buildUniqueAdminUsername(string $usernameInput): string
-    {
-        $base = Str::lower(trim($usernameInput));
-        $base = preg_replace('/[^a-z0-9._-]/', '', $base) ?? '';
-
-        if ($base === '') {
-            $base = 'admin';
-        }
-
-        $username = $base;
-        $counter = 1;
-
-        while (Admin::query()->where('username', $username)->exists()) {
-            $username = $base.$counter;
-            $counter++;
-        }
-
-        return $username;
     }
 }

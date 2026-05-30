@@ -3,35 +3,66 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\LaporanBarangHilang;
-use App\Models\Barang;
-use App\Models\Klaim;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\Admin\DashboardIndexRequest;
+use App\Http\Requests\Admin\DashboardReportTypeRequest;
+use App\Http\Requests\Admin\DashboardUpdateReportRequest;
+use App\Services\Admin\Dashboard\DashboardQueryService;
+use App\Services\Admin\Dashboard\ReportCommandService;
+use App\Support\Media\OptimizedImageUploader;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function __construct(
+        private readonly OptimizedImageUploader $imageUploader,
+        private readonly ReportCommandService $reportCommandService,
+        private readonly DashboardQueryService $reportFeedService
+    ) {
+    }
+
+    public function index(DashboardIndexRequest $request)
     {
-        // Total laporan hilang dari user
-        $totalHilang = LaporanBarangHilang::count();
+        /** @var \App\Models\Admin $admin */
+        $admin = \App\Support\ManagerPortal::user();
+        $dashboardData = $this->reportFeedService->buildDashboardData(
+            search: $request->search(),
+            statusFilter: $request->statusFilter(),
+            page: $request->pageNumber()
+        );
 
-        // Total barang temuan yang diinput admin
-        $totalTemuan = Barang::count();
+        return view('manager::pages.dashboard.index', [
+            'totalHilang' => $dashboardData['totalHilang'],
+            'totalTemuan' => $dashboardData['totalTemuan'],
+            'menungguVerifikasi' => $dashboardData['menungguVerifikasi'],
+            'latestReports' => $dashboardData['latestReports'],
+            'admin' => $admin,
+            'search' => $request->search() ?? '',
+            'statusFilter' => $request->statusFilter(),
+        ]);
+    }
 
-        // Total klaim yang menunggu verifikasi
-        $menungguVerifikasi = Klaim::where('status_klaim', 'pending')->count();
+    public function updateReport(DashboardUpdateReportRequest $request, string $type, string|int $id): RedirectResponse
+    {
+        abort_if(!\App\Support\ManagerPortal::check(), 403);
+        $statusMessage = $this->reportCommandService->updateReport(
+            type: $request->reportType(),
+            id: (int) $id,
+            validated: $request->validated(),
+            photo: $request->file('foto_barang'),
+            imageUploader: $this->imageUploader,
+            adminId: (int) \App\Support\ManagerPortal::id()
+        );
 
-        // Gabungkan data terbaru dari laporan hilang dan barang temuan
-        $hilang = LaporanBarangHilang::with('user')
-            ->select('id', 'user_id', 'nama_barang as item_name', 'lokasi_hilang as location', 'created_at', DB::raw("'hilang' as type"), 'tanggal_hilang as incident_date')
-            ->get();
+        return back()->with('status', $statusMessage);
+    }
 
-        $temuan = Barang::with('admin')
-            ->select('id', 'admin_id as user_id', 'nama_barang as item_name', 'lokasi_ditemukan as location', 'created_at', DB::raw("'temuan' as type"), 'tanggal_ditemukan as incident_date')
-            ->get();
+    public function publishToHome(DashboardReportTypeRequest $request, string $type, string|int $id): RedirectResponse
+    {
+        abort_if(!\App\Support\ManagerPortal::check(), 403);
+        $result = $this->reportCommandService->publishToHome($request->reportType(), (int) $id);
+        $flashType = $result['status'] ? 'status' : 'error';
 
-        $latestReports = $hilang->merge($temuan)->sortByDesc('created_at')->take(5);
-
-        return view('admin.dashboard', compact('totalHilang', 'totalTemuan', 'menungguVerifikasi', 'latestReports'));
+        return back()->with($flashType, $result['message']);
     }
 }

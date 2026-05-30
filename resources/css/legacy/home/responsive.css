@@ -1,0 +1,236 @@
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .section-space {
+        padding: 56px 0;
+    }
+
+    .hero-modern-section {
+        min-height: 100vh;
+        padding-top: 4.35rem;
+        padding-bottom: 0.7rem;
+        border-radius: 0;
+    }
+
+    .hero-modern-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .hero-modern-meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .carousel-item {
+        flex-basis: 78%;
+    }
+
+    .claim-help {
+        border-radius: 16px;
+    }
+
+    .claim-card {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.4rem !important;
+    }
+
+    .claim-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .claim-card .section-title {
+        font-size: clamp(1.55rem, 5vw, 2rem);
+    }
+
+    .claim-item h3 {
+        font-size: 1.15rem;
+    }
+
+    .claim-grid .text-muted {
+        font-size: 0.95rem;
+        max-width: 100%;
+    }
+
+    .claim-help-link {
+        font-size: 0.9rem;
+    }
+
+    .btn-register-submit {
+        min-height: 50px;
+    }
+
+    .map-layout {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .map-sidebar {
+        border-bottom: 1px solid var(--sinemu-border);
+        border-right: 0;
+        padding: 1rem;
+    }
+
+    .map-board {
+        padding: 0.9rem;
+    }
+
+    .map-canvas {
+        min-height: 320px;
+    }
+
+    .map-quick-grid {
+        max-height: none;
+        overflow: visible;
+    }
+
+    .map-zoom {
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .map-smart-nav {
+        width: calc(100% - 2rem);
+        right: 1rem;
+        left: 1rem;
+    }
+
+    .lokasi-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .lokasi-map-panel,
+    .lokasi-map-frame {
+        min-height: 240px;
+    }
+
+    .filter-wrap {
+        padding: 0.9rem;
+        transform: none;
+    }
+
+    .filter-subtitle {
+        max-width: none;
+    }
+
+    .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 1.6rem;
+    }
+
+    .contact-head {
+        text-align: left !important;
+    }
+
+    .footer-links-wrap {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .footer-title {
+        font-size: 1.65rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-modern-section {
+        min-height: 100vh;
+        gap: 0.65rem;
+        padding-top: 4.15rem;
+        padding-bottom: 0.35rem;
+    }
+
+    .item-block-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-block-title {
+        font-size: 1.35rem;
+    }
+
+    .carousel-item {
+        flex: 0 0 86%;
+    }
+
+    .item-media {
+        height: 172px;
+    }
+
+    .hero-modern-title {
+        font-size: clamp(1.55rem, 8.1vw, 2.2rem);
+    }
+
+    .hero-modern-subtitle {
+        font-size: 0.9rem;
+        max-width: 340px;
+        margin-inline: auto;
+        padding-inline: 1rem;
+    }
+
+    .hero-modern-actions {
+        flex-direction: column;
+        align-items: center;
+        padding-inline: 1rem;
+    }
+
+    .hero-modern-actions .btn {
+        width: 100%;
+        max-width: 340px;
+    }
+
+    .filter-wrap {
+        transform: translateY(0);
+    }
+
+    .hero-modern-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-section {
+        border-radius: 18px;
+    }
+
+    .contact-head .section-title {
+        font-size: clamp(1.6rem, 7vw, 2rem);
+    }
+
+    .contact-info-card {
+        padding: 0.9rem;
+        min-height: 148px;
+    }
+
+    .contact-form-card {
+        padding: 0.9rem;
+    }
+
+    .footer-links-wrap {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-bottom {
+        letter-spacing: 0.14em;
+    }
+}
+
+@media (min-width: 480px) and (max-width: 575.98px) {
+    .hero-modern-actions {
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        padding-inline: 1rem;
+    }
+
+    .hero-modern-actions .btn {
+        flex: 1 1 0;
+        width: auto;
+        max-width: 220px;
+        min-width: 0;
+        padding-inline: 0.8rem;
+        white-space: nowrap;
+    }
+}

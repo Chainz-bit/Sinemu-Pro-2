@@ -1,0 +1,358 @@
+/* ============================================================
+   Report Detail Page
+   Blade: .report-detail-page > .report-detail-stage > section.report-detail-hero
+          > .report-detail-media (img) | .report-detail-main (flex col)
+   ============================================================ */
+
+/* ---------- Page wrapper ---------- */
+.report-detail-page {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 0% 0%, rgba(122, 97, 255, 0.07), transparent 32%),
+        radial-gradient(circle at 100% 100%, rgba(90, 63, 246, 0.06), transparent 36%),
+        #f7f9ff;
+}
+
+/* ---------- Stage ---------- */
+.report-detail-stage {
+    width: min(1260px, 100%);
+    margin: 0 auto;
+    min-height: 100vh;
+    padding: 28px 32px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+/* ---------- Hero: 2-column grid ---------- */
+.report-detail-hero {
+    display: grid;
+    grid-template-columns: 1fr 520px;
+    column-gap: 52px;
+    width: 100%;
+    align-items: stretch;
+}
+
+/* ---------- Media / image panel ----------
+   The grid row height = right col content height.
+   Left col stretches to match (align-items: stretch on parent).
+   img is absolutely positioned inside so it fills the container
+   without pushing it taller.
+   ------------------------------------------------------------ */
+.report-detail-media {
+    min-height: 0;
+    min-width: 0;
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background:
+        linear-gradient(135deg, rgba(248, 250, 255, 0.96), rgba(238, 242, 251, 0.92));
+    border: 1px solid rgba(211, 222, 243, 0.7);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.78);
+    z-index: 1;
+}
+
+.report-detail-media img {
+    position: absolute;
+    inset: 22px;
+    width: calc(100% - 44px);
+    height: calc(100% - 44px);
+    object-fit: contain;
+    object-position: center center;
+    image-rendering: auto;
+    filter: contrast(1.03) saturate(1.05);
+    display: block;
+    transition: transform 0.35s ease, filter 0.35s ease;
+}
+
+.report-detail-media:hover img {
+    transform: scale(1.015);
+    filter: contrast(1.04) saturate(1.06);
+}
+
+/* ---------- Right column ---------- */
+.report-detail-main {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 6px 0;
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+}
+
+.report-detail-main > * {
+    margin: 0;
+}
+
+/* ---------- Heading ---------- */
+.report-detail-main h1 {
+    font-size: clamp(1.75rem, 2.6vw, 2.5rem);
+    line-height: 1.15;
+    font-weight: 800;
+    color: #0f172a;
+    word-break: break-word;
+    letter-spacing: -0.02em;
+}
+
+/* ---------- Subtitle ---------- */
+.report-detail-subtitle {
+    color: #64748b;
+    font-size: 0.92rem;
+    line-height: 1.65;
+}
+
+/* ---------- Status chip ---------- */
+.report-detail-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: 5px 12px;
+    font-size: 0.68rem;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+    font-weight: 800;
+    width: fit-content;
+    border: 1px solid transparent;
+}
+
+.report-detail-chip iconify-icon {
+    font-size: 0.86rem;
+}
+
+.report-detail-chip.is-lost {
+    color: #9a3412; background: #fff7ed; border-color: rgba(251, 146, 60, 0.28);
+}
+.report-detail-chip.is-found {
+    color: #047857; background: #ecfdf5; border-color: rgba(16, 185, 129, 0.24);
+}
+.report-detail-chip.is-in-progress {
+    color: #a16207; background: #fef3c7; border-color: rgba(161,98,7,0.2);
+}
+.report-detail-chip.is-claimed {
+    color: #1d4ed8; background: #dbeafe; border-color: rgba(29,78,216,0.2);
+}
+.report-detail-chip.is-returned {
+    color: #475569; background: #e2e8f0; border-color: rgba(71,85,105,0.18);
+}
+
+/* ---------- Meta grid ---------- */
+.report-detail-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.report-detail-meta-grid article {
+    border: 1px solid rgba(220, 230, 246, 0.8);
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 12px 14px;
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    cursor: default;
+}
+
+.report-detail-meta-grid article:hover {
+    transform: translateY(-2px);
+    border-color: rgba(160, 180, 230, 0.9);
+    box-shadow: 0 4px 16px rgba(100, 120, 200, 0.08);
+}
+
+.report-detail-meta-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.71rem;
+    color: #7a8ba8;
+    margin-bottom: 5px;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+}
+
+.report-detail-meta-label iconify-icon {
+    font-size: 13px;
+    color: #8898bb;
+    flex-shrink: 0;
+}
+
+.report-detail-meta-grid strong {
+    display: block;
+    font-size: 0.95rem;
+    color: #0f172a;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+/* ---------- Description ---------- */
+.report-detail-description {
+    border: 1px solid rgba(220, 230, 246, 0.8);
+    border-radius: 12px;
+    padding: 14px 16px;
+    background: #ffffff;
+}
+
+.report-detail-description h2 {
+    font-size: 0.71rem;
+    font-weight: 700;
+    color: #7a8ba8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 6px;
+}
+
+.report-detail-description p {
+    margin: 0;
+    color: #1e293b;
+    font-size: 0.93rem;
+    line-height: 1.75;
+    white-space: pre-line;
+}
+
+/* ---------- Pre-claim note ---------- */
+.report-detail-preclaim-note {
+    border: 1.5px dashed #f5c842;
+    border-radius: 12px;
+    background: #fffbeb;
+    padding: 13px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.report-detail-preclaim-note strong {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #92400e;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.3;
+}
+
+.report-detail-preclaim-note p {
+    margin: 0;
+    color: #78350f;
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+/* ---------- Action buttons ----------
+   Blade renders 1-3 <a> buttons depending on auth/type.
+   flex equal-grow keeps them side-by-side in all cases.
+   ---------------------------------------------------------- */
+.report-detail-actions {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    margin-top: 4px;
+}
+
+.report-detail-actions .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.84rem;
+    padding: 0.65rem 0.75rem;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    text-decoration: none;
+}
+
+.report-detail-actions .btn iconify-icon {
+    font-size: 1rem;
+    flex: 0 0 auto;
+}
+
+.report-detail-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(80, 60, 200, 0.16);
+}
+
+.report-detail-actions .btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 1200px) {
+    .report-detail-hero {
+        grid-template-columns: 1fr 460px;
+        column-gap: 36px;
+    }
+}
+
+@media (max-width: 900px) {
+    .report-detail-stage {
+        padding: 16px 16px 24px;
+        min-height: auto;
+        align-items: flex-start;
+    }
+
+    .report-detail-hero {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        gap: 20px;
+    }
+
+    /* On mobile: image no longer has a stretch partner, give it aspect-ratio */
+    .report-detail-media {
+        aspect-ratio: 16 / 10;
+        max-height: 400px;
+    }
+
+    /* img can go back to normal flow since container has defined height */
+    .report-detail-media img {
+        position: static;
+        width: calc(100% - 28px);
+        height: calc(100% - 28px);
+        margin: 14px;
+    }
+
+    .report-detail-main h1 {
+        font-size: clamp(1.5rem, 6vw, 2rem);
+    }
+}
+
+@media (max-width: 640px) {
+    .report-detail-stage {
+        padding: 12px 12px 20px;
+    }
+
+    .report-detail-meta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-detail-actions {
+        flex-wrap: wrap;
+    }
+
+    .report-detail-actions .btn {
+        flex: 1 1 100%;
+        white-space: normal;
+    }
+
+    .report-detail-subtitle {
+        font-size: 0.86rem;
+    }
+}

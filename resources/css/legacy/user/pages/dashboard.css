@@ -1,0 +1,78 @@
+/* Halaman dashboard user. */
+.dashboard-hub-page {
+    gap: 14px;
+}
+
+.dashboard-hub-page .intro {
+    margin: 8px 0 0;
+    padding: 20px 24px;
+    border-radius: 16px;
+}
+
+.dashboard-hub-page .intro h1 {
+    max-width: 28ch;
+    font-size: clamp(23px, 2.1vw, 28px);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+}
+
+.dashboard-hub-page .intro p {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.dashboard-hub-page .stats-grid {
+    margin-bottom: 0;
+}
+
+.dashboard-hub-page .dashboard-report-card {
+    min-height: 0;
+}
+
+.dashboard-hub-page .report-table-wrap {
+    padding-bottom: 18px;
+    scroll-padding-bottom: 18px;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    scrollbar-color: #b7c6da #eef3fa;
+}
+
+.dashboard-hub-page .report-table-wrap::-webkit-scrollbar,
+.claim-history-card .report-table-wrap::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dashboard-hub-page .report-table-wrap::-webkit-scrollbar-track,
+.claim-history-card .report-table-wrap::-webkit-scrollbar-track {
+    background: #eef3fa;
+    border-radius: 999px;
+}
+
+.dashboard-hub-page .report-table-wrap::-webkit-scrollbar-thumb,
+.claim-history-card .report-table-wrap::-webkit-scrollbar-thumb {
+    background: #b7c6da;
+    border-radius: 999px;
+    border: 2px solid #eef3fa;
+}
+
+.dashboard-hub-page .report-table-wrap::-webkit-scrollbar-thumb:hover,
+.claim-history-card .report-table-wrap::-webkit-scrollbar-thumb:hover {
+    background: #98aac2;
+}
+
+.dashboard-hub-page .report-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.dashboard-hub-page .dashboard-empty-row {
+    height: clamp(160px, 28dvh, 280px);
+    padding: 18px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.dashboard-hub-page .report-table tbody:has(.dashboard-empty-row) {
+    height: clamp(160px, 28dvh, 280px);
+}

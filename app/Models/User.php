@@ -2,19 +2,39 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $nama
+ * @property string $username
+ * @property string $email
+ * @property string|null $email_verified_at
+ * @property string $password
+ * @property string|null $remember_token
+ * @property string|null $google_id
+ * @property string|null $avatar
+ * @property string|null $nomor_telepon
+ * @property string|null $alamat
+ * @property string|null $profil
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property-read Collection<int, LaporanBarangHilang> $laporanHilang
+ * @property-read Collection<int, Klaim> $klaims
+ * @property-read Collection<int, UserNotification> $notifications
+ */
+class User extends Authenticatable
 {
-    use HasFactory, Notifiable, MustVerifyEmailTrait;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
-        'name', 'nama', 'username', 'email', 'password', 'profil',
+        'name', 'nama', 'username', 'email', 'email_verified_at', 'google_id', 'avatar', 'nomor_telepon', 'alamat', 'password', 'profil',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -54,5 +74,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function klaims()
     {
         return $this->hasMany(Klaim::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(UserNotification::class);
     }
 }

@@ -1,0 +1,672 @@
+/* =========================================================
+   Peta Lokasi Pengambilan Sinemu (Indramayu)
+   ========================================================= */
+
+.lokasi-wrap {
+    border: none !important;
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08) !important;
+    padding: clamp(0.95rem, 1.5vw, 1.35rem) !important;
+}
+
+.lokasi-header {
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+.lokasi-main-title {
+    font-size: clamp(1.2rem, 4.4vw, 1.85rem);
+    font-weight: 800;
+    letter-spacing: 0;
+    color: var(--sinemu-primary-dark);
+}
+
+.lokasi-main-subtitle {
+    font-size: 0.9rem;
+    color: var(--sinemu-muted);
+}
+
+.lokasi-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: stretch;
+}
+
+.lokasi-map-panel {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #f8fafc;
+    border: 1px solid rgba(217, 208, 198, 0.8);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.lokasi-map-frame {
+    width: 100%;
+    min-height: 360px;
+    height: 360px;
+    border: 0;
+    display: block;
+}
+
+.lokasi-map-frame .leaflet-container {
+    width: 100%;
+    height: 100%;
+}
+
+.lokasi-map-frame .leaflet-popup-content {
+    margin: 10px 12px;
+    min-width: 220px;
+}
+
+.pickup-popup {
+    font-size: 0.82rem;
+    color: #334155;
+    line-height: 1.5;
+}
+
+.pickup-popup strong {
+    display: block;
+    color: #0f172a;
+    font-size: 0.92rem;
+    margin-bottom: 2px;
+}
+
+.pickup-popup-link {
+    display: inline-block;
+    margin-top: 7px;
+    color: #2563eb;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.pickup-popup-link:hover {
+    text-decoration: underline;
+}
+
+.home-location-marker {
+    width: 44px !important;
+    height: 44px !important;
+    border: 0;
+    background: transparent;
+}
+
+.home-location-marker__pin {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    color: #2563eb;
+    filter: drop-shadow(0 10px 18px rgba(37, 99, 235, 0.28));
+}
+
+.home-location-marker__pin svg {
+    display: block;
+}
+
+.home-location-marker__pin::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.78);
+}
+
+.lokasi-map-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 8px 10px;
+    font-size: 0.74rem;
+    color: #64748b;
+    background: #ffffff;
+    border-top: 1px solid rgba(217, 208, 198, 0.8);
+}
+
+.lokasi-info-panel {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid rgba(217, 208, 198, 0.8);
+    padding: 1.05rem;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+}
+
+.lokasi-title {
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    color: #0f172a;
+}
+
+.lokasi-subtitle {
+    color: var(--sinemu-muted);
+    font-size: 0.87rem;
+    line-height: 1.45;
+}
+
+.lokasi-contact-chip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.8rem 0.85rem;
+    border-radius: 12px;
+    background: #f7f8ff;
+    border: 1px solid #e7e9ff;
+    min-height: 76px;
+}
+
+.lokasi-manager-label {
+    display: inline-block;
+    margin-bottom: 0.18rem;
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+.lokasi-chip-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ede9fe;
+    color: var(--sinemu-primary);
+    flex: 0 0 30px;
+}
+
+.lokasi-meta {
+    display: grid;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.lokasi-meta span {
+    font-size: 0.9rem;
+    color: #475569;
+}
+
+.lokasi-action-btn {
+    width: 100%;
+    border-radius: 999px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.97rem;
+    font-weight: 700;
+    min-height: 44px;
+    padding: 0.64rem 0.95rem;
+    border: 1px solid transparent;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 1.2;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.lokasi-action-primary {
+    color: #fff;
+    background: linear-gradient(135deg, var(--sinemu-primary) 0%, var(--sinemu-primary-mid) 100%);
+    box-shadow: 0 10px 18px rgba(90, 63, 246, 0.22);
+}
+
+.lokasi-action-primary:hover {
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.lokasi-actions {
+    margin-top: auto;
+    margin-bottom: 0 !important;
+}
+
+.lokasi-action-btn[disabled],
+.lokasi-action-btn[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.78;
+}
+
+.lokasi-action-btn[aria-disabled="true"] {
+    pointer-events: none;
+}
+
+.lokasi-action-secondary {
+    color: #0f172a;
+    background: #fff;
+    border-color: rgba(217, 208, 198, 0.95);
+}
+
+.lokasi-action-secondary:hover {
+    border-color: #14b8a6;
+    background: #f8fffd;
+    color: #0f172a;
+}
+
+.lokasi-action-light {
+    color: #0f766e;
+    background: #ecfeff;
+    border-color: #67e8f9;
+}
+
+.lokasi-action-light:hover {
+    border-color: #22d3ee;
+    background: #dff8ff;
+}
+
+.lokasi-action-support {
+    background: #dcfce7;
+    color: #047857;
+    border: 1px solid #86efac;
+}
+
+.lokasi-action-support:hover {
+    background: #ccf6db;
+    border-color: #4ade80;
+    color: #065f46;
+}
+
+.lokasi-list-wrap {
+    border-top: 1px solid rgba(217, 208, 198, 0.8);
+    padding-top: 16px;
+}
+
+.lokasi-list-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.lokasi-list-title {
+    font-size: 1.04rem;
+    font-weight: 800;
+    color: var(--sinemu-primary-dark);
+}
+
+.lokasi-carousel-controls {
+    display: inline-flex;
+    gap: 10px;
+    min-height: 38px;
+    align-items: center;
+}
+
+.lokasi-carousel-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    color: #0f172a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.86rem;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
+    transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.lokasi-carousel-btn[hidden] {
+    display: none !important;
+}
+
+.lokasi-carousel-btn:hover {
+    border-color: #8b7cff;
+    color: #4f46e5;
+    background: #f9f8ff;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(90, 63, 246, 0.12);
+}
+
+.lokasi-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    overflow: visible;
+    scroll-behavior: smooth;
+    min-height: 214px;
+    padding: 3px 3px 10px;
+    user-select: auto;
+}
+
+.lokasi-list.is-single {
+    cursor: default;
+    overflow: visible;
+    min-height: 224px;
+}
+
+.lokasi-item {
+    position: relative;
+    flex: 1 1 clamp(320px, 31vw, 410px);
+    max-width: 430px;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    border-radius: 18px;
+    padding: 1rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.72) 100%),
+        #fff;
+    min-height: 204px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+.lokasi-list.is-single .lokasi-item {
+    flex-basis: min(100%, 520px);
+}
+
+.lokasi-item::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: transparent;
+}
+
+.lokasi-item.is-active {
+    border-color: rgba(139, 124, 255, 0.9);
+    box-shadow: 0 16px 30px rgba(90, 63, 246, 0.14);
+}
+
+.lokasi-item.is-active::before {
+    background: linear-gradient(180deg, var(--sinemu-primary) 0%, #14b8a6 100%);
+}
+
+.lokasi-item:hover {
+    transform: translateY(-1px);
+}
+
+.lokasi-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.lokasi-item-heading {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.lokasi-item-manager {
+    color: #5b55b9;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.lokasi-item h4 {
+    margin: 0;
+    font-size: 1.08rem;
+    line-height: 1.22;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: 0;
+    overflow-wrap: break-word;
+}
+
+.lokasi-item-distance {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 auto;
+    font-size: 0.72rem;
+    color: #0f766e;
+    background: #f0fdfa;
+    border: 1px solid #99f6e4;
+    border-radius: 999px;
+    padding: 0.3rem 0.58rem;
+    white-space: nowrap;
+    text-align: center;
+    max-width: 142px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.lokasi-item-address {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 8px;
+    margin: 0.78rem 0 0.72rem;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    color: #475569;
+    overflow-wrap: break-word;
+}
+
+.lokasi-item-address i {
+    color: #8b7cff;
+    margin-top: 3px;
+}
+
+.lokasi-item-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 0.78rem;
+}
+
+.lokasi-item-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    border-radius: 10px;
+    background: #f8fafc;
+    border: 1px solid #edf2f7;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.78rem;
+    color: #64748b;
+}
+
+.lokasi-item-meta i {
+    color: #14b8a6;
+}
+
+.lokasi-item-meta strong {
+    min-width: 0;
+    color: #334155;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lokasi-item-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.lokasi-mini-btn {
+    border-radius: 999px;
+    text-decoration: none;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0.56rem 0.72rem;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.lokasi-mini-btn-primary {
+    color: #fff;
+    background: linear-gradient(135deg, var(--sinemu-primary) 0%, var(--sinemu-primary-mid) 100%);
+}
+
+.lokasi-mini-btn-primary:hover {
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.lokasi-mini-btn-secondary {
+    color: #0f766e;
+    background: #fff;
+    border-color: #99f6e4;
+}
+
+.lokasi-mini-btn-secondary:hover {
+    color: #0f766e;
+    background: #f0fdfa;
+    border-color: #5eead4;
+    transform: translateY(-1px);
+}
+
+.lokasi-empty-state {
+    flex: 1 0 100%;
+    min-height: 210px;
+    border: 1px solid rgba(217, 208, 198, 0.85);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    display: grid;
+    place-items: center;
+    padding: clamp(1.25rem, 4vw, 2rem);
+    text-align: center;
+    cursor: default;
+}
+
+.lokasi-empty-content {
+    display: grid;
+    justify-items: center;
+    gap: 0.85rem;
+    max-width: 440px;
+}
+
+.lokasi-empty-illustration {
+    position: relative;
+    width: 132px;
+    height: 98px;
+}
+
+.lokasi-empty-map {
+    position: absolute;
+    left: 4px;
+    bottom: 8px;
+    width: 94px;
+    height: 66px;
+    border-radius: 12px;
+    background:
+        linear-gradient(135deg, transparent 47%, rgba(20, 184, 166, 0.28) 48%, rgba(20, 184, 166, 0.28) 52%, transparent 53%),
+        linear-gradient(90deg, #eef2ff 0 33%, #ffffff 33% 66%, #ecfeff 66% 100%);
+    border: 1px solid #dbe3ff;
+    box-shadow: 0 14px 24px rgba(15, 23, 42, 0.08);
+}
+
+.lokasi-empty-map::before,
+.lokasi-empty-map::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: #dbe3ff;
+}
+
+.lokasi-empty-map::before {
+    left: 33%;
+}
+
+.lokasi-empty-map::after {
+    right: 33%;
+}
+
+.lokasi-empty-pin {
+    position: absolute;
+    right: 24px;
+    top: 2px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50% 50% 50% 8px;
+    background: linear-gradient(135deg, var(--sinemu-primary) 0%, var(--sinemu-primary-mid) 100%);
+    transform: rotate(-45deg);
+    box-shadow: 0 12px 18px rgba(90, 63, 246, 0.2);
+}
+
+.lokasi-empty-pin::before {
+    content: "?";
+    position: absolute;
+    inset: 9px;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--sinemu-primary);
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    font-weight: 800;
+    transform: rotate(45deg);
+}
+
+.lokasi-empty-text {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+@media (max-width: 575.98px) {
+    .lokasi-list {
+        min-height: 244px;
+    }
+
+    .lokasi-item {
+        flex-basis: calc(100vw - 42px);
+        min-height: 232px;
+    }
+
+    .lokasi-item-top {
+        align-items: flex-start;
+    }
+
+    .lokasi-item-meta {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 768px) {
+    .lokasi-map-frame {
+        min-height: 430px;
+        height: 430px;
+    }
+
+    .lokasi-item-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1200px) {
+    .lokasi-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 0.54fr);
+    }
+
+    .lokasi-info-panel {
+        min-height: 469px;
+    }
+
+    .lokasi-item {
+        flex-basis: min(31vw, 420px);
+    }
+}
+
+@media (min-width: 1480px) {
+    .lokasi-item {
+        flex-basis: min(27vw, 410px);
+    }
+}

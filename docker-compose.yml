@@ -9,12 +9,13 @@ services:
       - .env
     depends_on:
       - db
+    volumes:
+      - storage_data:/var/www/html/storage/app/public  # ← TAMBAHKAN INI
     networks:
       - app-network
-
   db:
     image: mysql:8.0
-    container_name: laravel_db
+    container_name: sinemu_db
     restart: always
     environment:
       MYSQL_DATABASE: ${DB_DATABASE}
@@ -28,6 +29,7 @@ services:
 
 volumes:
   db_data:
+  storage_data:  # ← TAMBAHKAN INI
 
 networks:
   app-network:
