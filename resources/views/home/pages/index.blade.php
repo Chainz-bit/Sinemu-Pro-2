@@ -12,23 +12,30 @@
         {{-- Navbar Start --}}
         {{-- ========================================= --}}
         <nav class="navbar navbar-expand-lg floating-nav fixed-nav px-3 px-lg-4" id="mainNavBar">
-            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold order-1" href="{{ route('home') }}" data-home-link>
-                <img src="{{ asset('img/logo.png') }}" alt="Sinemu" class="brand-logo" width="160" height="50" fetchpriority="high">
+            <a class="navbar-brand d-flex align-items-center gap-2 fw-bold order-1" href="{{ route('home') }}"
+                data-home-link>
+                <img src="{{ asset('img/logo.png') }}" alt="Sinemu" class="brand-logo" width="160" height="50"
+                    fetchpriority="high">
             </a>
-            <button class="navbar-toggler border-0 shadow-none order-2 ms-auto d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0 shadow-none order-2 ms-auto d-lg-none" type="button"
+                data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false"
+                aria-label="Toggle navigation">
                 <iconify-icon icon="mdi:menu" aria-hidden="true"></iconify-icon>
             </button>
 
             <div class="collapse navbar-collapse order-4 order-lg-2" id="mainNav">
                 @auth('web')
                     <div class="dropdown profile-dropdown nav-profile order-1 order-lg-2">
-                        <button class="user-chip profile-chip profile-toggle d-none d-lg-inline-flex" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="user-chip profile-chip profile-toggle d-none d-lg-inline-flex" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="profile-text">
                                 <div class="fw-semibold small">{{ $userName ?? 'Pengguna' }}</div>
                                 <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
                             </div>
                             <span class="avatar avatar-img">
-                                <img src="{{ $userAvatar ?? asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ asset('img/profil.jpg') }}';">
+                                <img src="{{ $userAvatar ?? asset('img/profil.jpg') }}"
+                                    alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async"
+                                    onerror="this.onerror=null;this.src='{{ asset('img/profil.jpg') }}';">
                             </span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end profile-menu">
@@ -37,7 +44,9 @@
                                     Dashboard
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
@@ -48,20 +57,17 @@
                             </li>
                         </ul>
 
-                        <button
-                            class="user-chip profile-chip profile-toggle-mobile d-lg-none w-100"
-                            type="button"
-                            data-bs-toggle="collapse"
-                            data-bs-target="#mobileProfileSubmenu"
-                            aria-expanded="false"
-                            aria-controls="mobileProfileSubmenu"
-                        >
+                        <button class="user-chip profile-chip profile-toggle-mobile d-lg-none w-100" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#mobileProfileSubmenu" aria-expanded="false"
+                            aria-controls="mobileProfileSubmenu">
                             <div class="profile-text">
                                 <div class="fw-semibold small">{{ $userName ?? 'Pengguna' }}</div>
                                 <div class="text-muted xsmall">{{ $userLocation ?? 'Lokasi Anda' }}</div>
                             </div>
                             <span class="avatar avatar-img">
-                                <img src="{{ $userAvatar ?? asset('img/profil.jpg') }}" alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='{{ asset('img/profil.jpg') }}';">
+                                <img src="{{ $userAvatar ?? asset('img/profil.jpg') }}"
+                                    alt="Profil {{ $userName ?? 'Pengguna' }}" loading="lazy" decoding="async"
+                                    onerror="this.onerror=null;this.src='{{ asset('img/profil.jpg') }}';">
                             </span>
                         </button>
                         <div id="mobileProfileSubmenu" class="collapse profile-submenu-mobile d-lg-none">
@@ -78,7 +84,8 @@
                     </div>
                 @else
                     <div class="nav-profile nav-guest order-1 order-lg-2">
-                        <button class="btn btn-sinemu btn-sinemu-primary btn-sm px-3 py-2" type="button" data-bs-toggle="modal" data-bs-target="#loginPortalModal">
+                        <button class="btn btn-sinemu btn-sinemu-primary btn-sm px-3 py-2" type="button" data-bs-toggle="modal"
+                            data-bs-target="#loginPortalModal">
                             Masuk
                         </button>
                     </div>
@@ -99,13 +106,16 @@
         {{-- Login Portal Modal Start --}}
         {{-- ========================================= --}}
         @guest('web')
-            <div class="modal fade login-portal-modal" id="loginPortalModal" tabindex="-1" aria-labelledby="loginPortalModalLabel" aria-hidden="true">
+            <div class="modal fade login-portal-modal" id="loginPortalModal" tabindex="-1"
+                aria-labelledby="loginPortalModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
-                        <button type="button" class="btn-close login-portal-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close login-portal-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                         <div class="modal-body p-0">
                             <div class="login-portal-head text-center">
-                                <img src="{{ asset('img/logo.png') }}" alt="Sinemu" class="login-portal-logo" loading="lazy" decoding="async">
+                                <img src="{{ asset('img/logo.png') }}" alt="Sinemu" class="login-portal-logo" loading="lazy"
+                                    decoding="async">
                                 <h2 id="loginPortalModalLabel" class="login-portal-title">Masuk ke SiNemu</h2>
                                 <p class="login-portal-subtitle mb-0">Pilih peran Anda untuk melanjutkan akses portal.</p>
                             </div>
@@ -119,7 +129,7 @@
                                 <i class="fa-solid fa-chevron-right login-portal-arrow"></i>
                             </a>
 
-                            <a href="{{ manager_route('login') }}" class="login-portal-option">
+                            <a href="{{ route('login') }}" class="login-portal-option">
                                 <span class="login-portal-option-icon"><i class="fa-regular fa-id-badge"></i></span>
                                 <span class="login-portal-option-text">
                                     <strong>{{ $managerRoleLabel }}</strong>
@@ -158,14 +168,18 @@
 
         <section id="hero" class="section-space hero-modern-section">
             <div class="hero-modern text-center" data-animate="1">
-                <h1 class="hero-modern-title mb-3">Kehilangan atau Menemukan <span>Barang</span> di <span>Indramayu?</span></h1>
-                <p class="hero-modern-subtitle mb-4">SiNemu bantu temukan barang berhargamu. Lapor dengan mudah, cari dengan cepat, dan klaim dengan aman.</p>
+                <h1 class="hero-modern-title mb-3">Kehilangan atau Menemukan <span>Barang</span> di <span>Indramayu?</span>
+                </h1>
+                <p class="hero-modern-subtitle mb-4">SiNemu bantu temukan barang berhargamu. Lapor dengan mudah, cari dengan
+                    cepat, dan klaim dengan aman.</p>
                 <div class="hero-modern-actions">
                     <a href="#hilang-temuan" class="btn btn-sinemu btn-sinemu-primary">Cari Barang Sekarang</a>
                     @auth('web')
-                        <a href="{{ route('user.lost-reports.create') }}" class="btn btn-sinemu btn-sinemu-outline">Lapor Kehilangan</a>
+                        <a href="{{ route('user.lost-reports.create') }}" class="btn btn-sinemu btn-sinemu-outline">Lapor
+                            Kehilangan</a>
                     @else
-                        <button type="button" class="btn btn-sinemu btn-sinemu-outline" data-bs-toggle="modal" data-bs-target="#loginPortalModal">Lapor Kehilangan</button>
+                        <button type="button" class="btn btn-sinemu btn-sinemu-outline" data-bs-toggle="modal"
+                            data-bs-target="#loginPortalModal">Lapor Kehilangan</button>
                     @endauth
                 </div>
             </div>
@@ -174,11 +188,13 @@
                 <div class="filter-header">
                     <div class="filter-head-left">
                         <span class="filter-icon">
-                            <img src="{{ asset('img/icon filter.png') }}" alt="Filter" class="filter-icon-img" loading="lazy" decoding="async">
+                            <img src="{{ asset('img/icon filter.png') }}" alt="Filter" class="filter-icon-img"
+                                loading="lazy" decoding="async">
                         </span>
                         <div>
                             <p class="filter-title mb-2">Filter Pencarian Cepat</p>
-                            <p class="filter-subtitle mb-4">Saring hasil pencarian berdasarkan kategori, waktu, dan lokasi secara spesifik.</p>
+                            <p class="filter-subtitle mb-4">Saring hasil pencarian berdasarkan kategori, waktu, dan lokasi
+                                secara spesifik.</p>
                         </div>
                     </div>
                     <button class="chevron-btn" type="button"><i class="fa-solid fa-chevron-up"></i></button>
@@ -189,7 +205,8 @@
                         <label for="keywordInput" class="form-label ps-2 py-2">KATA KUNCI</label>
                         <div class="input-with-icon">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input id="keywordInput" type="text" class="form-control" placeholder="Dompet, Kunci, HP..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <input id="keywordInput" type="text" class="form-control" placeholder="Dompet, Kunci, HP..."
+                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                         </div>
                     </div>
                     <div class="col-md-6 col-xl">
@@ -204,7 +221,8 @@
                         <label for="dateInput" class="form-label ps-2 py-2">WAKTU PENEMUAN</label>
                         <div class="input-with-icon input-with-icon-date">
                             <i class="fa-regular fa-calendar"></i>
-                            <input id="dateInput" type="text" class="form-control modern-date-input" placeholder="dd/mm/yyyy" inputmode="numeric" autocomplete="off">
+                            <input id="dateInput" type="text" class="form-control modern-date-input"
+                                placeholder="dd/mm/yyyy" inputmode="numeric" autocomplete="off">
                         </div>
                     </div>
                     <div class="col-md-6 col-xl">
@@ -216,7 +234,8 @@
                         </select>
                     </div>
                     <div class="col-md-6 col-xl-2 d-flex">
-                        <button id="searchButton" class="btn btn-sinemu btn-sinemu-primary w-100 filter-search-btn" type="submit">
+                        <button id="searchButton" class="btn btn-sinemu btn-sinemu-primary w-100 filter-search-btn"
+                            type="submit">
                             <i class="fa-solid fa-magnifying-glass me-2"></i>Cari
                         </button>
                     </div>
@@ -239,10 +258,12 @@
                         <h2 class="item-block-title mb-0 fs-5">Daftar Barang Hilang Terkini</h2>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
+                        <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList"
+                            data-carousel-dir="prev" aria-label="Sebelumnya">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
-                        <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList" data-carousel-dir="next" aria-label="Berikutnya">
+                        <button type="button" class="carousel-nav-btn" data-carousel-target="lostItemsList"
+                            data-carousel-dir="next" aria-label="Berikutnya">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
                     </div>
@@ -250,21 +271,23 @@
 
                 <div class="carousel-track" id="lostItemsList">
                     @forelse ($lostItems as $item)
-                        <article class="carousel-item item-card-v2 filter-item"
-                            data-list="lost"
-                            data-category="{{ strtoupper($item['category']) }}"
-                            data-name="{{ strtolower($item['name']) }}"
-                            data-region="{{ strtolower($item['location']) }}"
-                            data-date="{{ $item['date'] }}">
+                        <article class="carousel-item item-card-v2 filter-item" data-list="lost"
+                            data-category="{{ strtoupper($item['category']) }}" data-name="{{ strtolower($item['name']) }}"
+                            data-region="{{ strtolower($item['location']) }}" data-date="{{ $item['date'] }}">
                             <div class="item-media">
-                                <img src="{{ $item['image_url'] ?? asset('img/login-image.png') }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="600" height="360" onerror="this.onerror=null;this.src='{{ asset('img/login-image.png') }}';">
-                                <span class="item-status {{ $item['status_class'] ?? 'item-status-danger' }}">{{ $item['status_label'] ?? 'Belum Ditemukan' }}</span>
+                                <img src="{{ $item['image_url'] ?? asset('img/login-image.png') }}" alt="{{ $item['name'] }}"
+                                    loading="lazy" decoding="async" width="600" height="360"
+                                    onerror="this.onerror=null;this.src='{{ asset('img/login-image.png') }}';">
+                                <span
+                                    class="item-status {{ $item['status_class'] ?? 'item-status-danger' }}">{{ $item['status_label'] ?? 'Belum Ditemukan' }}</span>
                             </div>
                             <div class="item-body">
                                 <h3 class="item-name">{{ $item['name'] }}</h3>
-                                <p class="item-category"><i class="fa-solid fa-tag"></i> {{ ucwords(strtolower($item['category'])) }}</p>
+                                <p class="item-category"><i class="fa-solid fa-tag"></i>
+                                    {{ ucwords(strtolower($item['category'])) }}</p>
                                 <p class="item-meta"><i class="fa-solid fa-location-dot"></i> {{ $item['location'] }}</p>
-                                <p class="item-meta"><i class="fa-regular fa-clock"></i> {{ $item['date_label'] ?? $item['date'] }}</p>
+                                <p class="item-meta"><i class="fa-regular fa-clock"></i>
+                                    {{ $item['date_label'] ?? $item['date'] }}</p>
                                 <a href="{{ $item['detail_url'] }}" class="btn item-action-btn">Lihat Detail Laporan</a>
                             </div>
                         </article>
@@ -275,7 +298,8 @@
                     <div class="empty-state-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
                     <div class="empty-state-body">
                         <h3 class="empty-state-title">Belum ada barang hilang sesuai filter</h3>
-                        <p class="empty-state-text">Coba ubah kata kunci, kategori, waktu, atau wilayah pencarian untuk melihat laporan lainnya.</p>
+                        <p class="empty-state-text">Coba ubah kata kunci, kategori, waktu, atau wilayah pencarian untuk
+                            melihat laporan lainnya.</p>
                     </div>
                 </div>
             </div>
@@ -287,10 +311,12 @@
                         <h2 class="item-block-title mb-0 fs-5">Barang Temuan Terbaru</h2>
                     </div>
                     <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="prev" aria-label="Sebelumnya">
+                        <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList"
+                            data-carousel-dir="prev" aria-label="Sebelumnya">
                             <i class="fa-solid fa-chevron-left"></i>
                         </button>
-                        <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList" data-carousel-dir="next" aria-label="Berikutnya">
+                        <button type="button" class="carousel-nav-btn" data-carousel-target="foundItemsList"
+                            data-carousel-dir="next" aria-label="Berikutnya">
                             <i class="fa-solid fa-chevron-right"></i>
                         </button>
                     </div>
@@ -308,39 +334,41 @@
                             $isClaimable = (bool) ($item['is_claimable'] ?? true);
                             $claimButtonLabel = $isClaimable ? 'Klaim Barang Ini' : 'Tidak Tersedia untuk Klaim';
                         @endphp
-                        <article class="carousel-item item-card-v2 filter-item"
-                            data-list="found"
-                            data-category="{{ strtoupper($item['category']) }}"
-                            data-name="{{ strtolower($item['name']) }}"
-                            data-region="{{ strtolower($item['location']) }}"
-                            data-date="{{ $item['date'] }}">
+                        <article class="carousel-item item-card-v2 filter-item" data-list="found"
+                            data-category="{{ strtoupper($item['category']) }}" data-name="{{ strtolower($item['name']) }}"
+                            data-region="{{ strtolower($item['location']) }}" data-date="{{ $item['date'] }}">
                             <div class="item-media">
-                                <img src="{{ $item['image_url'] ?? asset('img/login-image.png') }}" alt="{{ $item['name'] }}" loading="lazy" decoding="async" width="600" height="360" onerror="this.onerror=null;this.src='{{ asset('img/login-image.png') }}';">
-                                <span class="item-status {{ $statusClass }}">{{ $item['claim_status_label'] ?? 'Tersedia untuk Diklaim' }}</span>
+                                <img src="{{ $item['image_url'] ?? asset('img/login-image.png') }}" alt="{{ $item['name'] }}"
+                                    loading="lazy" decoding="async" width="600" height="360"
+                                    onerror="this.onerror=null;this.src='{{ asset('img/login-image.png') }}';">
+                                <span
+                                    class="item-status {{ $statusClass }}">{{ $item['claim_status_label'] ?? 'Tersedia untuk Diklaim' }}</span>
                             </div>
                             <div class="item-body">
                                 <h3 class="item-name">{{ $item['name'] }}</h3>
                                 <p class="item-meta"><i class="fa-solid fa-location-dot"></i> {{ $item['location'] }}</p>
-                                <p class="item-meta"><i class="fa-regular fa-clock"></i> {{ $item['date_label'] ?? $item['date'] }}</p>
+                                <p class="item-meta"><i class="fa-regular fa-clock"></i>
+                                    {{ $item['date_label'] ?? $item['date'] }}</p>
                                 <a href="{{ $item['detail_url'] }}" class="item-detail-link">Lihat Detail Laporan</a>
                                 @auth('web')
                                     @if($isClaimable)
-                                        <a
-                                            class="btn item-action-btn"
-                                            href="{{ route('user.claims.create', ['barang_id' => $item['id']]) }}"
-                                        >
+                                        <a class="btn item-action-btn"
+                                            href="{{ route('user.claims.create', ['barang_id' => $item['id']]) }}">
                                             {{ $claimButtonLabel }}
                                         </a>
                                     @else
-                                        <button class="btn item-action-btn item-action-btn-disabled" type="button" disabled aria-disabled="true">
+                                        <button class="btn item-action-btn item-action-btn-disabled" type="button" disabled
+                                            aria-disabled="true">
                                             {{ $claimButtonLabel }}
                                         </button>
                                     @endif
                                 @else
                                     @if($isClaimable)
-                                        <button class="btn item-action-btn" type="button" data-bs-toggle="modal" data-bs-target="#loginPortalModal">{{ $claimButtonLabel }}</button>
+                                        <button class="btn item-action-btn" type="button" data-bs-toggle="modal"
+                                            data-bs-target="#loginPortalModal">{{ $claimButtonLabel }}</button>
                                     @else
-                                        <button class="btn item-action-btn item-action-btn-disabled" type="button" disabled aria-disabled="true">
+                                        <button class="btn item-action-btn item-action-btn-disabled" type="button" disabled
+                                            aria-disabled="true">
                                             {{ $claimButtonLabel }}
                                         </button>
                                     @endif
@@ -354,7 +382,8 @@
                     <div class="empty-state-icon"><i class="fa-regular fa-map"></i></div>
                     <div class="empty-state-body">
                         <h3 class="empty-state-title">Belum ada barang temuan sesuai filter</h3>
-                        <p class="empty-state-text">Perluas wilayah atau kosongkan filter untuk melihat semua barang temuan terbaru.</p>
+                        <p class="empty-state-text">Perluas wilayah atau kosongkan filter untuk melihat semua barang temuan
+                            terbaru.</p>
                     </div>
                 </div>
             </div>
@@ -368,7 +397,8 @@
             <div class="surface-card claim-card p-4 p-lg-5">
                 <div class="text-center mb-4">
                     <h2 class="section-title mb-0">
-                        <img src="{{ asset('img/Icon-verifikaasi.png') }}" alt="Verifikasi" class="klaim-title-icon" loading="lazy" decoding="async">
+                        <img src="{{ asset('img/Icon-verifikaasi.png') }}" alt="Verifikasi" class="klaim-title-icon"
+                            loading="lazy" decoding="async">
                         Prosedur Klaim Barang
                     </h2>
                 </div>
@@ -378,7 +408,8 @@
                             <div class="step-number">1</div>
                             <div>
                                 <h3 class="h5 fw-bold mb-2">Temukan &amp; Identifikasi</h3>
-                                <p class="text-muted fs-6 mb-0">Cari barang Anda di daftar temuan dan catat kode unik barang untuk proses verifikasi lebih cepat oleh sistem kami.</p>
+                                <p class="text-muted fs-6 mb-0">Cari barang Anda di daftar temuan dan catat kode unik barang
+                                    untuk proses verifikasi lebih cepat oleh sistem kami.</p>
                             </div>
                         </div>
                     </div>
@@ -387,7 +418,8 @@
                             <div class="step-number">2</div>
                             <div>
                                 <h3 class="h5 fw-bold mb-2">Unggah Bukti Sah</h3>
-                                <p class="text-muted fs-6 mb-0">Siapkan foto barang saat masih dimiliki, kuitansi pembelian, atau jelaskan ciri fisik mendetail yang tidak terlihat di foto.</p>
+                                <p class="text-muted fs-6 mb-0">Siapkan foto barang saat masih dimiliki, kuitansi pembelian,
+                                    atau jelaskan ciri fisik mendetail yang tidak terlihat di foto.</p>
                             </div>
                         </div>
                     </div>
@@ -396,7 +428,8 @@
                             <div class="step-number">3</div>
                             <div>
                                 <h3 class="h5 fw-bold mb-2">Verifikasi {{ $managerRoleLabel }}</h3>
-                                <p class="text-muted fs-6 mb-0">Tim {{ $managerRoleLabelLower }} kami akan memproses klaim Anda maksimal 24 jam untuk memastikan keabsahan kepemilikan barang.</p>
+                                <p class="text-muted fs-6 mb-0">Tim {{ $managerRoleLabelLower }} kami akan memproses klaim
+                                    Anda maksimal 24 jam untuk memastikan keabsahan kepemilikan barang.</p>
                             </div>
                         </div>
                     </div>
@@ -405,13 +438,15 @@
                             <div class="step-number">4</div>
                             <div>
                                 <h3 class="h5 fw-bold mb-2">Pengambilan Fisik</h3>
-                                <p class="text-muted fs-6 mb-0">Datang ke lokasi kantor kecamatan yang telah ditentukan dengan membawa kartu identitas asli (KTP/SIM) sebagai bukti akhir.</p>
+                                <p class="text-muted fs-6 mb-0">Datang ke lokasi kantor kecamatan yang telah ditentukan
+                                    dengan membawa kartu identitas asli (KTP/SIM) sebagai bukti akhir.</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="claim-outcome-note mt-4 text-center" role="note" aria-label="Catatan hasil verifikasi">
-                    Klaim dapat <strong>disetujui</strong> atau <strong>ditolak</strong> jika bukti kepemilikan belum memadai.
+                    Klaim dapat <strong>disetujui</strong> atau <strong>ditolak</strong> jika bukti kepemilikan belum
+                    memadai.
                 </div>
                 <div class="claim-help mt-4 text-center">
                     <a href="https://wa.me/6285174386642" target="_blank" rel="noopener noreferrer" class="claim-help-link">
@@ -434,7 +469,8 @@
 
                 <div class="lokasi-layout">
                     <div class="lokasi-map-panel">
-                        <div id="pickupMap" class="lokasi-map-frame" aria-label="Peta lokasi pengambilan Sinemu Indramayu"></div>
+                        <div id="pickupMap" class="lokasi-map-frame" aria-label="Peta lokasi pengambilan Sinemu Indramayu">
+                        </div>
                         <div class="lokasi-map-footer">
                             <span>Peta statis. Gunakan tombol Maps atau Rute untuk navigasi.</span>
                             <span>&copy; Sinemu Indramayu</span>
@@ -443,12 +479,14 @@
 
                     <aside class="lokasi-info-panel">
                         <h3 class="lokasi-title mb-2">Support & Lokasi Aktif</h3>
-                        <p class="lokasi-subtitle mb-3">Pilih lokasi pengambilan terdekat, lalu buka peta atau dapatkan rute langsung.</p>
+                        <p class="lokasi-subtitle mb-3">Pilih lokasi pengambilan terdekat, lalu buka peta atau dapatkan rute
+                            langsung.</p>
 
                         <div class="lokasi-contact-chip mb-3">
                             <span class="lokasi-chip-icon"><i class="fa-solid fa-lock"></i></span>
                             <div>
-                                <small class="lokasi-manager-label" id="selectedLocationManager">{{ $managerRoleLabel }}</small>
+                                <small class="lokasi-manager-label"
+                                    id="selectedLocationManager">{{ $managerRoleLabel }}</small>
                                 <p class="mb-0 fw-bold" id="selectedLocationName">Sinemu Center Indramayu</p>
                                 <small id="selectedLocationAddress">Jl. Jenderal Sudirman No. 88, Indramayu</small>
                             </div>
@@ -460,21 +498,20 @@
                         </div>
 
                         <div class="lokasi-actions mb-3">
-                            <a id="selectedOpenMaps" class="lokasi-action-btn lokasi-action-primary" href="#" target="_blank" rel="noopener noreferrer">
+                            <a id="selectedOpenMaps" class="lokasi-action-btn lokasi-action-primary" href="#"
+                                target="_blank" rel="noopener noreferrer">
                                 <i class="fa-regular fa-map me-2"></i>Buka di Maps
                             </a>
-                            <button id="selectedGetRoute" type="button" class="lokasi-action-btn lokasi-action-secondary mt-2">
+                            <button id="selectedGetRoute" type="button"
+                                class="lokasi-action-btn lokasi-action-secondary mt-2">
                                 <i class="fa-solid fa-route me-2"></i>Dapatkan Route
                             </button>
                             <button id="locateMeButton" type="button" class="lokasi-action-btn lokasi-action-light mt-2">
                                 <i class="fa-solid fa-location-crosshairs me-2"></i>Lokasi Saya
                             </button>
-                            <a
-                                class="lokasi-action-btn lokasi-action-support mt-2"
+                            <a class="lokasi-action-btn lokasi-action-support mt-2"
                                 href="https://wa.me/6285174386642?text=Halo%20Sinemu%20Support%20Indramayu%2C%20saya%20butuh%20bantuan%20proses%20klaim."
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
+                                target="_blank" rel="noopener noreferrer">
                                 <i class="fa-brands fa-whatsapp me-2"></i>Hubungi Support Center (0851-7438-6642)
                             </a>
                         </div>
@@ -485,10 +522,12 @@
                     <div class="lokasi-list-head">
                         <h3 class="lokasi-list-title mb-0">Daftar Titik Pengambilan</h3>
                         <div class="lokasi-carousel-controls" aria-label="Navigasi carousel lokasi">
-                            <button id="pickupCarouselPrev" type="button" class="lokasi-carousel-btn" aria-label="Geser ke kiri">
+                            <button id="pickupCarouselPrev" type="button" class="lokasi-carousel-btn"
+                                aria-label="Geser ke kiri">
                                 <i class="fa-solid fa-chevron-left"></i>
                             </button>
-                            <button id="pickupCarouselNext" type="button" class="lokasi-carousel-btn" aria-label="Geser ke kanan">
+                            <button id="pickupCarouselNext" type="button" class="lokasi-carousel-btn"
+                                aria-label="Geser ke kanan">
                                 <i class="fa-solid fa-chevron-right"></i>
                             </button>
                         </div>
@@ -518,7 +557,8 @@
                                     <div class="contact-info-body">
                                         <p class="contact-info-label">EMAIL</p>
                                         <p class="contact-info-text mb-0">
-                                            <a href="mailto:support@sinemu.id" class="contact-info-link">support@sinemu.id</a>
+                                            <a href="mailto:support@sinemu.id"
+                                                class="contact-info-link">support@sinemu.id</a>
                                         </p>
                                         <p class="contact-info-note mb-0">Untuk bantuan klaim dan verifikasi data.</p>
                                     </div>
@@ -538,13 +578,17 @@
                             </div>
                             <div class="col-12 col-sm-6">
                                 <article class="contact-info-card h-100">
-                                    <span class="contact-info-icon bg-location"><i class="fa-solid fa-location-dot"></i></span>
+                                    <span class="contact-info-icon bg-location"><i
+                                            class="fa-solid fa-location-dot"></i></span>
                                     <div class="contact-info-body">
                                         <p class="contact-info-label">ALAMAT KANTOR</p>
                                         <p class="contact-info-text mb-0">Jl. Jenderal Sudirman No. 88, Indramayu</p>
-                                        <p class="contact-info-note mb-0">Kunjungan terkait barang hanya sesuai arahan {{ $managerRoleLabelLower }}.</p>
+                                        <p class="contact-info-note mb-0">Kunjungan terkait barang hanya sesuai arahan
+                                            {{ $managerRoleLabelLower }}.</p>
                                         <p class="contact-info-note mb-0">
-                                            <a href="https://www.google.com/maps/search/?api=1&amp;query=Jl.%20Jenderal%20Sudirman%20No.%2088%2C%20Indramayu" target="_blank" rel="noopener noreferrer" class="contact-info-link">Buka di Maps</a>
+                                            <a href="https://www.google.com/maps/search/?api=1&amp;query=Jl.%20Jenderal%20Sudirman%20No.%2088%2C%20Indramayu"
+                                                target="_blank" rel="noopener noreferrer" class="contact-info-link">Buka di
+                                                Maps</a>
                                         </p>
                                     </div>
                                 </article>
@@ -565,14 +609,18 @@
                                         <span class="contact-support-icon"><i class="fa-solid fa-headset"></i></span>
                                         <div>
                                             <h3 class="contact-support-title mb-1">Butuh bantuan cepat?</h3>
-                                            <p class="contact-support-text mb-0">Sertakan nama barang, lokasi, dan nomor klaim jika ada agar tim Sinemu bisa mengecek lebih cepat.</p>
+                                            <p class="contact-support-text mb-0">Sertakan nama barang, lokasi, dan nomor
+                                                klaim jika ada agar tim Sinemu bisa mengecek lebih cepat.</p>
                                         </div>
                                     </div>
                                     <div class="contact-support-actions">
-                                        <a href="https://wa.me/6285174386642?text=Halo%20Sinemu%20Support%2C%20saya%20butuh%20bantuan." target="_blank" rel="noopener noreferrer" class="contact-support-btn contact-support-primary">
+                                        <a href="https://wa.me/6285174386642?text=Halo%20Sinemu%20Support%2C%20saya%20butuh%20bantuan."
+                                            target="_blank" rel="noopener noreferrer"
+                                            class="contact-support-btn contact-support-primary">
                                             <i class="fa-brands fa-whatsapp"></i>WhatsApp
                                         </a>
-                                        <a href="mailto:support@sinemu.id" class="contact-support-btn contact-support-secondary">
+                                        <a href="mailto:support@sinemu.id"
+                                            class="contact-support-btn contact-support-secondary">
                                             <i class="fa-regular fa-envelope"></i>Email
                                         </a>
                                     </div>
@@ -582,34 +630,42 @@
                     </div>
 
                     <div class="col-lg-5">
-                        <form id="contactForm" class="contact-form-card h-100" action="https://wa.me/6285174386642" target="_blank" novalidate>
+                        <form id="contactForm" class="contact-form-card h-100" action="https://wa.me/6285174386642"
+                            target="_blank" novalidate>
                             <div class="contact-form-head">
                                 <h3 class="contact-form-title mb-1">Kirim Pesan</h3>
-                                <p class="contact-form-subtitle mb-0">Isi detail singkat agar tim support dapat membantu lebih tepat.</p>
+                                <p class="contact-form-subtitle mb-0">Isi detail singkat agar tim support dapat membantu
+                                    lebih tepat.</p>
                             </div>
                             <div id="contactFormFeedback" class="contact-form-feedback" aria-live="polite"></div>
                             <div class="mb-3">
                                 <label for="contactName" class="form-label">Nama Lengkap</label>
-                                <input id="contactName" type="text" class="form-control" placeholder="Nama lengkap" maxlength="100" required>
+                                <input id="contactName" type="text" class="form-control" placeholder="Nama lengkap"
+                                    maxlength="100" required>
                             </div>
                             <div class="mb-3">
                                 <label for="contactEmail" class="form-label">Alamat Email</label>
-                                <input id="contactEmail" type="email" class="form-control" placeholder="Email aktif" maxlength="255">
+                                <input id="contactEmail" type="email" class="form-control" placeholder="Email aktif"
+                                    maxlength="255">
                             </div>
                             <div class="mb-3">
                                 <label for="contactPhone" class="form-label">Telepon</label>
-                                <input id="contactPhone" type="text" class="form-control" placeholder="Contoh: 085174386642" inputmode="tel">
+                                <input id="contactPhone" type="text" class="form-control" placeholder="Contoh: 085174386642"
+                                    inputmode="tel">
                             </div>
                             <div class="mb-3">
                                 <label for="contactMessage" class="form-label">Pesan</label>
-                                <textarea id="contactMessage" class="form-control contact-textarea" rows="5" placeholder="Tuliskan pesan Anda" maxlength="1000" required></textarea>
+                                <textarea id="contactMessage" class="form-control contact-textarea" rows="5"
+                                    placeholder="Tuliskan pesan Anda" maxlength="1000" required></textarea>
                             </div>
-                            <p class="contact-form-subtitle mb-3">Pesan akan dibuka di WhatsApp agar Anda dapat meninjau sebelum mengirim.</p>
+                            <p class="contact-form-subtitle mb-3">Pesan akan dibuka di WhatsApp agar Anda dapat meninjau
+                                sebelum mengirim.</p>
                             <button type="submit" class="btn btn-sinemu btn-sinemu-primary w-100 contact-submit-btn">
                                 <i class="fa-brands fa-whatsapp me-2"></i>Kirim via WhatsApp
                             </button>
                             <p class="contact-form-subtitle mb-0 mt-3">
-                                <a id="contactWhatsappFallback" href="https://wa.me/6285174386642" target="_blank" rel="noopener noreferrer" class="contact-info-link">Buka WhatsApp langsung</a>
+                                <a id="contactWhatsappFallback" href="https://wa.me/6285174386642" target="_blank"
+                                    rel="noopener noreferrer" class="contact-info-link">Buka WhatsApp langsung</a>
                             </p>
                         </form>
                     </div>
@@ -660,7 +716,8 @@
                                     @endif
                                 </select>
                                 @if($wilayahOptions->isEmpty())
-                                    <div class="form-text">Saat ini belum ada wilayah dengan pengelola aktif. Silakan hubungi Support SiNemu.</div>
+                                    <div class="form-text">Saat ini belum ada wilayah dengan pengelola aktif. Silakan hubungi
+                                        Support SiNemu.</div>
                                 @endif
                             </div>
                             <div class="mb-3">
@@ -677,7 +734,8 @@
                             </div>
                             <div class="mt-3">
                                 <label class="form-label">No. WA Penemu</label>
-                                <input type="text" name="kontak_penemu" class="form-control" placeholder="Contoh: 085174386642" required>
+                                <input type="text" name="kontak_penemu" class="form-control" placeholder="Contoh: 085174386642"
+                                    required>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -691,8 +749,8 @@
         @endauth
 
         <script id="pickupLocationsData" type="application/json">
-            @json($pickupLocations ?? [])
-        </script>
+                @json($pickupLocations ?? [])
+            </script>
         <script>
             window.__SINEMU_ROLE_LABELS = @json([
                 'managerDisplayName' => $managerRoleLabel,
@@ -711,7 +769,8 @@
             <div class="footer-grid">
                 <div class="footer-brand">
                     <h3 class="footer-title mb-3">Sinemu</h3>
-                    <p class="footer-copy mb-4">Sistem Informasi Penemuan &amp; Pengambilan Barang Milik Umum. Berkomitmen membantu masyarakat dengan menjunjung tinggi integritas dan keterbukaan informasi.</p>
+                    <p class="footer-copy mb-4">Sistem Informasi Penemuan &amp; Pengambilan Barang Milik Umum. Berkomitmen
+                        membantu masyarakat dengan menjunjung tinggi integritas dan keterbukaan informasi.</p>
                     <div class="footer-social">
                         <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
                         <a href="#" aria-label="Share"><i class="fa-solid fa-share-nodes"></i></a>
@@ -735,7 +794,8 @@
                     </div>
                     <div>
                         <div class="footer-head">KONTAK</div>
-                        <p class="footer-link footer-contact mb-2">Gedung Teknologi Informasi Lt. 3<br>Jl. Jenderal Sudirman No. 88</p>
+                        <p class="footer-link footer-contact mb-2">Gedung Teknologi Informasi Lt. 3<br>Jl. Jenderal Sudirman
+                            No. 88</p>
                         <p class="footer-link footer-contact mb-0">support@sinemu.id</p>
                     </div>
                 </div>
